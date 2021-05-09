@@ -113,16 +113,6 @@ public class MessagesActivity extends AppCompatActivity {
             }
         });
 
-        adapter2.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(@NonNull Item item, @NonNull View view) {
-                ContactItem contactItem = (ContactItem) item;
-                Intent intent = new Intent(MessagesActivity.this, ChatActivity.class);
-                intent.putExtra("user", contactItem.contact.getLastMessage());
-                startActivity(intent);
-            }
-        });
-
 
         verifyAuth();
         fetchUsers();
