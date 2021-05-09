@@ -2,21 +2,25 @@
     <string name="app_name">ChatFirebase</string>
 
     <!-- User Edit Hints -->
-    <string name="login_hint">Login</string>
-    <string name="email_hint">Email</string>
-    <string name="password_hint">Password</string>
-    <string name="name_hint">Name</string>
-    <string name="confirm_password_hint">Confirm Password</string>
-    <string name="message_hint">Digite aqui…</string>
+    <string name="hint_login">Login</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="hint_message">Digite aqui…</string>
 
     <!-- Login Strings -->
-    <string name="login_title">Login account </string>
+    <string name="title_login">Login account </string>
     <string name="bt_login">Login</string>
     <string name="lost_password">Password</string>
 
+    <string name="error_email">Insira seu Email</string>
+    <string name="error_password">Insira sua Senha</string>
+    <string name="success_login">Logado com sucesso</string>
+
     <!-- Register Strings -->
     <string name="new_register">Register</string>
-    <string name="register_title">Register account</string>
+    <string name="title_register">Register account</string>
     <string name="have_account">I already have an account!</string>
     <string name="bt_photo">Photo</string>
 

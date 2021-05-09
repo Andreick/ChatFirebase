@@ -41,7 +41,7 @@
                 android:paddingStart="0dp"
                 android:background="@drawable/card_fundo_message"
                 android:ems="10"
-                android:hint="@string/message_hint"
+                android:hint="@string/hint_message"
                 android:inputType="textPersonName"
                 android:textColor="@color/corSecundaria"
                 android:textColorHint="@color/corSecundaria"
