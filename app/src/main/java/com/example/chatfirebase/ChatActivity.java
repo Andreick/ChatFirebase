@@ -131,18 +131,13 @@ public class ChatActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
 
-                            Contact contact = new Contact();
-                            contact.setUuid(toId);
-                            contact.setUsername(user.getUsername());
-                            contact.setPhotoUrl(user.getProfileUrl());
-                            contact.setTimestamp(message.getTimestamp());
-                            contact.setLastMessage(message.getText());
+                            ContactChat contactChat = new ContactChat(toId, user.getUsername(), user.getProfileUrl(), message);
 
                             FirebaseFirestore.getInstance().collection("/last-messages")
                                     .document(fromId)
                                     .collection("/contacts")
                                     .document(toId)
-                                    .set(contact);
+                                    .set(contactChat);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -160,18 +155,13 @@ public class ChatActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
 
-                            Contact contact = new Contact();
-                            contact.setUuid(toId);
-                            contact.setUsername(me.getUsername());
-                            contact.setPhotoUrl(me.getProfileUrl());
-                            contact.setTimestamp(message.getTimestamp());
-                            contact.setLastMessage(message.getText());
+                            ContactChat contactChat = new ContactChat(toId, me.getUsername(), me.getProfileUrl(), message);
 
                             FirebaseFirestore.getInstance().collection("/last-messages")
                                     .document(toId)
                                     .collection("/contacts")
                                     .document(fromId)
-                                    .set(contact);
+                                    .set(contactChat);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {

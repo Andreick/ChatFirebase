@@ -15,9 +15,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -135,9 +133,9 @@ public class MessagesActivity extends AppCompatActivity {
                         if (documentChanges != null){
                             for (DocumentChange doc: documentChanges){
                                 if (doc.getType() == DocumentChange.Type.ADDED){
-                                    Contact contact = doc.getDocument().toObject(Contact.class);
+                                    ContactChat contactChat = doc.getDocument().toObject(ContactChat.class);
 
-                                    adapter2.add(new ContactItem(contact));
+                                    adapter2.add(new ContactItem(contactChat));
                                 }
                             }
                         }
@@ -177,9 +175,9 @@ public class MessagesActivity extends AppCompatActivity {
 
     private class ContactItem extends Item<GroupieViewHolder>{
 
-        private final Contact contact;
+        private final ContactChat contactChat;
 
-        private ContactItem(Contact contact) { this.contact = contact; }
+        private ContactItem(ContactChat contactChat) { this.contactChat = contactChat; }
 
         @Override
         public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
@@ -187,9 +185,9 @@ public class MessagesActivity extends AppCompatActivity {
             TextView message = viewHolder.itemView.findViewById(R.id.txtLastMessage2);
             ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto2);
 
-            username.setText(contact.getUsername());
-            message.setText(contact.getLastMessage());
-            Picasso.get().load(contact.getPhotoUrl()).into(imgPhoto);
+            username.setText(contactChat.getContactName());
+            message.setText(contactChat.getText());
+            Picasso.get().load(contactChat.getProfileUrl()).into(imgPhoto);
         }
 
         @Override
