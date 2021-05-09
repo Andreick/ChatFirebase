@@ -2,40 +2,33 @@ package com.example.chatfirebase;
 
 class Message {
 
+    private String senderId;
     private String text;
     private long timestamp;
-    private String fromId;
-    private String toId;
+
+    public Message() { }
+
+    public Message(String senderId, String text) {
+        this.senderId = senderId;
+        this.text = text;
+        this.timestamp = System.currentTimeMillis();
+    }
+
+    public Message(String senderId, String text, long timestamp) {
+        this.senderId = senderId;
+        this.text = text;
+        this.timestamp = timestamp;
+    }
+
+    public String getSenderId() {
+        return senderId;
+    }
 
     public String getText() {
         return text;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
     public long getTimestamp() {
         return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getFromId() {
-        return fromId;
-    }
-
-    public void setFromId(String fromId) {
-        this.fromId = fromId;
-    }
-
-    public String getToId() {
-        return toId;
-    }
-
-    public void setToId(String toId) {
-        this.toId = toId;
     }
 }

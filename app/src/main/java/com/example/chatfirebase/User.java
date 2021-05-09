@@ -9,15 +9,13 @@ public class User implements Parcelable {
     private String username;
     private String profileUrl;
 
-    public User(){
-    }
+    public User() { }
 
     public User(String uuid, String username, String profileUrl){
         this.uuid = uuid;
         this.username = username;
         this.profileUrl = profileUrl;
     }
-
 
     protected User(Parcel in) {
         uuid = in.readString();

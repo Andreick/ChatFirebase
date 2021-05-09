@@ -120,11 +120,7 @@ public class ChatActivity extends AppCompatActivity {
         final String toId = user.getUuid();
         long timeStamp = System.currentTimeMillis();
 
-        final Message message = new Message();
-        message.setFromId(fromId);
-        message.setToId(toId);
-        message.setTimestamp(timeStamp);
-        message.setText(text);
+        final Message message = new Message(fromId, text);
 
         if (!message.getText().isEmpty()){
             FirebaseFirestore.getInstance().collection("/conversations")
@@ -207,7 +203,7 @@ public class ChatActivity extends AppCompatActivity {
         @Override
         public int getLayout() {
 
-            return message.getFromId().equals(FirebaseAuth.getInstance().getUid())
+            return message.getSenderId().equals(FirebaseAuth.getInstance().getUid())
                     ? R.layout.message_users
                     : R.layout.message_contacts;
         }
