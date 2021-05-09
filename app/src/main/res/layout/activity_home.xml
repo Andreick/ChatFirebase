@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/corPrimaria"
     android:visibility="visible"
-    tools:context=".MessagesActivity">
+    tools:context=".HomeActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"

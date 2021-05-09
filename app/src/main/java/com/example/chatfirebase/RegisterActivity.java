@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,12 +24,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -44,6 +43,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button vButtonPhoto;
     private Uri vSelectData;
     private ImageView vImgPhoto;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +58,14 @@ public class RegisterActivity extends AppCompatActivity {
         vButtonHaveAccout = findViewById(R.id.btHaveAccount);
         vButtonPhoto = findViewById(R.id.btPhoto);
         vImgPhoto = findViewById(R.id.imgPhoto);
+        progressBar = findViewById(R.id.progressBar);
 
 
 
         vButtonHaveAccout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             }
         });
 
@@ -113,7 +114,7 @@ public class RegisterActivity extends AppCompatActivity {
             vEditConfirmPass.setError("Senhas diferentes");
             return;
         }
-
+        progressBar.setVisibility(View.VISIBLE);
 
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, senha)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -183,7 +184,8 @@ public class RegisterActivity extends AppCompatActivity {
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
-                                                Intent intent = new Intent(RegisterActivity.this, MessagesActivity.class);
+                                                progressBar.setVisibility(View.GONE);
+                                                Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
                                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                                 startActivity(intent);
                                             }
