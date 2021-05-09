@@ -40,9 +40,6 @@ public class MessagesActivity extends AppCompatActivity {
     private ImageView vimgProfile;
     private User user;
 
-    public MessagesActivity() {
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +75,7 @@ public class MessagesActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(MessagesActivity.this, MainActivity.class);
+                Intent intent = new Intent(MessagesActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
         });
@@ -146,7 +143,7 @@ public class MessagesActivity extends AppCompatActivity {
     // Verifica se o usuario esta conectado
     private void verifyAuth() {
         if (FirebaseAuth.getInstance().getUid() == null) {
-            Intent intent = new Intent(MessagesActivity.this, MainActivity.class);
+            Intent intent = new Intent(MessagesActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }

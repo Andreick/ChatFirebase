@@ -52,13 +52,13 @@ public class RegisterActivity extends AppCompatActivity {
         vButtonPhoto = findViewById(R.id.btPhoto);
         vImgPhoto = findViewById(R.id.imgPhoto);
 
-        vButtonHaveAccout.setOnClickListener(view -> goToMainActivity());
+        vButtonHaveAccout.setOnClickListener(view -> goToLoginActivity());
         vButtonPhoto.setOnClickListener(view -> selectPhoto());
         vButtonRegister.setOnClickListener(view -> createUser());
     }
 
-    private void goToMainActivity() {
-        Intent loginIntent = new Intent(this, MainActivity.class);
+    private void goToLoginActivity() {
+        Intent loginIntent = new Intent(this, LoginActivity.class);
         startActivity(loginIntent);
     }
 
@@ -144,6 +144,7 @@ public class RegisterActivity extends AppCompatActivity {
         reference.putFile(vSelectData)
                 .addOnSuccessListener(taskSnapshot -> reference.getDownloadUrl()
                         .addOnSuccessListener(uri -> {
+                            Toast.makeText(this, "Registrando...", Toast.LENGTH_SHORT).show();
                             String profileUrl = uri.toString();
 
                             User user = new User(uid, username, profileUrl);

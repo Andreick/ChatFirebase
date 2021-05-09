@@ -5,20 +5,20 @@ import android.os.Parcelable;
 
 public class User implements Parcelable {
 
-    private String uuid;
+    private String id;
     private String username;
     private String profileUrl;
 
     public User() { }
 
-    public User(String uuid, String username, String profileUrl){
-        this.uuid = uuid;
+    public User(String id, String username, String profileUrl) {
+        this.id = id;
         this.username = username;
         this.profileUrl = profileUrl;
     }
 
     protected User(Parcel in) {
-        uuid = in.readString();
+        id = in.readString();
         username = in.readString();
         profileUrl = in.readString();
     }
@@ -35,8 +35,8 @@ public class User implements Parcelable {
         }
     };
 
-    public String getUuid(){
-        return uuid;
+    public String getId(){
+        return id;
     }
 
     public String getUsername(){
@@ -54,7 +54,7 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(uuid);
+        parcel.writeString(id);
         parcel.writeString(username);
         parcel.writeString(profileUrl);
     }

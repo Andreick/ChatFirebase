@@ -87,8 +87,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private void fetchMessages() {
         if (me != null){
-            String fromId = me.getUuid();
-            String toId = user.getUuid();
+            String fromId = me.getId();
+            String toId = user.getId();
 
             FirebaseFirestore.getInstance().collection("/conversations")
                     .document(fromId)
@@ -117,7 +117,7 @@ public class ChatActivity extends AppCompatActivity {
         vEditChat.setText(null);
 
         final String fromId = FirebaseAuth.getInstance().getUid();
-        final String toId = user.getUuid();
+        final String toId = user.getId();
         long timeStamp = System.currentTimeMillis();
 
         final Message message = new Message(fromId, text);
