@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="corSecundaria">#151515</color>
+    <color name="corDetalhes">#FDC800</color>
+    <color name="corPrimaria">#EFEFEF</color>
+    <color name="Verdinho">#37DB1B</color>
+    <color name="Cinza">#909090</color>
+    <color name="Laranja">#F18F34</color>
+</resources>
