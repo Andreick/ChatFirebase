@@ -9,13 +9,17 @@
     <string name="hint_confirm_password">Confirm Password</string>
     <string name="hint_message">Digite aqui…</string>
 
+    <!-- User Edit Errors -->
+    <string name="error_email">Insira seu Email</string>
+    <string name="error_password">Insira sua Senha</string>
+    <string name="error_username">Insira um nome</string>
+    <string name="error_photo">Insira uma foto</string>
+    <string name="error_confirm_password">Senhas diferentes</string>
+
     <!-- Login Strings -->
     <string name="title_login">Login account </string>
     <string name="bt_login">Login</string>
     <string name="lost_password">Password</string>
-
-    <string name="error_email">Insira seu Email</string>
-    <string name="error_password">Insira sua Senha</string>
     <string name="success_login">Logado com sucesso</string>
 
     <!-- Register Strings -->
@@ -23,10 +27,23 @@
     <string name="title_register">Register account</string>
     <string name="have_account">I already have an account!</string>
     <string name="bt_photo">Photo</string>
+    <string name="success_register">Conta criada com sucesso</string>
 
     <!-- Messages Strings -->
     <string name="bt_inbox">Inbox</string>
     <string name="bt_contacts">Contacts</string>
     <string name="bt_calls">Calls</string>
     <string name="bt_logout">Logout</string>
+
+    <!-- Log Strings -->
+    <string name="log_tag">ExceptionLog</string>
+    <string name="log_msg">Error!\ </string>
+
+    <!-- Firestore Collections -->
+    <string name="collection_users">users</string>
+    <string name="collection_conversations">conversations</string>
+    <string name="collection_inboxes">inboxes</string>
+
+    <!-- Firebase Storage References -->
+    <string name="storage_path_photos">images/photos/</string>
 </resources>

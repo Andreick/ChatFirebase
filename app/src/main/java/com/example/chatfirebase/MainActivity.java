@@ -2,7 +2,6 @@ package com.example.chatfirebase;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -56,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener(authResult -> goToMessagesActivity())
-                .addOnFailureListener(e -> Toast.makeText(this, "Error ! " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> Toast.makeText(this, getString(R.string.log_msg) + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void goToMessagesActivity() {
