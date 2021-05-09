@@ -30,7 +30,7 @@ import com.xwray.groupie.OnItemClickListener;
 
 import java.util.List;
 
-public class MessagesActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity {
 
     private Button vButtonLogout;
     private RadioGroup vRadioOptions;
@@ -40,10 +40,12 @@ public class MessagesActivity extends AppCompatActivity {
     private ImageView vimgProfile;
     private User user;
 
+    public HomeActivity() { }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_messages);
+        setContentView(R.layout.activity_home);
 
 
         vButtonLogout = findViewById(R.id.btLogout);
@@ -75,7 +77,7 @@ public class MessagesActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(MessagesActivity.this, LoginActivity.class);
+                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
         });
@@ -102,7 +104,7 @@ public class MessagesActivity extends AppCompatActivity {
             @Override
             public void onItemClick(@NonNull Item item, @NonNull View view) {
                 UserItem userItem = (UserItem) item;
-                Intent intent = new Intent(MessagesActivity.this, ChatActivity.class);
+                Intent intent = new Intent(HomeActivity.this, ChatActivity.class);
                 intent.putExtra("user", userItem.user);
                 startActivity(intent);
             }
@@ -143,7 +145,7 @@ public class MessagesActivity extends AppCompatActivity {
     // Verifica se o usuario esta conectado
     private void verifyAuth() {
         if (FirebaseAuth.getInstance().getUid() == null) {
-            Intent intent = new Intent(MessagesActivity.this, LoginActivity.class);
+            Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
@@ -195,7 +197,7 @@ public class MessagesActivity extends AppCompatActivity {
 
 
 
-    private class UserItem extends Item<GroupieViewHolder>{
+    private class UserItem extends Item<GroupieViewHolder> {
         private final User user;
 
         public UserItem(User user) {
@@ -218,6 +220,6 @@ public class MessagesActivity extends AppCompatActivity {
             return R.layout.card_user;
         }
     }
-    }
+}
 
 

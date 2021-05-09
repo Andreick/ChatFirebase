@@ -9,9 +9,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button vButtonPhoto;
     private Uri vSelectData;
     private ImageView vImgPhoto;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
         vButtonHaveAccout = findViewById(R.id.btHaveAccount);
         vButtonPhoto = findViewById(R.id.btPhoto);
         vImgPhoto = findViewById(R.id.imgPhoto);
+        progressBar = findViewById(R.id.progressBar);
 
         vButtonHaveAccout.setOnClickListener(view -> goToLoginActivity());
         vButtonPhoto.setOnClickListener(view -> selectPhoto());
@@ -96,6 +100,8 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.error_photo), Toast.LENGTH_SHORT).show();
             return;
         }
+
+        progressBar.setVisibility(View.VISIBLE);
 
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, senha)
                 .addOnSuccessListener(authResult -> saveUserFirebase(nome))
@@ -144,7 +150,6 @@ public class RegisterActivity extends AppCompatActivity {
         reference.putFile(vSelectData)
                 .addOnSuccessListener(taskSnapshot -> reference.getDownloadUrl()
                         .addOnSuccessListener(uri -> {
-                            Toast.makeText(this, "Registrando...", Toast.LENGTH_SHORT).show();
                             String profileUrl = uri.toString();
 
                             User user = new User(uid, username, profileUrl);
@@ -160,8 +165,9 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void goToMessagesActivity() {
+        progressBar.setVisibility(View.GONE);
         Toast.makeText(this, getString(R.string.success_register), Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, MessagesActivity.class);
+        Intent intent = new Intent(this, HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
