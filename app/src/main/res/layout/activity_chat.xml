@@ -36,16 +36,20 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
                 android:paddingRight="5dp"
+                android:paddingLeft="0dp"
+                android:paddingEnd="5dp"
+                android:paddingStart="0dp"
                 android:background="@drawable/card_fundo_message"
                 android:ems="10"
-                android:hint="Digite aqui..."
+                android:hint="@string/message_hint"
                 android:inputType="textPersonName"
                 android:textColor="@color/corSecundaria"
                 android:textColorHint="@color/corSecundaria"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btSend"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="Autofill" />
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/btSend"
@@ -97,7 +101,6 @@
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:fontFamily="sans-serif-black"
-            android:text="TextView"
             android:textColor="@color/corPrimaria"
             android:textSize="24sp"
             app:layout_constraintStart_toEndOf="@+id/imgContact"

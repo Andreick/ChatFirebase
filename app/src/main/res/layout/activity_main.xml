@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-black"
-        android:text="Login account "
+        android:text="@string/login_title"
         android:textColor="@color/corSecundaria"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,7 +27,7 @@
         android:layout_marginTop="55dp"
         android:ems="10"
         android:fontFamily="sans-serif"
-        android:hint="Email"
+        android:hint="@string/email_hint"
         android:inputType="textEmailAddress"
         android:textColor="@color/corSecundaria"
         android:textColorHighlight="@color/corSecundaria"
@@ -36,7 +36,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        tools:ignore="Autofill" />
 
     <EditText
         android:id="@+id/edtPassword"
@@ -45,7 +46,7 @@
         android:layout_marginTop="32dp"
         android:ems="10"
         android:fontFamily="sans-serif"
-        android:hint="Password"
+        android:hint="@string/password_hint"
         android:inputType="textPassword"
         android:textColor="@color/corSecundaria"
         android:textColorHighlight="@color/corSecundaria"
@@ -53,7 +54,8 @@
         android:textColorLink="@color/corSecundaria"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtRemail" />
+        app:layout_constraintTop_toBottomOf="@+id/edtRemail"
+        tools:ignore="Autofill" />
 
     <Button
         android:id="@+id/btLogin"
@@ -65,7 +67,7 @@
         android:layout_marginRight="50dp"
         android:layout_marginBottom="100dp"
         android:background="@color/corDetalhes"
-        android:text="Login"
+        android:text="@string/bt_login"
         android:textColor="@color/corSecundaria"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -77,7 +79,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Password"
+        android:text="@string/lost_password"
         android:textColor="@color/corSecundaria"
         app:layout_constraintEnd_toStartOf="@+id/textView4"
         app:layout_constraintTop_toBottomOf="@+id/btLogin" />
@@ -99,18 +101,19 @@
         android:id="@+id/imageView2"
         android:layout_width="196dp"
         android:layout_height="210dp"
-        android:tint="@color/corSecundaria"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_launcher_foreground2" />
+        app:srcCompat="@drawable/ic_launcher_foreground2"
+        app:tint="@color/corSecundaria"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/btRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Register"
+        android:text="@string/new_register"
         android:textColor="@color/corSecundaria"
         app:layout_constraintStart_toEndOf="@+id/textView4"
         app:layout_constraintTop_toBottomOf="@+id/btLogin" />
