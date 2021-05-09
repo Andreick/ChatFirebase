@@ -106,13 +106,13 @@ public class ChatActivity extends AppCompatActivity {
                     .collection(contactId)
                     .add(message)
                     .addOnSuccessListener(documentReference -> {
-                        ContactChat contactChat = new ContactChat(contactId, message);
+                        InboxMessage inboxMessage = new InboxMessage(contactId, message);
 
                         FirebaseFirestore.getInstance().collection(getString(R.string.collection_inboxes))
                                 .document(uid)
                                 .collection(getString(R.string.collection_inbox_message))
                                 .document(contactId)
-                                .set(contactChat)
+                                .set(inboxMessage)
                                 .addOnFailureListener(e -> Log.e(getString(R.string.log_tag), getString(R.string.log_msg), e));
                     })
                     .addOnFailureListener(e -> Log.e(getString(R.string.log_tag), getString(R.string.log_msg), e));

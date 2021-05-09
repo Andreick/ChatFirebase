@@ -157,18 +157,18 @@ public class RegisterActivity extends AppCompatActivity {
                             FirebaseFirestore.getInstance().collection(getString(R.string.collection_users))
                                     .document(uid)
                                     .set(user)
-                                    .addOnSuccessListener(aVoid -> goToMessagesActivity())
+                                    .addOnSuccessListener(aVoid -> goToHomeActivity())
                                     .addOnFailureListener(e -> Log.e(getString(R.string.log_tag), getString(R.string.log_msg), e));
                         })
                         .addOnFailureListener(e -> Log.e(getString(R.string.log_tag), getString(R.string.log_msg), e))
                 .addOnFailureListener(e -> Log.e(getString(R.string.log_tag), getString(R.string.log_msg), e)));
     }
 
-    private void goToMessagesActivity() {
+    private void goToHomeActivity() {
         progressBar.setVisibility(View.GONE);
         Toast.makeText(this, getString(R.string.success_register), Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        Intent homeIntent = new Intent(this, HomeActivity.class);
+        homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(homeIntent);
     }
 }

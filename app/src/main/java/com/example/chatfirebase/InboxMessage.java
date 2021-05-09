@@ -1,14 +1,14 @@
 package com.example.chatfirebase;
 
-class ContactChat extends Message {
+class InboxMessage extends Message {
 
     private String contactId;
     private String contactName;
     private String profileUrl;
 
-    public ContactChat() { }
+    public InboxMessage() { }
 
-    public ContactChat(String contactId, Message message) {
+    public InboxMessage(String contactId, Message message) {
         super(message.getSenderId(), message.getText(), message.getTimestamp());
         this.contactId = contactId;
     }

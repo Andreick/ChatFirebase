@@ -1,8 +1,5 @@
 package com.example.chatfirebase;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -12,9 +9,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
@@ -38,54 +34,41 @@ public class LoginActivity extends AppCompatActivity {
         vButtonRegister = findViewById(R.id.btRegister);
         progressBar = findViewById(R.id.progressBar);
 
+        vButtonRegister.setOnClickListener(view -> goToRegisterActivity());
+        vButtonLogin.setOnClickListener(view -> login());
+    }
 
+    private void goToRegisterActivity() {
+        Intent registerIntent = new Intent(this, RegisterActivity.class);
+        startActivity(registerIntent);
+    }
 
-        vButtonRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(),RegisterActivity.class));
-            }
-        });
+    // Faz o login do usuário no Firebase e vai para a MessagesActivity
+    private void login() {
+        String email = vEditEmail.getText().toString();
+        String password = vEditPassword.getText().toString();
 
+        if (email.isEmpty()) {
+            vEditEmail.setError(getString(R.string.error_email));
+            return;
+        }
+        if (password.isEmpty()) {
+            vEditPassword.setError(getString(R.string.error_password));
+            return;
+        }
 
-        vButtonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String email = vEditEmail.getText().toString();
-                String password = vEditPassword.getText().toString();
+        progressBar.setVisibility(View.VISIBLE);
 
-                if (email == null || email.isEmpty()){
-                    vEditEmail.setError("Insira seu Email");
-                    return;
-                }
-                if (password == null || password.isEmpty()){
-                    vEditPassword.setError("Insira sua Senha");
-                    return;
-                }
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener(authResult -> goToHomeActivity())
+                .addOnFailureListener(e -> Toast.makeText(this, getString(R.string.log_msg) + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
 
-                progressBar.setVisibility(View.VISIBLE);
-
-                FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(LoginActivity.this, "Logado com sucesso", Toast.LENGTH_SHORT).show();
-                            vEditEmail.getText().clear();
-                            vEditPassword.getText().clear();
-                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-
-                        } else {
-                            Toast.makeText(LoginActivity.this, "Erro ! "+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            progressBar.setVisibility(View.GONE);
-                        }
-                    }
-                });
-
-            }
-        });
-
-
+    private void goToHomeActivity() {
+        progressBar.setVisibility(View.GONE);
+        Toast.makeText(this, getString(R.string.success_login), Toast.LENGTH_SHORT).show();
+        Intent homeIntent = new Intent(this, HomeActivity.class);
+        homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(homeIntent);
     }
 }

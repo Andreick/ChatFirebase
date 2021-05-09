@@ -26,9 +26,10 @@ import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
-import com.xwray.groupie.OnItemClickListener;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -36,17 +37,20 @@ public class HomeActivity extends AppCompatActivity {
     private RadioGroup vRadioOptions;
     private RadioButton vInbox, vGroups, vCalls;
     private RecyclerView vViewContacts, vViewInbox;
-    private GroupAdapter<GroupieViewHolder> adapter, adapter2;
+    private GroupAdapter<GroupieViewHolder> contactsAdapter, InboxAdapter;
     private ImageView vimgProfile;
-    private User user;
 
-    public HomeActivity() { }
+    private final Map<String, User> contactMap = new HashMap<>();
+    private String currentUid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        currentUid = FirebaseAuth.getInstance().getUid();
+
+        if (currentUid == null) goToLoginActivity();
 
         vButtonLogout = findViewById(R.id.btLogout);
         vRadioOptions = findViewById(R.id.rdOptions);
@@ -57,66 +61,32 @@ public class HomeActivity extends AppCompatActivity {
         vViewInbox = findViewById(R.id.lsInbox);
         vimgProfile = findViewById(R.id.imgProfile);
 
-        //Picasso.get().load(user.getProfileUrl()).into(vimgProfile);
-
-
-        adapter = new GroupAdapter<>();
+        contactsAdapter = new GroupAdapter<>();
         vViewContacts.setLayoutManager(new LinearLayoutManager(this));
-        vViewContacts.setAdapter(adapter);
+        vViewContacts.setAdapter(contactsAdapter);
 
-        adapter2 = new GroupAdapter<>();
+        InboxAdapter = new GroupAdapter<>();
         vViewInbox.setLayoutManager(new LinearLayoutManager(this));
-        vViewInbox.setAdapter(adapter2);
+        vViewInbox.setAdapter(InboxAdapter);
 
-
-
-
-//------------------------------------------------------------
-        // Deslogar
-        vButtonLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
-        });
-//------------------------------------------------------------
-        // Configuracao RadioButtons
-        vRadioOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.btInbox) {
-                    vViewInbox.setVisibility(View.VISIBLE);
-                    vViewContacts.setVisibility(View.INVISIBLE);
-
-                }
-                if (checkedId == R.id.btContacts){
-                    vViewInbox.setVisibility(View.INVISIBLE);
-                    vViewContacts.setVisibility(View.VISIBLE);
-
-                }
-
-            }
-        });
-
-        adapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(@NonNull Item item, @NonNull View view) {
-                UserItem userItem = (UserItem) item;
-                Intent intent = new Intent(HomeActivity.this, ChatActivity.class);
-                intent.putExtra("user", userItem.user);
-                startActivity(intent);
-            }
-        });
-
-
-        verifyAuth();
         fetchUsers();
         fetchMessages();
 
+        vButtonLogout.setOnClickListener(view -> {
+            FirebaseAuth.getInstance().signOut();
+            goToLoginActivity();
+        });
+
+        vRadioOptions.setOnCheckedChangeListener((group, checkedId) -> onRadioButtonSelected(checkedId));
+
+        contactsAdapter.setOnItemClickListener((item, view) -> goToChatActivity((ContactItem) item));
     }
 
+    private void goToLoginActivity() {
+        Intent loginIntent = new Intent(this, LoginActivity.class);
+        loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(loginIntent);
+    }
 
     private void fetchMessages() {
         final String uid = FirebaseAuth.getInstance().getUid();
@@ -132,9 +102,9 @@ public class HomeActivity extends AppCompatActivity {
                         if (documentChanges != null){
                             for (DocumentChange doc: documentChanges){
                                 if (doc.getType() == DocumentChange.Type.ADDED){
-                                    ContactChat contactChat = doc.getDocument().toObject(ContactChat.class);
+                                    InboxMessage inboxMessage = doc.getDocument().toObject(InboxMessage.class);
 
-                                    adapter2.add(new ContactItem(contactChat));
+                                    InboxAdapter.add(new InboxItem(inboxMessage));
                                 }
                             }
                         }
@@ -142,17 +112,7 @@ public class HomeActivity extends AppCompatActivity {
                 });
     }
 
-    // Verifica se o usuario esta conectado
-    private void verifyAuth() {
-        if (FirebaseAuth.getInstance().getUid() == null) {
-            Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        }
-    }
-
-
-    private void fetchUsers(){
+    private void fetchUsers() {
 
         FirebaseFirestore.getInstance().collection("/users")
             .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -165,18 +125,61 @@ public class HomeActivity extends AppCompatActivity {
                     final List<DocumentSnapshot> docs = value.getDocuments();
                     for (DocumentSnapshot doc: docs){
                         User user = doc.toObject(User.class);
-                        adapter.add(new UserItem(user));
-                        adapter.notifyDataSetChanged();
+                        contactsAdapter.add(new ContactItem(user));
+                        contactsAdapter.notifyDataSetChanged();
                     }
                 }
             });
     }
 
-    private class ContactItem extends Item<GroupieViewHolder>{
+    private void goToChatActivity(ContactItem contactItem) {
+        Intent chatIntent = new Intent(HomeActivity.this, ChatActivity.class);
+        chatIntent.putExtra(getString(R.string.extra_contact), contactItem.contact);
+        startActivity(chatIntent);
+    }
 
-        private final ContactChat contactChat;
+    private void onRadioButtonSelected(int checkedId) {
+        if (checkedId == R.id.btInbox) {
+            vViewInbox.setVisibility(View.VISIBLE);
+            vViewContacts.setVisibility(View.INVISIBLE);
 
-        private ContactItem(ContactChat contactChat) { this.contactChat = contactChat; }
+        }
+        if (checkedId == R.id.btContacts){
+            vViewInbox.setVisibility(View.INVISIBLE);
+            vViewContacts.setVisibility(View.VISIBLE);
+
+        }
+    }
+
+    private class ContactItem extends Item<GroupieViewHolder> {
+
+        private final User contact;
+
+        public ContactItem(User contact) {
+            this.contact = contact;
+        }
+
+        @Override
+        public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
+            TextView txtUserNm = viewHolder.itemView.findViewById(R.id.txtUserName);
+            ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto);
+
+            Picasso.get().load(contact.getProfileUrl()).into(imgPhoto);
+            txtUserNm.setText(contact.getName());
+        }
+
+        @Override
+        public int getLayout() {
+            return R.layout.card_user;
+        }
+    }
+
+    private class InboxItem extends Item<GroupieViewHolder>{
+
+        private final InboxMessage inboxMessage;
+        private User contact;
+
+        private InboxItem(InboxMessage inboxMessage) { this.inboxMessage = inboxMessage; }
 
         @Override
         public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
@@ -185,39 +188,13 @@ public class HomeActivity extends AppCompatActivity {
             ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto2);
 
             //username.setText(contactChat.getContactName());
-            message.setText(contactChat.getText());
+            message.setText(inboxMessage.getText());
             //Picasso.get().load(contactChat.getProfileUrl()).into(imgPhoto);
         }
 
         @Override
         public int getLayout() {
             return R.layout.card_user_inbox;
-        }
-    }
-
-
-
-    private class UserItem extends Item<GroupieViewHolder> {
-        private final User user;
-
-        public UserItem(User user) {
-            this.user = user;
-        }
-
-        @Override
-        public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
-
-            TextView txtUserNm = viewHolder.itemView.findViewById(R.id.txtUserName);
-            ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto);
-
-            txtUserNm.setText(user.getName());
-
-            Picasso.get().load(user.getProfileUrl()).into(imgPhoto);
-        }
-
-        @Override
-        public int getLayout() {
-            return R.layout.card_user;
         }
     }
 }
