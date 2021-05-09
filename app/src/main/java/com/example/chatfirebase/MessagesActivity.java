@@ -182,9 +182,9 @@ public class MessagesActivity extends AppCompatActivity {
             TextView message = viewHolder.itemView.findViewById(R.id.txtLastMessage2);
             ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto2);
 
-            username.setText(contactChat.getContactName());
+            //username.setText(contactChat.getContactName());
             message.setText(contactChat.getText());
-            Picasso.get().load(contactChat.getProfileUrl()).into(imgPhoto);
+            //Picasso.get().load(contactChat.getProfileUrl()).into(imgPhoto);
         }
 
         @Override
@@ -208,7 +208,7 @@ public class MessagesActivity extends AppCompatActivity {
             TextView txtUserNm = viewHolder.itemView.findViewById(R.id.txtUserName);
             ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto);
 
-            txtUserNm.setText(user.getUsername());
+            txtUserNm.setText(user.getName());
 
             Picasso.get().load(user.getProfileUrl()).into(imgPhoto);
         }

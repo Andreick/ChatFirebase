@@ -8,22 +8,20 @@ class ContactChat extends Message {
 
     public ContactChat() { }
 
-    public ContactChat(String contactId, String contactName, String profileUrl, Message message) {
+    public ContactChat(String contactId, Message message) {
         super(message.getSenderId(), message.getText(), message.getTimestamp());
         this.contactId = contactId;
-        this.contactName = contactName;
-        this.profileUrl = profileUrl;
     }
 
     public String getContactId() {
         return contactId;
     }
 
-    public String getContactName() {
+    /*public String getContactName() {
         return contactName;
     }
 
     public String getProfileUrl() {
         return profileUrl;
-    }
+    }*/
 }

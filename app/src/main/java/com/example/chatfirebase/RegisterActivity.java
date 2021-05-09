@@ -139,7 +139,7 @@ public class RegisterActivity extends AppCompatActivity {
     // Salva a foto do usuário no Storage e os outros dados no Firestore
     private void saveUserFirebase(String username) {
         String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getUid());
-        final StorageReference reference = FirebaseStorage.getInstance().getReference(getString(R.string.storage_path_photos) + uid);
+        StorageReference reference = FirebaseStorage.getInstance().getReference(getString(R.string.storage_path_photos) + uid);
 
         reference.putFile(vSelectData)
                 .addOnSuccessListener(taskSnapshot -> reference.getDownloadUrl()

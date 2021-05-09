@@ -1,34 +1,28 @@
 package com.example.chatfirebase;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -36,19 +30,17 @@ public class ChatActivity extends AppCompatActivity {
     private TextView vtxtNameContact;
     private RecyclerView vlsViewChat;
     private EditText vEditChat;
-    private GroupAdapter adapter;
+    private GroupAdapter<GroupieViewHolder> adapter;
     private ImageView vbtSend;
-    private User user;
-    private User me;
 
+    private User contact;
+    private String currentUid;
+    private CollectionReference conversations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
-        user = getIntent().getExtras().getParcelable("user");
-        String name = user.getUsername();
 
         vImgContact = findViewById(R.id.imgContact);
         vtxtNameContact = findViewById(R.id.txtNameContact);
@@ -56,132 +48,84 @@ public class ChatActivity extends AppCompatActivity {
         vbtSend = findViewById(R.id.btSend);
         vEditChat = findViewById(R.id.edtChat);
 
+        contact = getIntent().getExtras().getParcelable(getString(R.string.extra_contact));
+        Picasso.get().load(contact.getProfileUrl()).into(vImgContact);
+        vtxtNameContact.setText(contact.getName());
+
+        currentUid = FirebaseAuth.getInstance().getUid();
+        conversations = FirebaseFirestore.getInstance().collection(getString(R.string.collection_conversations));
 
         adapter = new GroupAdapter<>();
         vlsViewChat.setLayoutManager(new LinearLayoutManager(this));
         vlsViewChat.setAdapter(adapter);
 
-        vtxtNameContact.setText(name);
-        Picasso.get().load(user.getProfileUrl()).into(vImgContact);
+        fetchMessages();
 
-
-        vbtSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendMessage();
-            }
-        });
-
-        FirebaseFirestore.getInstance().collection("/users")
-                .document(FirebaseAuth.getInstance().getUid())
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        me = documentSnapshot.toObject(User.class);
-                        fetchMessages();
-                    }
-                });
-
+        vbtSend.setOnClickListener(view -> sendMessage());
     }
 
+    // Exibe todas as mensagens da conversa
     private void fetchMessages() {
-        if (me != null){
-            String fromId = me.getId();
-            String toId = user.getId();
+        conversations.document(currentUid)
+                .collection(contact.getId())
+                .orderBy(getString(R.string.message_timestamp), Query.Direction.ASCENDING)
+                .addSnapshotListener((querySnapshot, e) -> {
+                    if (e == null) {
+                        List<DocumentChange> documentChanges = Objects.requireNonNull(querySnapshot).getDocumentChanges();
 
-            FirebaseFirestore.getInstance().collection("/conversations")
-                    .document(fromId)
-                    .collection(toId)
-                    .orderBy("timestamp", Query.Direction.ASCENDING)
-                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                        @Override
-                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                            List<DocumentChange> documentChanges = value.getDocumentChanges();
-                            if (documentChanges != null){
-                                for (DocumentChange doc: documentChanges){
-                                    if (doc.getType() == DocumentChange.Type.ADDED){
-                                        Message message = doc.getDocument().toObject(Message.class);
-                                        adapter.add(new MessageItem(message));
-                                    }
-                                }
+                        for (DocumentChange doc: documentChanges){
+                            if (doc.getType() == DocumentChange.Type.ADDED){
+                                Message message = Objects.requireNonNull(doc.getDocument().toObject(Message.class));
+                                adapter.add(new MessageItem(message));
                             }
                         }
-                    });
-
-        }
+                    }
+                    else {
+                        Log.e(getString(R.string.log_tag), getString(R.string.log_msg), e);
+                    }
+                });
     }
 
+    // Salva a mensagem para o usuário atual e para o contato no Firestore
     private void sendMessage() {
         String text = vEditChat.getText().toString();
-        vEditChat.setText(null);
 
-        final String fromId = FirebaseAuth.getInstance().getUid();
-        final String toId = user.getId();
-        long timeStamp = System.currentTimeMillis();
+        if (!text.isEmpty()) {
+            Message message = new Message(currentUid, text);
 
-        final Message message = new Message(fromId, text);
+            saveMessageInFirestore(currentUid, contact.getId(), message);
+            saveMessageInFirestore(contact.getId(), currentUid, message);
 
-        if (!message.getText().isEmpty()){
-            FirebaseFirestore.getInstance().collection("/conversations")
-                    .document(fromId)
-                    .collection(toId)
-                    .add(message)
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
-
-                            ContactChat contactChat = new ContactChat(toId, user.getUsername(), user.getProfileUrl(), message);
-
-                            FirebaseFirestore.getInstance().collection("/last-messages")
-                                    .document(fromId)
-                                    .collection("/contacts")
-                                    .document(toId)
-                                    .set(contactChat);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-
-                        }
-                    });
-
-            FirebaseFirestore.getInstance().collection("/conversations")
-                    .document(toId)
-                    .collection(fromId)
-                    .add(message)
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
-
-                            ContactChat contactChat = new ContactChat(toId, me.getUsername(), me.getProfileUrl(), message);
-
-                            FirebaseFirestore.getInstance().collection("/last-messages")
-                                    .document(toId)
-                                    .collection("/contacts")
-                                    .document(fromId)
-                                    .set(contactChat);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-
-                        }
-                    });
-
+            vEditChat.setText(null);
         }
     }
 
-    private class MessageItem extends Item<GroupieViewHolder>{
+    // Salva a mensagem na coleção de mensagens e na coleção de caixas de entrada
+    private void saveMessageInFirestore(String uid, String contactId, Message message) {
+        conversations.document(uid)
+                    .collection(contactId)
+                    .add(message)
+                    .addOnSuccessListener(documentReference -> {
+                        ContactChat contactChat = new ContactChat(contactId, message);
+
+                        FirebaseFirestore.getInstance().collection(getString(R.string.collection_inboxes))
+                                .document(uid)
+                                .collection(getString(R.string.collection_inbox_message))
+                                .document(contactId)
+                                .set(contactChat)
+                                .addOnFailureListener(e -> Log.e(getString(R.string.log_tag), getString(R.string.log_msg), e));
+                    })
+                    .addOnFailureListener(e -> Log.e(getString(R.string.log_tag), getString(R.string.log_msg), e));
+    }
+
+    // Balão de mensagem
+    private class MessageItem extends Item<GroupieViewHolder> {
 
         private final Message message;
 
         private MessageItem(Message message) {
             this.message = message;
         }
-
 
         @Override
         public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
@@ -192,8 +136,7 @@ public class ChatActivity extends AppCompatActivity {
 
         @Override
         public int getLayout() {
-
-            return message.getSenderId().equals(FirebaseAuth.getInstance().getUid())
+            return message.getSenderId().equals(currentUid)
                     ? R.layout.message_users
                     : R.layout.message_contacts;
         }

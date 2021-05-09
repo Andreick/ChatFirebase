@@ -17,7 +17,7 @@
     <string name="error_confirm_password">Senhas diferentes</string>
 
     <!-- Login Strings -->
-    <string name="title_login">Login account\ </string>
+    <string name="title_login">Login account</string>
     <string name="bt_login">Login</string>
     <string name="lost_password">Password</string>
     <string name="success_login">Logado com sucesso</string>
@@ -39,10 +39,20 @@
     <string name="log_tag">ExceptionLog</string>
     <string name="log_msg">Error!\ </string>
 
+    <!-- User Class Fields -->
+    <string name="user_name">name</string>
+
+    <!-- Message Class Fields -->
+    <string name="message_timestamp">timestamp</string>
+
+    <!-- Intent Extra Names -->
+    <string name="extra_contact">contact</string>
+
     <!-- Firestore Collections -->
     <string name="collection_users">users</string>
     <string name="collection_conversations">conversations</string>
     <string name="collection_inboxes">inboxes</string>
+    <string name="collection_inbox_message">inbox-message</string>
 
     <!-- Firebase Storage References -->
     <string name="storage_path_photos">images/photos/</string>
