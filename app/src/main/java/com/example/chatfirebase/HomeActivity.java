@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,7 +18,6 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -27,9 +27,13 @@ import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -40,8 +44,9 @@ public class HomeActivity extends AppCompatActivity {
     private GroupAdapter<GroupieViewHolder> contactsAdapter, InboxAdapter;
     private ImageView vimgProfile;
 
-    private final Map<String, User> contactMap = new HashMap<>();
     private String currentUid;
+    private Set<ContactItem> contactItemSet;
+    private Map<String, User> contactMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +55,10 @@ public class HomeActivity extends AppCompatActivity {
 
         currentUid = FirebaseAuth.getInstance().getUid();
 
-        if (currentUid == null) goToLoginActivity();
+        if (currentUid == null) {
+            goToLoginActivity();
+            return;
+        }
 
         vButtonLogout = findViewById(R.id.btLogout);
         vRadioOptions = findViewById(R.id.rdOptions);
@@ -69,15 +77,18 @@ public class HomeActivity extends AppCompatActivity {
         vViewInbox.setLayoutManager(new LinearLayoutManager(this));
         vViewInbox.setAdapter(InboxAdapter);
 
-        fetchUsers();
-        fetchMessages();
+        contactItemSet = new TreeSet<>(new ContactItemComparator());
+        contactMap = new HashMap<>();
+
+        fetchContacts();
+        fetchInbox();
+
+        vRadioOptions.setOnCheckedChangeListener((group, checkedId) -> onRadioButtonSelected(checkedId));
 
         vButtonLogout.setOnClickListener(view -> {
             FirebaseAuth.getInstance().signOut();
             goToLoginActivity();
         });
-
-        vRadioOptions.setOnCheckedChangeListener((group, checkedId) -> onRadioButtonSelected(checkedId));
 
         contactsAdapter.setOnItemClickListener((item, view) -> goToChatActivity((ContactItem) item));
     }
@@ -88,7 +99,34 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(loginIntent);
     }
 
-    private void fetchMessages() {
+    private void fetchContacts() {
+        FirebaseFirestore.getInstance().collection(getString(R.string.collection_users))
+                .orderBy(getString(R.string.user_name))
+                .addSnapshotListener((querySnapshot, e) -> {
+                    if (e == null) {
+                        List<DocumentChange> documentChanges = Objects.requireNonNull(querySnapshot).getDocumentChanges();
+
+                        for (DocumentChange documentChange : documentChanges) {
+                            User user = Objects.requireNonNull(documentChange.getDocument().toObject(User.class));
+
+                            if (documentChange.getType() == DocumentChange.Type.ADDED) {
+
+                                if (!currentUid.equals(user.getId())) {
+                                    contactItemSet.add(new ContactItem(user));
+                                    contactMap.put(user.getId(), user);
+                                }
+                            }
+
+                            contactsAdapter.update(contactItemSet);
+                        }
+                    }
+                    else {
+                        Log.e(getString(R.string.log_tag), getString(R.string.log_msg), e);
+                    }
+                });
+    }
+
+    private void fetchInbox() {
         final String uid = FirebaseAuth.getInstance().getUid();
         if (uid == null) return;
 
@@ -110,26 +148,6 @@ public class HomeActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    private void fetchUsers() {
-
-        FirebaseFirestore.getInstance().collection("/users")
-            .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                @Override
-                public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                    if (error != null){
-
-                        return;
-                    }
-                    final List<DocumentSnapshot> docs = value.getDocuments();
-                    for (DocumentSnapshot doc: docs){
-                        User user = doc.toObject(User.class);
-                        contactsAdapter.add(new ContactItem(user));
-                        contactsAdapter.notifyDataSetChanged();
-                    }
-                }
-            });
     }
 
     private void goToChatActivity(ContactItem contactItem) {
@@ -171,6 +189,14 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public int getLayout() {
             return R.layout.card_user;
+        }
+    }
+
+    private class ContactItemComparator implements Comparator<ContactItem> {
+
+        @Override
+        public int compare(ContactItem ci1, ContactItem ci2) {
+            return ci1.contact.getName().compareTo(ci2.contact.getName());
         }
     }
 
