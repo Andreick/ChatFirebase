@@ -26,9 +26,9 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
+import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 import com.xwray.groupie.OnItemClickListener;
-import com.xwray.groupie.ViewHolder;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class MessagesActivity extends AppCompatActivity {
     private RadioGroup vRadioOptions;
     private RadioButton vInbox, vGroups, vCalls;
     private RecyclerView vViewContacts, vViewInbox;
-    private GroupAdapter<ViewHolder> adapter, adapter2;
+    private GroupAdapter<GroupieViewHolder> adapter, adapter2;
     private ImageView vimgProfile;
     private User user;
 
@@ -175,14 +175,14 @@ public class MessagesActivity extends AppCompatActivity {
             });
     }
 
-    private class ContactItem extends Item<ViewHolder>{
+    private class ContactItem extends Item<GroupieViewHolder>{
 
         private final Contact contact;
 
         private ContactItem(Contact contact) { this.contact = contact; }
 
         @Override
-        public void bind(@NonNull ViewHolder viewHolder, int position) {
+        public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
             TextView username = viewHolder.itemView.findViewById(R.id.txtUserName2);
             TextView message = viewHolder.itemView.findViewById(R.id.txtLastMessage2);
             ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto2);
@@ -200,7 +200,7 @@ public class MessagesActivity extends AppCompatActivity {
 
 
 
-    private class UserItem extends Item<ViewHolder>{
+    private class UserItem extends Item<GroupieViewHolder>{
         private final User user;
 
         public UserItem(User user) {
@@ -208,7 +208,7 @@ public class MessagesActivity extends AppCompatActivity {
         }
 
         @Override
-        public void bind(@NonNull ViewHolder viewHolder, int position) {
+        public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
 
             TextView txtUserNm = viewHolder.itemView.findViewById(R.id.txtUserName);
             ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto);

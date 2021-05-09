@@ -25,8 +25,8 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
+import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
-import com.xwray.groupie.ViewHolder;
 
 import java.util.List;
 
@@ -188,7 +188,7 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private class MessageItem extends Item<ViewHolder>{
+    private class MessageItem extends Item<GroupieViewHolder>{
 
         private final Message message;
 
@@ -198,7 +198,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
         @Override
-        public void bind(@NonNull ViewHolder viewHolder, int position) {
+        public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
             TextView txtMessage = viewHolder.itemView.findViewById(R.id.txtMessage);
 
             txtMessage.setText(message.getText());
