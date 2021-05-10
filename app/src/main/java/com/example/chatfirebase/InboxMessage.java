@@ -3,8 +3,6 @@ package com.example.chatfirebase;
 class InboxMessage extends Message {
 
     private String contactId;
-    private String contactName;
-    private String profileUrl;
 
     public InboxMessage() { }
 
@@ -16,12 +14,4 @@ class InboxMessage extends Message {
     public String getContactId() {
         return contactId;
     }
-
-    /*public String getContactName() {
-        return contactName;
-    }
-
-    public String getProfileUrl() {
-        return profileUrl;
-    }*/
 }
