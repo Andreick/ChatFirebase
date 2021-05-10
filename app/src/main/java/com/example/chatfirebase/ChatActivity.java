@@ -31,10 +31,10 @@ public class ChatActivity extends AppCompatActivity {
     private RecyclerView vlsViewChat;
     private EditText vEditChat;
     private GroupAdapter<GroupieViewHolder> adapter;
-    private ImageView vbtSend;
+    private ImageView vbtSend, vbtCall;
 
+    private static String currentUid;
     private User contact;
-    private String currentUid;
     private CollectionReference conversations;
 
     @Override
@@ -45,8 +45,9 @@ public class ChatActivity extends AppCompatActivity {
         vImgContact = findViewById(R.id.imgContact);
         vtxtNameContact = findViewById(R.id.txtNameContact);
         vlsViewChat = findViewById(R.id.lsViewChat);
-        vbtSend = findViewById(R.id.btSend);
         vEditChat = findViewById(R.id.edtChat);
+        vbtSend = findViewById(R.id.btSend);
+        vbtCall = findViewById(R.id.imgCall);
 
         contact = getIntent().getExtras().getParcelable(getString(R.string.extra_contact));
         Picasso.get().load(contact.getProfileUrl()).into(vImgContact);
@@ -61,7 +62,10 @@ public class ChatActivity extends AppCompatActivity {
 
         fetchMessages();
 
+        ChatFirebase chatFirebase = (ChatFirebase) getApplicationContext();
+
         vbtSend.setOnClickListener(view -> sendMessage());
+        vbtCall.setOnClickListener(view -> chatFirebase.callContact(contact.getId()));
     }
 
     // Exibe todas as mensagens da conversa
@@ -119,7 +123,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     // Balão de mensagem
-    private class MessageItem extends Item<GroupieViewHolder> {
+    private static class MessageItem extends Item<GroupieViewHolder> {
 
         private final Message message;
 

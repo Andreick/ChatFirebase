@@ -41,7 +41,8 @@ public class HomeActivity extends AppCompatActivity {
     private GroupAdapter<GroupieViewHolder> contactsAdapter, inboxAdapter;
     private ImageView vimgProfile;
 
-    private String currentUid;
+    private static String currentUid;
+    private ChatFirebase chatFirebase;
     private Set<ContactItem> contactItemSet;
     private Map<String, InboxItem> inboxItemMap;
 
@@ -51,11 +52,14 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         currentUid = FirebaseAuth.getInstance().getUid();
+        chatFirebase = (ChatFirebase) getApplicationContext();
 
         if (currentUid == null) {
             goToLoginActivity();
             return;
         }
+
+        chatFirebase.setSinchClient(currentUid);
 
         vButtonLogout = findViewById(R.id.btLogout);
         vRadioOptions = findViewById(R.id.rdOptions);
@@ -70,14 +74,15 @@ public class HomeActivity extends AppCompatActivity {
         vViewContacts.setLayoutManager(new LinearLayoutManager(this));
         vViewContacts.setAdapter(contactsAdapter);
 
-        inboxAdapter = new GroupAdapter<>();
-        vViewInbox.setLayoutManager(new LinearLayoutManager(this));
-        vViewInbox.setAdapter(inboxAdapter);
-
         contactItemSet = new TreeSet<>(new ContactItemComparator());
         inboxItemMap = new HashMap<>();
 
         fetchContacts();
+
+        inboxAdapter = new GroupAdapter<>();
+        vViewInbox.setLayoutManager(new LinearLayoutManager(this));
+        vViewInbox.setAdapter(inboxAdapter);
+
         fetchInbox();
 
         vButtonLogout.setOnClickListener(view -> {
@@ -185,8 +190,14 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        chatFirebase.terminateSinchClient();
+    }
+
     // Contato na tela de contatos
-    private class ContactItem extends Item<GroupieViewHolder> {
+    private static class ContactItem extends Item<GroupieViewHolder> {
 
         private final User contact;
 
@@ -210,7 +221,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     // Compara os ContactItems de acordo com o nome do usuário
-    private class ContactItemComparator implements Comparator<ContactItem> {
+    private static class ContactItemComparator implements Comparator<ContactItem> {
 
         @Override
         public int compare(ContactItem ci1, ContactItem ci2) {
@@ -219,7 +230,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     // Contato na caixa de entrada
-    private class InboxItem extends Item<GroupieViewHolder>{
+    private static class InboxItem extends Item<GroupieViewHolder>{
 
         private final User contact;
         private Message lastMessage;

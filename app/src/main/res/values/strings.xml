@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">ChatFirebase</string>
 
     <!-- User Edit Hints -->
@@ -35,6 +35,11 @@
     <string name="bt_calls">Calls</string>
     <string name="bt_logout">Logout</string>
 
+    <!-- Call Strings -->
+    <string name="on_call_progressing" tools:ignore="TypographyEllipsis">Tocando...</string>
+    <string name="on_call_established">Chamada estabelecida</string>
+    <string name="call_hang_up">Chamada encerrada</string>
+
     <!-- Log Strings -->
     <string name="log_tag">ExceptionLog</string>
     <string name="log_msg">Error!\ </string>
@@ -56,4 +61,9 @@
 
     <!-- Firebase Storage References -->
     <string name="storage_path_photos">images/photos/</string>
+
+    <!-- Sinch Credentials -->
+    <string name="sinch_hostname">clientapi.sinch.com</string>
+    <string name="sinch_key" tools:ignore="TypographyDashes">8c26ee5f-5ed7-4f00-9720-2da9bbfb127c</string>
+    <string name="sinch_secret">dxYgmyu/XE+jGNBoAsmJtA==</string>
 </resources>
