@@ -105,7 +105,10 @@ public class RegisterActivity extends AppCompatActivity {
 
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, senha)
                 .addOnSuccessListener(authResult -> saveUserFirebase(nome))
-                .addOnFailureListener(e -> Toast.makeText(this, getString(R.string.log_msg) + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, getString(R.string.log_msg) + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
+                });
     }
 
     @Override

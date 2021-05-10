@@ -19,6 +19,9 @@ allprojects {
         mavenCentral()
         //noinspection JcenterRepositoryObsolete
         jcenter()
+        flatDir {
+            dirs '/libs'
+        }
     }
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {

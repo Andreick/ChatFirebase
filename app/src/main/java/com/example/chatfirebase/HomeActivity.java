@@ -237,8 +237,15 @@ public class HomeActivity extends AppCompatActivity {
             ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto2);
 
             Picasso.get().load(contact.getProfileUrl()).into(imgPhoto);
+
+            String text = lastMessage.getText();
+
+            if (!currentUid.equals(lastMessage.getSenderId())) {
+                text = contact.getName() + ": " + text;
+            }
+
             username.setText(contact.getName());
-            message.setText(lastMessage.getText());
+            message.setText(text);
         }
 
         @Override
