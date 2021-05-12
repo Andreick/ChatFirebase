@@ -20,6 +20,7 @@
     <string name="title_login">Login account</string>
     <string name="bt_login">Login</string>
     <string name="lost_password">Password</string>
+    <string name="loading_login">Logando</string>
     <string name="success_login">Logado com sucesso</string>
 
     <!-- Register Strings -->
@@ -27,6 +28,8 @@
     <string name="title_register">Register account</string>
     <string name="have_account">I already have an account!</string>
     <string name="bt_photo">Photo</string>
+    <string name="loading_register">Criando uma nova conta</string>
+    <string name="loading_message">Aguarde…</string>
     <string name="success_register">Conta criada com sucesso</string>
 
     <!-- Messages Strings -->
@@ -45,7 +48,9 @@
     <string name="log_msg">Error!\ </string>
 
     <!-- User Class Fields -->
+    <string name="user_id">id</string>
     <string name="user_name">name</string>
+    <string name="user_profile_url">profileUrl</string>
 
     <!-- Message Class Fields -->
     <string name="message_timestamp">timestamp</string>
