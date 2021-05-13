@@ -200,13 +200,15 @@ public class HomeActivity extends AppCompatActivity {
     // Troca para o RecyclerView selecionado
     private void onRadioButtonSelected(int checkedId) {
         if (checkedId == R.id.btInbox) {
+            inboxRegistration.remove();
             fetchInbox();
-            contactsRegistration.remove();
+            if (contactsRegistration != null) contactsRegistration.remove();
             vViewInbox.setVisibility(View.VISIBLE);
             vViewContacts.setVisibility(View.INVISIBLE);
 
         }
         else if (checkedId == R.id.btContacts) {
+            if (contactsRegistration != null) contactsRegistration.remove();
             fetchContacts();
             inboxRegistration.remove();
             linkedInboxItems.clear();
