@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".ChatFirebaseApplication"
@@ -48,6 +50,7 @@
         <activity android:name=".HomeActivity" />
 
         <service android:name=".SinchService" />
+        <service android:name=".CallNotificationService" />
 
         <meta-data
             android:name="preloaded_fonts"

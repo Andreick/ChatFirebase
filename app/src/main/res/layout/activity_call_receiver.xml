@@ -8,25 +8,11 @@
     android:background="@color/corPrimaria">
 
     <TextView
-        android:id="@+id/txtEmiterNumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Number"
-        android:textColor="@color/corSecundaria"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtEmitterName" />
-
-    <TextView
         android:id="@+id/txtEmitterName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:fontFamily="sans-serif-black"
-        android:text="Emiter Name"
         android:textColor="@color/corSecundaria"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,8 +27,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
     <TextView
         android:id="@+id/textView6"
@@ -63,19 +48,31 @@
         android:layout_height="60dp"
         android:layout_marginStart="100dp"
         android:layout_marginLeft="100dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="64dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtEmiterNumber"
+        app:layout_constraintTop_toBottomOf="@+id/imgEmitterSpeaker"
         app:srcCompat="@drawable/btn_aceitar" />
 
     <ImageView
         android:id="@+id/btReject"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="64dp"
         android:layout_marginEnd="100dp"
         android:layout_marginRight="100dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtEmiterNumber"
+        app:layout_constraintTop_toBottomOf="@+id/imgEmitterSpeaker"
         app:srcCompat="@drawable/btn_recusar" />
+
+    <ImageView
+        android:id="@+id/imgEmitterSpeaker"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="32dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtEmitterName"
+        app:srcCompat="@drawable/btn_viva_voz_desativado" />
 </androidx.constraintlayout.widget.ConstraintLayout>

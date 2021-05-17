@@ -7,52 +7,51 @@
     <string name="hint_password">Password</string>
     <string name="hint_name">Name</string>
     <string name="hint_confirm_password">Confirm Password</string>
-    <string name="hint_message">Digite aqui…</string>
+    <string name="hint_message">Type here…</string>
 
     <!-- User Edit Errors -->
-    <string name="error_email">Insira seu Email</string>
-    <string name="error_password">Insira sua Senha</string>
-    <string name="error_username">Insira um nome</string>
-    <string name="error_photo">Insira uma foto</string>
-    <string name="error_confirm_password">Senhas diferentes</string>
+    <string name="error_email">Enter your email</string>
+    <string name="error_password">Enter your password</string>
+    <string name="error_username">Enter your name</string>
+    <string name="error_photo">Enter your photo</string>
+    <string name="error_confirm_password">Passwords do not match</string>
 
     <!-- Login Strings -->
     <string name="title_login">Login account</string>
     <string name="bt_login">Login</string>
     <string name="lost_password">Password</string>
-    <string name="loading_login">Logando</string>
-    <string name="success_login">Logado com sucesso</string>
+    <string name="success_login">Successfully logged in</string>
 
     <!-- Register Strings -->
     <string name="new_register">Register</string>
     <string name="title_register">Register account</string>
     <string name="have_account">I already have an account!</string>
     <string name="bt_photo">Photo</string>
-    <string name="loading_register">Criando uma nova conta</string>
-    <string name="loading_message">Aguarde…</string>
-    <string name="success_register">Conta criada com sucesso</string>
+    <string name="loading_register">Creating a new account</string>
+    <string name="loading_message">Wait…</string>
+    <string name="success_register">Account successfully created</string>
 
     <!-- Messages Strings -->
-    <string name="bt_inbox">Inbox</string>
+    <string name="bt_inbox">Chats</string>
     <string name="bt_contacts">Contacts</string>
     <string name="bt_calls">Calls</string>
-    <string name="bt_logout">Logout</string>
+    <string name="bt_logout">Log out</string>
 
     <!-- Call Strings -->
-    <string name="on_call_progressing" tools:ignore="TypographyEllipsis">Tocando...</string>
-    <string name="on_call_established">Chamada estabelecida</string>
-    <string name="call_hang_up">Chamada encerrada</string>
+    <string name="on_call_progressing" tools:ignore="TypographyEllipsis">Calling...</string>
+    <string name="on_call_established">Call established</string>
+    <string name="call_hang_up">Call ended</string>
+    <string name="call_notification_title">Incoming call</string>
+    <string name="call_notification_text">tap to see</string>
 
     <!-- User Class Fields -->
     <string name="user_id">id</string>
     <string name="user_name">name</string>
     <string name="user_profile_url">profileUrl</string>
+    <string name="user_connection_status">connectionStatus</string>
 
     <!-- Message Class Fields -->
     <string name="message_timestamp">timestamp</string>
-
-    <!-- Intent Extra Names -->
-    <string name="extra_contact">contact</string>
 
     <!-- Firestore Collections -->
     <string name="collection_users">users</string>

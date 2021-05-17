@@ -91,9 +91,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToHomeActivity() {
-        ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
-        application.setup();
-
         loadingBar.setVisibility(View.GONE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         Toast.makeText(this, getString(R.string.success_login), Toast.LENGTH_SHORT).show();
@@ -101,5 +98,8 @@ public class LoginActivity extends AppCompatActivity {
         Intent homeIntent = new Intent(this, HomeActivity.class);
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(homeIntent);
+
+        ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
+        application.setup();
     }
 }

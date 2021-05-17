@@ -64,7 +64,7 @@ public class ChatActivity extends AppCompatActivity {
         currentUser = application.getCurrentUser();
         SinchService sinchService = application.getSinchService();
 
-        String contactId = getIntent().getStringExtra(getString(R.string.extra_contact));
+        String contactId = getIntent().getStringExtra(getString(R.string.user_id));
 
         contactQuery = FirebaseFirestore.getInstance().collection(getString(R.string.collection_users))
                 .whereEqualTo(getString(R.string.user_id), contactId);

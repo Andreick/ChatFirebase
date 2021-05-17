@@ -63,7 +63,7 @@ public class HomeActivity extends AppCompatActivity {
         vRadioOptions = findViewById(R.id.rdOptions);
         vInbox = findViewById(R.id.btInbox);
         vContacts = findViewById(R.id.btContacts);
-        vCalls = findViewById(R.id.btCalls);
+        //vCalls = findViewById(R.id.btCalls);
         vViewContacts = findViewById(R.id.lsContacts);
         vViewInbox = findViewById(R.id.lsInbox);
         vimgProfile = findViewById(R.id.imgProfile);
@@ -203,7 +203,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void goToChatActivity(String contactId) {
         Intent chatIntent = new Intent(this, ChatActivity.class);
-        chatIntent.putExtra(getString(R.string.extra_contact), contactId);
+        chatIntent.putExtra(getString(R.string.user_id), contactId);
         startActivity(chatIntent);
     }
 

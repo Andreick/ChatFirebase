@@ -33,11 +33,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void goToHomeActivity() {
-        ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
-        application.setup();
-
         Intent homeIntent = new Intent(this, HomeActivity.class);
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(homeIntent);
+
+        ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
+        application.setup();
     }
 }

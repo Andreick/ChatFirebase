@@ -81,7 +81,7 @@
                 android:textColor="@color/corPrimaria"
                 android:textSize="18sp" />
 
-            <RadioButton
+            <!--<RadioButton
                 android:id="@+id/btCalls"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
                 android:paddingHorizontal="20dp"
                 android:text="@string/bt_calls"
                 android:textColor="@color/corPrimaria"
-                android:textSize="18sp" />
+                android:textSize="18sp" />/-->
         </RadioGroup>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

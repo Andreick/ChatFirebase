@@ -1,22 +1,32 @@
 package com.example.chatfirebase;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+
 import com.google.firebase.auth.FirebaseAuth;
+import com.sinch.android.rtc.AudioController;
 import com.sinch.android.rtc.ClientRegistration;
 import com.sinch.android.rtc.MissingPermissionException;
+import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
 import com.sinch.android.rtc.SinchClient;
 import com.sinch.android.rtc.SinchError;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallClient;
 import com.sinch.android.rtc.calling.CallClientListener;
+import com.sinch.android.rtc.calling.CallListener;
+
+import java.util.List;
 
 public class SinchService extends Service {
 
@@ -24,6 +34,7 @@ public class SinchService extends Service {
 
     private final IBinder binder = new SinchServiceBinder();
     private SinchClient sinchClient;
+    private Intent notificationIntent;
     private Call call;
 
     @Override
@@ -56,9 +67,20 @@ public class SinchService extends Service {
                 sinchClient.addSinchClientListener(new SinchClientListener());
                 sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
 
+                createNotificationChannel();
+
                 Log.d(TAG, "Starting Sinch Client");
                 sinchClient.start();
             }
+        }
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(getString(R.string.channel_id),
+                    getString(R.string.channel_name), NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription(getString(R.string.channel_description));
+            getSystemService(NotificationManager.class).createNotificationChannel(channel);
         }
     }
 
@@ -112,6 +134,10 @@ public class SinchService extends Service {
         return call;
     }
 
+    public AudioController getAudioController() {
+        return sinchClient.getAudioController();
+    }
+
     public void callEnded() {
         call = null;
     }
@@ -125,12 +151,37 @@ public class SinchService extends Service {
             Log.d(TAG, "Incoming call");
             if (call == null) {
                 call = incomingCall;
+                call.addCallListener(new NotificationCallListener());
 
-                Intent receiverIntent = new Intent(SinchService.this, CallReceiverActivity.class);
-
-                receiverIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(receiverIntent);
+                notificationIntent = new Intent(SinchService.this, CallNotificationService.class);
+                ContextCompat.startForegroundService(SinchService.this, notificationIntent);
             }
+        }
+    }
+
+    private class NotificationCallListener implements CallListener {
+
+        @Override
+        public void onCallProgressing(Call progressingCall) {
+            Log.d(TAG, "onCallProgressing");
+        }
+
+        @Override
+        public void onCallEstablished(Call establishedCall) {
+            Log.d(TAG, "onCallEstablished");
+            call.removeCallListener(this);
+        }
+
+        @Override
+        public void onCallEnded(Call endedCall) {
+            Log.d(TAG, "onCallEnded");
+            getApplicationContext().stopService(notificationIntent);
+            call = null;
+        }
+
+        @Override
+        public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
+
         }
     }
 

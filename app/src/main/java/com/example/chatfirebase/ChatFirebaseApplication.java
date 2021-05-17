@@ -42,8 +42,8 @@ public class ChatFirebaseApplication extends Application implements ServiceConne
     }
 
     public void close() {
-        FirebaseAuth.getInstance().signOut();
         unbindService(this);
+        FirebaseAuth.getInstance().signOut();
         currentUser = null;
         sinchService = null;
     }
