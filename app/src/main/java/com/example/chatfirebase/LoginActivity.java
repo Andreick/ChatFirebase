@@ -53,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(registerIntent);
     }
 
-    // Faz o login do usuário no Firebase e vai para a MessagesActivity
+    // Faz o login do usuário no Firebase e vai para a HomeActivity
     private void login() {
         boolean hasInvalidField = false;
         
@@ -86,14 +86,18 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     loadingBar.setVisibility(View.GONE);
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    Toast.makeText(this, getString(R.string.log_msg) + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
     private void goToHomeActivity() {
+        ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
+        application.setup();
+
         loadingBar.setVisibility(View.GONE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         Toast.makeText(this, getString(R.string.success_login), Toast.LENGTH_SHORT).show();
+
         Intent homeIntent = new Intent(this, HomeActivity.class);
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(homeIntent);

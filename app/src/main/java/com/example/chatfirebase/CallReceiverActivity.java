@@ -1,18 +1,32 @@
 package com.example.chatfirebase;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.sinch.android.rtc.MissingPermissionException;
 import com.sinch.android.rtc.calling.Call;
 import com.squareup.picasso.Picasso;
 
-public class CallReceiverActivity extends AppCompatActivity {
+public class CallReceiverActivity extends AppCompatActivity implements ServiceConnection {
 
-    private ChatFirebase chatFirebase;
+    private static final String TAG = "CallReceiverActivity";
+
+    ImageView vImgEmitter;
+    TextView vTxtEmitterName;
+    ImageView vbtReject;
+    ImageView vbtAccept;
+
     private Call call;
 
     @Override
@@ -20,31 +34,53 @@ public class CallReceiverActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_call_receiver);
 
-        ImageView vImgEmitter = findViewById(R.id.imgEmitter);
-        TextView vTxtEmitterName = findViewById(R.id.txtEmitterName);
-        ImageView vbtReject = findViewById(R.id.btReject);
-        ImageView vbtAccept = findViewById(R.id.btAccept);
+        vImgEmitter = findViewById(R.id.imgEmitter);
+        vTxtEmitterName = findViewById(R.id.txtEmitterName);
+        vbtReject = findViewById(R.id.btReject);
+        vbtAccept = findViewById(R.id.btAccept);
 
-        chatFirebase = (ChatFirebase) getApplicationContext();
-        call = chatFirebase.getCall();
-        call.addCallListener(new SinchCallListener(this));
+        Intent serviceIntent = new Intent(this, SinchService.class);
+        bindService(serviceIntent, this, 0);
+    }
 
-        String profileUrl = getIntent().getStringExtra(getString(R.string.user_profile_url));
-        Picasso.get().load(profileUrl).into(vImgEmitter);
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        SinchService.SinchServiceBinder binder = (SinchService.SinchServiceBinder) service;
+        SinchService sinchService = binder.getService();
 
-        String username = getIntent().getStringExtra(getString(R.string.user_name));
-        vTxtEmitterName.setText(username);
+        call = sinchService.getCall();
+        call.addCallListener(new SinchCallListener(this, sinchService));
+
+        FirebaseFirestore.getInstance().collection(getString(R.string.collection_users))
+                .document(call.getRemoteUserId())
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    String profileUrl = (String) snapshot.get(getString(R.string.user_profile_url));
+                    Picasso.get().load(profileUrl).into(vImgEmitter);
+
+                    String username = (String) snapshot.get(getString(R.string.user_name));
+                    vTxtEmitterName.setText(username);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Get remote user failure");
+                    call.hangup();
+                });
 
         vbtReject.setOnClickListener(view -> call.hangup());
         vbtAccept.setOnClickListener(view -> {
-            call.answer();
-            vbtAccept.setVisibility(View.INVISIBLE);
+            try {
+                call.answer();
+                vbtAccept.setVisibility(View.INVISIBLE);
+            }
+            catch (MissingPermissionException e) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
         });
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        chatFirebase.callEnded();
+    public void onServiceDisconnected(ComponentName name) {
+        Log.e(TAG, "Sinch Service disconnected");
+        finish();
     }
 }

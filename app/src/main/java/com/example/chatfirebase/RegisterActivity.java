@@ -27,11 +27,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class RegisterActivity extends AppCompatActivity {
+
+    private static final String TAG = "RegisterActivity";
 
     private EditText vEditName;
     private EditText vEditPassword;
@@ -45,6 +47,9 @@ public class RegisterActivity extends AppCompatActivity {
     private ProgressBar loadingBar;
 
     private FirebaseUser currentUser;
+    private String displayName;
+    private Uri photoUrl;
+    private StorageReference photoReference;
     private boolean isRegistered;
 
     @Override
@@ -78,6 +83,13 @@ public class RegisterActivity extends AppCompatActivity {
         startActivity(loginIntent);
     }
 
+    // Solicita a escolha de uma imagem
+    private void selectPhoto() {
+        Intent pickIntent = new Intent(Intent.ACTION_PICK);
+        pickIntent.setType("image/*");
+        startActivityForResult(pickIntent, 0);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -99,21 +111,14 @@ public class RegisterActivity extends AppCompatActivity {
                     vButtonPhoto.setAlpha(0);
                 }
                 catch (IOException e) {
-                    Log.e(getString(R.string.log_tag), getString(R.string.log_msg), e);
+                    Log.e(TAG, "Bitmap exception", e);
                 }
             }
         }
     }
 
-    // Solicita a escolha de uma imagem
-    private void selectPhoto() {
-        Intent pickIntent = new Intent(Intent.ACTION_PICK);
-        pickIntent.setType("image/*");
-        startActivityForResult(pickIntent, 0);
-    }
-
     // Cria o usuário no Firebase usando o email e a senha
-    public void createUser() {
+    private void createUser() {
         boolean hasInvalidField = false;
 
         String name = vEditName.getText().toString();
@@ -154,37 +159,55 @@ public class RegisterActivity extends AppCompatActivity {
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener(authResult -> {
                     currentUser = authResult.getUser();
-                    updateUser(name);
+                    displayName = name;
+                    savePhotoInStorage();
                 })
                 .addOnFailureListener(e -> {
                     loadingBar.setVisibility(View.GONE);
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    Toast.makeText(this, getString(R.string.log_msg) + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
-    // Salva a foto do usuário no Storage e atualiza os dados no Firebase
-    private void updateUser(String displayName) {
-        FirebaseStorage.getInstance().getReference(getString(R.string.storage_path_photos) + currentUser.getUid())
-                .putFile(vSelectData)
-                .addOnSuccessListener(taskSnapshot -> taskSnapshot.getStorage().getDownloadUrl()
+    // Salva a foto do usuário no Storage
+    private void savePhotoInStorage() {
+        photoReference = FirebaseStorage.getInstance().getReference(getString(R.string.storage_path_photos) + currentUser.getUid());
+        photoReference.putFile(vSelectData)
+                .addOnSuccessListener(taskSnapshot -> photoReference.getDownloadUrl()
                         .addOnSuccessListener(this, photoUri -> {
-                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                    .setDisplayName(displayName)
-                                    .setPhotoUri(photoUri)
-                                    .build();
-
-                            currentUser.updateProfile(profileUpdates)
-                                    .addOnSuccessListener(this, unused -> saveUserInFirestore())
-                                    .addOnFailureListener(this::onRegisterFailure);
+                            photoUrl = photoUri;
+                            updateUser();
                         })
-                        .addOnFailureListener(this::onRegisterFailure)
-                .addOnFailureListener(this::onRegisterFailure));
+                        .addOnFailureListener(e -> {
+                            Log.e(TAG, "Failed to get photo URL", e);
+                            deletePhotoInStorage();
+                            deleteUser();
+                        })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to save photo", e);
+                    deleteUser();
+                }));
+    }
+
+    // Atualiza os dados do usuário no Firebase
+    private void updateUser() {
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(displayName)
+                .setPhotoUri(photoUrl)
+                .build();
+
+        currentUser.updateProfile(profileUpdates)
+                .addOnSuccessListener(this, unused -> saveUserInFirestore())
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "User update failed", e);
+                    deletePhotoInStorage();
+                    deleteUser();
+                });
     }
 
     // Salva o usuário no Firestore
     private void saveUserInFirestore() {
-        User user = new User(currentUser.getUid(), currentUser.getDisplayName(), Objects.requireNonNull(currentUser.getPhotoUrl()));
+        User user = new User(currentUser.getUid(), displayName, photoUrl.toString());
 
         FirebaseFirestore.getInstance().collection(getString(R.string.collection_users))
                 .document(currentUser.getUid())
@@ -197,27 +220,43 @@ public class RegisterActivity extends AppCompatActivity {
                         isRegistered = true;
                     }
                 })
-                .addOnFailureListener(this::onRegisterFailure);
-    }
-
-    // Deleta o usuário do Firebase em caso de erro
-    private void onRegisterFailure(Exception e) {
-        Log.e(getString(R.string.log_tag), getString(R.string.log_msg), e);
-        currentUser.delete()
-                .addOnCompleteListener(task -> {
-                   if (!task.isSuccessful()) {
-                       Log.e(getString(R.string.log_tag), getString(R.string.log_msg), task.getException());
-                   }
-                   loadingBar.setVisibility(View.GONE);
-                   getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                   Toast.makeText(this, getString(R.string.success_register), Toast.LENGTH_SHORT).show();
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to save user in Firestore", e);
+                    deletePhotoInStorage();
+                    deleteUser();
                 });
     }
 
+    // Deleta o usuário do Firebase
+    private void deleteUser() {
+        currentUser.delete()
+                .addOnCompleteListener(task -> {
+                   if (task.isSuccessful()) {
+                       Log.d(TAG, "User deleted");
+                   }
+                   else {
+                       Log.e(TAG, "User deletion failed", task.getException());
+                   }
+                   loadingBar.setVisibility(View.GONE);
+                   getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                });
+    }
+
+    // Deleta a foto do Storage
+    private void deletePhotoInStorage() {
+        photoReference.delete()
+                .addOnSuccessListener(unused -> Log.d(TAG, "Photo deleted"))
+                .addOnFailureListener(e -> Log.e(TAG, "Photo deletion failed", e));
+    }
+
     private void goToHomeActivity() {
+        ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
+        application.setup();
+
         loadingBar.setVisibility(View.GONE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         Toast.makeText(this, getString(R.string.success_register), Toast.LENGTH_SHORT).show();
+
         Intent homeIntent = new Intent(this, HomeActivity.class);
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(homeIntent);

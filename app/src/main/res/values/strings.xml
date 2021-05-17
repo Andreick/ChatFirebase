@@ -43,10 +43,6 @@
     <string name="on_call_established">Chamada estabelecida</string>
     <string name="call_hang_up">Chamada encerrada</string>
 
-    <!-- Log Strings -->
-    <string name="log_tag">ExceptionLog</string>
-    <string name="log_msg">Error!\ </string>
-
     <!-- User Class Fields -->
     <string name="user_id">id</string>
     <string name="user_name">name</string>
@@ -66,6 +62,11 @@
 
     <!-- Firebase Storage References -->
     <string name="storage_path_photos">images/photos/</string>
+
+    <!-- Channel Strings -->
+    <string name="channel_id">SinchChannel</string>
+    <string name="channel_name">Sinch Channel</string>
+    <string name="channel_description">Call Notifications</string>
 
     <!-- Sinch Credentials -->
     <string name="sinch_hostname">clientapi.sinch.com</string>

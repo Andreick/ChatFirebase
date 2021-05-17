@@ -15,9 +15,11 @@ import java.util.List;
 public class SinchCallListener implements CallListener {
 
     private final Activity activity;
+    private final SinchService sinchService;
 
-    public SinchCallListener(Activity activity) {
+    public SinchCallListener(Activity activity, SinchService sinchService) {
         this.activity = activity;
+        this.sinchService = sinchService;
     }
 
     @Override
@@ -33,6 +35,7 @@ public class SinchCallListener implements CallListener {
 
     @Override
     public void onCallEnded(Call endedCall) {
+        sinchService.callEnded();
         activity.setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
 
         CallEndCause endCause = endedCall.getDetails().getEndCause();
@@ -42,7 +45,7 @@ public class SinchCallListener implements CallListener {
                 break;
             case FAILURE:
                 SinchError e = endedCall.getDetails().getError();
-                Toast.makeText(activity, activity.getString(R.string.log_msg) + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
                 break;
             default:
                 Toast.makeText(activity, endCause.toString(), Toast.LENGTH_SHORT).show();

@@ -1,6 +1,5 @@
 package com.example.chatfirebase;
 
-import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -16,12 +15,6 @@ public class User implements Parcelable {
         this.id = id;
         this.name = name;
         this.profileUrl = profileUrl;
-    }
-
-    public User(String id, String name, Uri profileUrl) {
-        this.id = id;
-        this.name = name;
-        this.profileUrl = profileUrl.toString();
     }
 
     protected User(Parcel in) {
