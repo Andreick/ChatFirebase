@@ -18,13 +18,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+//import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -52,6 +55,31 @@ public class RegisterActivity extends AppCompatActivity {
     private StorageReference photoReference;
     private boolean isRegistered;
 
+    ActivityResultLauncher<String> getContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
+                    vSelectData = uri;
+
+                    Bitmap bitmap;
+                    try {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), vSelectData);
+                        }
+                        else {
+                            ImageDecoder.Source source = ImageDecoder.createSource(getContentResolver(), vSelectData);
+                            bitmap = ImageDecoder.decodeBitmap(source);
+                        }
+                        vImgPhoto.setImageDrawable(new BitmapDrawable(getResources(), bitmap));
+                        vButtonPhoto.setAlpha(0);
+                    }
+                    catch (IOException e) {
+                        Log.e(TAG, "Bitmap exception", e);
+                        Toast.makeText(RegisterActivity.this, "Failed to pick photo", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,54 +95,16 @@ public class RegisterActivity extends AppCompatActivity {
         vImgPhoto = findViewById(R.id.imgPhoto);
         loadingBar = findViewById(R.id.progressBar);
 
-        vButtonHaveAccount.setOnClickListener(view -> goToLoginActivity());
-        vButtonPhoto.setOnClickListener(view -> selectPhoto());
+        // Solicita a escolha de uma imagem
+        vButtonPhoto.setOnClickListener(view -> getContent.launch("image/*"));
         vButtonRegister.setOnClickListener(view -> createUser());
+        vButtonHaveAccount.setOnClickListener(view -> goToLoginActivity());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (isRegistered) goToHomeActivity();
-    }
-
-    private void goToLoginActivity() {
-        Intent loginIntent = new Intent(this, LoginActivity.class);
-        startActivity(loginIntent);
-    }
-
-    // Solicita a escolha de uma imagem
-    private void selectPhoto() {
-        Intent pickIntent = new Intent(Intent.ACTION_PICK);
-        pickIntent.setType("image/*");
-        startActivityForResult(pickIntent, 0);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (data != null) {
-            if (requestCode == 0) { // Obtém o bitmap da foto escolhida e exibe a foto na ImageView
-                vSelectData = data.getData();
-
-                Bitmap bitmap;
-                try {
-                    if (Build.VERSION.SDK_INT < 28) {
-                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), vSelectData);
-                    }
-                    else {
-                        ImageDecoder.Source source = ImageDecoder.createSource(getContentResolver(), vSelectData);
-                        bitmap = ImageDecoder.decodeBitmap(source);
-                    }
-                    vImgPhoto.setImageDrawable(new BitmapDrawable(this.getResources(), bitmap));
-                    vButtonPhoto.setAlpha(0);
-                }
-                catch (IOException e) {
-                    Log.e(TAG, "Bitmap exception", e);
-                }
-            }
-        }
     }
 
     // Cria o usuário no Firebase usando o email e a senha
@@ -227,6 +217,27 @@ public class RegisterActivity extends AppCompatActivity {
                 });
     }
 
+    /*private void saveUserInDatabase() {
+        User user = new User(currentUser.getUid(), displayName, photoUrl.toString());
+
+        FirebaseDatabase.getInstance().getReference(getString(R.string.database_users))
+                .child(user.getId())
+                .setValue(user)
+                .addOnSuccessListener(unused -> {
+                    if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                        goToHomeActivity();
+                    }
+                    else {
+                        isRegistered = true;
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to save user in Firestore", e);
+                    deletePhotoInStorage();
+                    deleteUser();
+                });
+    }*/
+
     // Deleta o usuário do Firebase
     private void deleteUser() {
         currentUser.delete()
@@ -239,6 +250,7 @@ public class RegisterActivity extends AppCompatActivity {
                    }
                    loadingBar.setVisibility(View.GONE);
                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                   Toast.makeText(this, "Failed to create account", Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -260,5 +272,10 @@ public class RegisterActivity extends AppCompatActivity {
 
         ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
         application.setup();
+    }
+
+    private void goToLoginActivity() {
+        Intent loginIntent = new Intent(this, LoginActivity.class);
+        startActivity(loginIntent);
     }
 }

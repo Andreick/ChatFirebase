@@ -5,16 +5,42 @@
     android:id="@+id/Constraint"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/corPrimaria"
+    android:background="@color/cor_secundaria"
     android:visibility="visible"
     tools:context=".HomeActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgProfile"
+        android:layout_width="73dp"
+        android:layout_height="73dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="8dp"
+        android:visibility="visible"
+        app:civ_border_color="@color/cor_primaria"
+        app:civ_border_width="3dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <Button
+        android:id="@+id/btLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
+        android:text="@string/bt_logout"
+        app:layout_constraintBottom_toBottomOf="@+id/imgProfile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imgProfile" />
+
+    <!--androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="0dp"
-        android:layout_height="130dp"
+        android:layout_height="90dp"
         android:background="@color/corSecundaria"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -81,7 +107,7 @@
                 android:textColor="@color/corPrimaria"
                 android:textSize="18sp" />
 
-            <!--<RadioButton
+            <RadioButton
                 android:id="@+id/btCalls"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -91,12 +117,40 @@
                 android:paddingHorizontal="20dp"
                 android:text="@string/bt_calls"
                 android:textColor="@color/corPrimaria"
-                android:textSize="18sp" />/-->
+                android:textSize="18sp" />
         </RadioGroup>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout-->
 
-    <androidx.recyclerview.widget.RecyclerView
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgProfile">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_bar"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            app:tabBackground="@color/cor_secundaria"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="@color/cinza" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/cor_primaria" />
+
+    </LinearLayout>
+
+    <!--androidx.recyclerview.widget.RecyclerView
         android:id="@+id/lsContacts"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -113,6 +167,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" /-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

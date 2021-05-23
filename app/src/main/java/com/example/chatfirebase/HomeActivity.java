@@ -1,216 +1,97 @@
 package com.example.chatfirebase;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
-import com.xwray.groupie.GroupAdapter;
-import com.xwray.groupie.GroupieViewHolder;
-import com.xwray.groupie.Item;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import org.jetbrains.annotations.NotNull;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private static final String TAG = "HomeActivity";
+    private static final int NUM_PAGES = 3;
 
-    private final Map<String, InboxItem> inboxItemMap = new HashMap<>();
-    private final LinkedList<InboxItem> linkedInboxItems = new LinkedList<>();
-    private final Set<ContactItem> contactItemSet = new TreeSet<>(new ContactItemComparator());
-
-    private Button vButtonLogout;
-    private RadioGroup vRadioOptions;
-    private RadioButton vInbox, vContacts, vCalls;
-    private RecyclerView vViewContacts, vViewInbox;
-    private GroupAdapter<GroupieViewHolder> contactsAdapter, inboxAdapter;
-    private ImageView vimgProfile;
-
-    private String currentUid;
-    private Query inboxMessagesQuery;
-    private Query contactsQuery;
-    private ListenerRegistration inboxRegistration;
-    private ListenerRegistration contactsRegistration;
+    private ImageView imgProfile;
+    private Button buttonLogout;
+    private TextView tvChats, tvContacts, tvCalls;
+    private TabLayout tabLayout;
+    private ViewPager2 viewPager;
+    private FragmentStateAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        vButtonLogout = findViewById(R.id.btLogout);
-        vRadioOptions = findViewById(R.id.rdOptions);
-        vInbox = findViewById(R.id.btInbox);
-        vContacts = findViewById(R.id.btContacts);
-        //vCalls = findViewById(R.id.btCalls);
-        vViewContacts = findViewById(R.id.lsContacts);
-        vViewInbox = findViewById(R.id.lsInbox);
-        vimgProfile = findViewById(R.id.imgProfile);
+        imgProfile = findViewById(R.id.imgProfile);
+        buttonLogout = findViewById(R.id.btLogout);
+        tabLayout = findViewById(R.id.tab_bar);
+        viewPager = findViewById(R.id.view_pager);
 
-        inboxAdapter = new GroupAdapter<>();
-        vViewInbox.setLayoutManager(new LinearLayoutManager(this));
-        vViewInbox.setAdapter(inboxAdapter);
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        contactsAdapter = new GroupAdapter<>();
-        vViewContacts.setLayoutManager(new LinearLayoutManager(this));
-        vViewContacts.setAdapter(contactsAdapter);
+        if (currentUser == null) {
+            Toast.makeText(this, "Failed to load user", Toast.LENGTH_SHORT).show();
+            goToLoginActivity();
+            return;
+        }
 
-        currentUid = FirebaseAuth.getInstance().getUid();
+        Uri profileUri = currentUser.getPhotoUrl();
+        Picasso.get().load(profileUri).into(imgProfile);
 
-        inboxMessagesQuery = FirebaseFirestore.getInstance().collection(getString(R.string.collection_inboxes))
-                .document(currentUid)
-                .collection(getString(R.string.collection_inbox_message))
-                .orderBy(getString(R.string.message_timestamp), Query.Direction.ASCENDING);
+        pagerAdapter = new PagerAdapter(this);
+        viewPager.setAdapter(pagerAdapter);
 
-        contactsQuery = FirebaseFirestore.getInstance().collection(getString(R.string.collection_users))
-                .whereNotEqualTo(getString(R.string.user_id), currentUid);
+        tabLayout.addOnTabSelectedListener(new TabSelectedListener());
 
-        contactsAdapter.setOnItemClickListener((item, view) -> {
-            ContactItem contactItem = (ContactItem) item;
-            goToChatActivity(contactItem.contactId);
-        });
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
 
-        inboxAdapter.setOnItemClickListener((item, view) -> {
-            InboxItem inboxItem = (InboxItem) item;
-            goToChatActivity(inboxItem.contactId);
-        });
+            tab.setCustomView(R.layout.custom_tab);
+            View view = tab.getCustomView();
 
-        vButtonLogout.setOnClickListener(view -> logout());
-        vRadioOptions.setOnCheckedChangeListener((group, checkedId) -> onRadioButtonSelected(checkedId));
+            if (view != null) {
+
+                switch (position) {
+                    case 0:
+                        tvChats = view.findViewById(R.id.tv_tab);
+                        tvChats.setText(R.string.tab_chats);
+                        break;
+                    case 1:
+                        tvContacts = view.findViewById(R.id.tv_tab);
+                        tvContacts.setText(R.string.tab_contacts);
+                        break;
+                    case 2:
+                        tvCalls = view.findViewById(R.id.tv_tab);
+                        tvCalls.setText(R.string.tab_calls);
+                        break;
+                }
+            }
+        }).attach();
+
+        buttonLogout.setOnClickListener(view -> logout());
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        if (vInbox.isChecked()) {
-            Log.d(TAG, "Inbox radio button is checked");
-            fetchInbox();
-        }
-        else if (vContacts.isChecked()) {
-            Log.d(TAG, "Contacts radio button is checked");
-            fetchContacts();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        inboxRegistration = null;
-        linkedInboxItems.clear();
-        contactsRegistration = null;
-    }
-
-    // Atualiza a caixa de entrada em tempo real
-    private void fetchInbox() {
-        inboxRegistration = inboxMessagesQuery.addSnapshotListener(this, (snapshots, e) -> {
-            if (e == null) {
-                if (snapshots != null) {
-                    for (DocumentChange doc : snapshots.getDocumentChanges()) {
-                        InboxMessage inboxMessage = doc.getDocument().toObject(InboxMessage.class);
-
-                        switch (doc.getType()) {
-                            case ADDED:
-                                InboxItem newInboxItem = new InboxItem(inboxMessage);
-                                inboxItemMap.put(inboxMessage.getContactId(), newInboxItem);
-                                linkedInboxItems.addFirst(newInboxItem);
-                                break;
-                            case MODIFIED:
-                                InboxItem inboxItem = Objects.requireNonNull(inboxItemMap.get(inboxMessage.getContactId()));
-                                linkedInboxItems.remove(inboxItem);
-                                inboxItem.setMessage(inboxMessage);
-                                linkedInboxItems.addFirst(inboxItem);
-                                break;
-                        }
-
-                        inboxAdapter.update(linkedInboxItems, false);
-                        inboxAdapter.notifyDataSetChanged();
-                    }
-                }
-            }
-            else {
-                Log.e(TAG, "Inbox query exception", e);
-            }
-        });
-    }
-
-    // Atualiza os contatos em tempo real
-    private void fetchContacts() {
-        contactsRegistration = contactsQuery.addSnapshotListener(this, (snapshots, e) -> {
-            if (e == null) {
-                if (snapshots != null) {
-                    for (DocumentChange doc : snapshots.getDocumentChanges()) {
-                        User contact = doc.getDocument().toObject(User.class);
-
-                        if (doc.getType() == DocumentChange.Type.ADDED) {
-                            contactItemSet.add(new ContactItem(contact));
-                        }
-
-                        contactsAdapter.update(contactItemSet);
-                        contactsAdapter.notifyDataSetChanged();
-                    }
-                }
-            }
-            else {
-                Log.e(TAG, "Contacts query exception", e);
-            }
-        });
-    }
-
-    // Troca para o RecyclerView selecionado
-    private void onRadioButtonSelected(int checkedId) {
-        if (inboxRegistration != null) {
-            inboxRegistration.remove();
-            linkedInboxItems.clear();
-        }
-        if (contactsRegistration != null) {
-            contactsRegistration.remove();
-        }
-
-        if (checkedId == R.id.btInbox) {
-            Log.d(TAG, "Inbox radio button selected");
-            fetchInbox();
-            vViewInbox.setVisibility(View.VISIBLE);
-            vViewContacts.setVisibility(View.INVISIBLE);
-        }
-        else if (checkedId == R.id.btContacts) {
-            Log.d(TAG, "Contacts radio button selected");
-            fetchContacts();
-            vViewInbox.setVisibility(View.INVISIBLE);
-            vViewContacts.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void goToChatActivity(String contactId) {
-        Intent chatIntent = new Intent(this, ChatActivity.class);
-        chatIntent.putExtra(getString(R.string.user_id), contactId);
-        startActivity(chatIntent);
-    }
-
-    private void logout() {
-        ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
-        application.close();
-        goToLoginActivity();
+    public void onBackPressed() {
+        if (viewPager.getCurrentItem() == 0) super.onBackPressed();
+        else viewPager.setCurrentItem(0);
     }
 
     private void goToLoginActivity() {
@@ -219,84 +100,77 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(loginIntent);
     }
 
-    private class InboxItem extends Item<GroupieViewHolder> {
+    private void logout() {
+        ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
+        application.close();
+        goToLoginActivity();
+    }
 
-        private final String contactId;
-        private final String contactProfileUrl;
-        private final String contactName;
-        private String senderId;
-        private String lastMessage;
-
-        public InboxItem(InboxMessage inboxMessage) {
-            contactId = inboxMessage.getContactId();
-            contactProfileUrl = inboxMessage.getContactProfileUrl();
-            contactName = inboxMessage.getContactName();
-            senderId = inboxMessage.getSenderId();
-            lastMessage = inboxMessage.getText();
-        }
-
-        private void setMessage(Message message) {
-            senderId = message.getSenderId();
-            lastMessage = message.getText();
-        }
+    private class TabSelectedListener implements TabLayout.OnTabSelectedListener {
 
         @Override
-        public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
-            TextView username = viewHolder.itemView.findViewById(R.id.txtUserName2);
-            TextView message = viewHolder.itemView.findViewById(R.id.txtLastMessage2);
-            ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto2);
+        public void onTabSelected(TabLayout.Tab tab) {
 
-            Picasso.get().load(contactProfileUrl).into(imgPhoto);
-
-            String text = lastMessage;
-
-            if (!currentUid.equals(senderId)) {
-                text = contactName + ": " + text;
+            switch (tab.getPosition()) {
+                case 0:
+                    tvChats.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.cinza));
+                    break;
+                case 1:
+                    tvContacts.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.cinza));
+                    break;
+                case 2:
+                    tvCalls.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.cinza));
+                    break;
             }
-
-            username.setText(contactName);
-            message.setText(text);
         }
 
         @Override
-        public int getLayout() {
-            return R.layout.card_user_inbox;
+        public void onTabUnselected(TabLayout.Tab tab) {
+
+            switch (tab.getPosition()) {
+                case 0:
+                    tvChats.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.cor_primaria));
+                    break;
+                case 1:
+                    tvContacts.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.cor_primaria));
+                    break;
+                case 2:
+                    tvCalls.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.cor_primaria));
+                    break;
+            }
+        }
+
+        @Override
+        public void onTabReselected(TabLayout.Tab tab) {
+
         }
     }
 
-    private static class ContactItem extends Item<GroupieViewHolder> {
+    private static class PagerAdapter extends FragmentStateAdapter {
 
-        private final String contactId;
-        private final String contactProfileUrl;
-        private final String contactName;
+        public PagerAdapter(FragmentActivity fragmentActivity) {
+            super(fragmentActivity);
+        }
 
-        public ContactItem(User contact) {
-            contactId = contact.getId();
-            contactProfileUrl = contact.getProfileUrl();
-            contactName = contact.getName();
+        @NotNull
+        @Override
+        public Fragment createFragment(int position) {
+
+            switch (position) {
+                case 0:
+                    return new ChatsFragment();
+                case 1:
+                    return new ContactsFragment();
+                case 2:
+                    return new CallsFragment();
+                default:
+                    return new Fragment();
+            }
         }
 
         @Override
-        public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
-            TextView txtUserNm = viewHolder.itemView.findViewById(R.id.txtUserName);
-            ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto);
-
-            Picasso.get().load(contactProfileUrl).into(imgPhoto);
-            txtUserNm.setText(contactName);
-        }
-
-        @Override
-        public int getLayout() {
-            return R.layout.card_user;
-        }
-    }
-
-    // Compara os ContactItems de acordo com o nome do usuário
-    private static class ContactItemComparator implements Comparator<ContactItem> {
-
-        @Override
-        public int compare(ContactItem ci1, ContactItem ci2) {
-            return ci1.contactName.compareTo(ci2.contactName);
+        public int getItemCount() {
+            return NUM_PAGES;
         }
     }
 }

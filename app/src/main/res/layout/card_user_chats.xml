@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/corPrimaria">
+    android:background="@color/cor_primaria">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgUserPhoto2"
@@ -15,7 +15,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         app:civ_border_width="3dp"
-        app:civ_border_color="@color/corSecundaria"
+        app:civ_border_color="@color/cor_secundaria"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -30,7 +30,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:fontFamily="@font/alegreya_sans_sc_extrabold"
-        android:textColor="@color/corSecundaria"
+        android:textColor="@color/cor_secundaria"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -46,7 +46,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
-        android:textColor="@color/corSecundaria"
+        android:textColor="@color/cor_secundaria"
         app:layout_constraintBottom_toBottomOf="@+id/imgUserPhoto2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imgUserPhoto2"

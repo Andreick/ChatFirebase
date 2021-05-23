@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CallEmitterActivity"
-    android:background="@color/corPrimaria">
+    android:background="@color/cor_primaria">
 
     <ImageView
         android:id="@+id/btReject2"
@@ -24,7 +24,7 @@
         android:layout_marginTop="50dp"
         android:letterSpacing="0.3"
         android:text="Voice Call"
-        android:textColor="@color/corSecundaria"
+        android:textColor="@color/cor_secundaria"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:fontFamily="sans-serif-black"
-        android:textColor="@color/corSecundaria"
+        android:textColor="@color/cor_secundaria"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

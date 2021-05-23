@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,8 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.GroupieViewHolder;
@@ -28,52 +31,59 @@ public class ChatActivity extends AppCompatActivity {
 
     private final LinkedList<MessageItem> linkedMessages = new LinkedList<>();
 
-    private ImageView vImgContact;
-    private TextView vTxtNameContact;
-    private RecyclerView vlsViewChat;
-    private EditText vEditChat;
-    private GroupAdapter<GroupieViewHolder> adapter;
-    private ImageView vbtSend, vbtCall;
-
     private User currentUser;
     private Query contactQuery;
+    private EventListener<QuerySnapshot> contactEventListener;
     private CollectionReference conversationsReference;
     private Query messagesQuery;
+    private EventListener<QuerySnapshot> messagesEventListener;
     private User contact;
+
+    private ImageView imgContact;
+    private TextView txtNameContact;
+    private RecyclerView rvChat;
+    private EditText editChat;
+    private GroupAdapter<GroupieViewHolder> chatAdapter;
+    private ImageView vbtSend, vbtCall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        vImgContact = findViewById(R.id.imgContact);
-        vTxtNameContact = findViewById(R.id.txtNameContact);
-        vlsViewChat = findViewById(R.id.lsViewChat);
-        vEditChat = findViewById(R.id.edtChat);
-        vbtSend = findViewById(R.id.btSend);
-        vbtCall = findViewById(R.id.imgCall);
-
-        adapter = new GroupAdapter<>();
-        vlsViewChat.setLayoutManager(new LinearLayoutManager(this));
-        vlsViewChat.setAdapter(adapter);
-
-        vbtSend.setEnabled(false);
-        vbtCall.setEnabled(false);
-
         ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
         currentUser = application.getCurrentUser();
-        SinchService sinchService = application.getSinchService();
 
         String contactId = getIntent().getStringExtra(getString(R.string.user_id));
 
         contactQuery = FirebaseFirestore.getInstance().collection(getString(R.string.collection_users))
                 .whereEqualTo(getString(R.string.user_id), contactId);
 
+        setContactEventListener();
+
         conversationsReference = FirebaseFirestore.getInstance().collection(getString(R.string.collection_conversations));
 
         messagesQuery = conversationsReference.document(currentUser.getId())
                 .collection(contactId)
                 .orderBy(getString(R.string.message_timestamp), Query.Direction.ASCENDING);
+
+        setMessagesEventListener();
+
+        imgContact = findViewById(R.id.imgContact);
+        txtNameContact = findViewById(R.id.txtNameContact);
+        rvChat = findViewById(R.id.lsViewChat);
+        editChat = findViewById(R.id.edtChat);
+        vbtSend = findViewById(R.id.btSend);
+        vbtCall = findViewById(R.id.imgCall);
+
+        chatAdapter = new GroupAdapter<>();
+        rvChat.setLayoutManager(new LinearLayoutManager(this));
+        rvChat.setAdapter(chatAdapter);
+
+        vbtSend.setEnabled(false);
+        vbtCall.setEnabled(false);
+
+        SinchService sinchService = application.getSinchService();
 
         vbtSend.setOnClickListener(view -> sendMessage());
         vbtCall.setOnClickListener(view -> sinchService.callUser(contact));
@@ -82,7 +92,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        fetchContact();
+        contactQuery.addSnapshotListener(this, contactEventListener);
     }
 
     @Override
@@ -94,19 +104,18 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     // Atualiza os dados do contato em tempo real
-    private void fetchContact() {
-        Log.d(TAG, "fetchContact");
-        contactQuery.addSnapshotListener(this, (snapshots, e) -> {
+    private void setContactEventListener() {
+        contactEventListener = (snapshots, e) -> {
             if (e == null) {
                 if (snapshots != null) {
                     for (DocumentChange doc : snapshots.getDocumentChanges()) {
                         switch (doc.getType()) {
                             case ADDED:
                                 contact = doc.getDocument().toObject(User.class);
-                                fetchMessages();
+                                messagesQuery.addSnapshotListener(this, messagesEventListener);
 
-                                Picasso.get().load(contact.getProfileUrl()).into(vImgContact);
-                                vTxtNameContact.setText(contact.getName());
+                                Picasso.get().load(contact.getProfileUrl()).into(imgContact);
+                                txtNameContact.setText(contact.getName());
 
                                 vbtSend.setEnabled(true);
                                 vbtCall.setEnabled(true);
@@ -118,15 +127,16 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
             else {
-                Log.e(TAG, "Contact query exception", e);
+                Log.e(TAG, "Contact snapshot listener failed", e);
+                Toast.makeText(this, "Failed to load contact", Toast.LENGTH_SHORT).show();
+                finish();
             }
-        });
+        };
     }
 
     // Exibe todas as mensagens e atualiza a conversa em tempo real
-    private void fetchMessages() {
-        Log.d(TAG, "fetchMessages");
-        messagesQuery.addSnapshotListener(this, (snapshots, e) -> {
+    private void setMessagesEventListener() {
+        messagesEventListener = (snapshots, e) -> {
             if (e == null) {
                 if (snapshots != null) {
                     for (DocumentChange doc: snapshots.getDocumentChanges()){
@@ -136,18 +146,21 @@ public class ChatActivity extends AppCompatActivity {
                         }
                     }
 
-                    adapter.replaceAll(linkedMessages);
+                    rvChat.smoothScrollToPosition(linkedMessages.size() - 1);
+                    chatAdapter.replaceAll(linkedMessages);
                 }
             }
             else {
-                Log.e(TAG, "Messages query exception", e);
+                Log.e(TAG, "Messages snapshot listener failed", e);
+                Toast.makeText(this, "Failed to load messages", Toast.LENGTH_SHORT).show();
+                finish();
             }
-        });
+        };
     }
 
     // Salva a mensagem para o usuário atual e para o contato no Firestore
     private void sendMessage() {
-        String text = vEditChat.getText().toString();
+        String text = editChat.getText().toString();
 
         if (!text.isEmpty()) {
             Message message = new Message(currentUser.getId(), text);
@@ -155,7 +168,7 @@ public class ChatActivity extends AppCompatActivity {
             saveMessageInFirestore(currentUser.getId(), contact, message);
             saveMessageInFirestore(contact.getId(), currentUser, message);
 
-            vEditChat.setText(null);
+            editChat.setText(null);
         }
     }
 
@@ -172,12 +185,11 @@ public class ChatActivity extends AppCompatActivity {
                                 .collection(getString(R.string.collection_inbox_message))
                                 .document(contact.getId())
                                 .set(inboxMessage)
-                                .addOnFailureListener(e -> Log.e(TAG, "Set " + uid + " inbox exception", e));
+                                .addOnFailureListener(e -> Log.e(TAG, "Set " + uid + " inbox failed", e));
                     })
-                    .addOnFailureListener(e -> Log.e(TAG, "Add " + uid + " conversation exception", e));
+                    .addOnFailureListener(e -> Log.e(TAG, "Add " + uid + " conversation failed", e));
     }
 
-    // Balão de mensagem
     private class MessageItem extends Item<GroupieViewHolder> {
 
         private final String senderId;

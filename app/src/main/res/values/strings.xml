@@ -31,10 +31,10 @@
     <string name="loading_message">Wait…</string>
     <string name="success_register">Account successfully created</string>
 
-    <!-- Messages Strings -->
-    <string name="bt_inbox">Chats</string>
-    <string name="bt_contacts">Contacts</string>
-    <string name="bt_calls">Calls</string>
+    <!-- Home Strings -->
+    <string name="tab_chats">Chats</string>
+    <string name="tab_contacts">Contacts</string>
+    <string name="tab_calls">Calls</string>
     <string name="bt_logout">Log out</string>
 
     <!-- Call Strings -->
@@ -58,6 +58,9 @@
     <string name="collection_conversations">conversations</string>
     <string name="collection_inboxes">inboxes</string>
     <string name="collection_inbox_message">inbox-message</string>
+
+    <!-- Firebase Database References -->
+    <string name="database_users">users</string>
 
     <!-- Firebase Storage References -->
     <string name="storage_path_photos">images/photos/</string>
