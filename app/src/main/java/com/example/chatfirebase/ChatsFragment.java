@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,20 +29,15 @@ import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 import com.xwray.groupie.OnItemClickListener;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Objects;
 
 public class ChatsFragment extends Fragment {
 
     private static final String TAG = "ChatsFragment";
 
-    private final Map<String, ChatItem> chatItemMap = new HashMap<>();
     private final LinkedList<ChatItem> linkedChatItems = new LinkedList<>();
 
+    private String currentUid;
     private Query chatsQuery;
     private EventListener<QuerySnapshot> chatsEventListener;
     private ListenerRegistration chatsRegistration;
@@ -54,12 +50,12 @@ public class ChatsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String currentUid = FirebaseAuth.getInstance().getUid();
+        currentUid = FirebaseAuth.getInstance().getUid();
 
-        chatsQuery = FirebaseFirestore.getInstance().collection(getString(R.string.collection_inboxes))
+        chatsQuery = FirebaseFirestore.getInstance().collection(getString(R.string.collection_chats))
                 .document(currentUid)
-                .collection(getString(R.string.collection_inbox_message))
-                .orderBy(getString(R.string.message_timestamp), Query.Direction.ASCENDING);
+                .collection(getString(R.string.collection_chat))
+                .orderBy(getString(R.string.chat_last_message_timestamp), Query.Direction.ASCENDING);
 
         setChatsEventListener();
     }
@@ -70,7 +66,7 @@ public class ChatsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NotNull View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         context = view.getContext();
@@ -94,6 +90,7 @@ public class ChatsFragment extends Fragment {
         super.onStop();
         chatsRegistration.remove();
         linkedChatItems.clear();
+        chatsAdapter.clear();
     }
 
     // Atualiza as conversas em tempo real
@@ -102,46 +99,34 @@ public class ChatsFragment extends Fragment {
             if (e == null) {
                 if (snapshots != null) {
                     for (DocumentChange doc : snapshots.getDocumentChanges()) {
-                        InboxMessage inboxMessage = doc.getDocument().toObject(InboxMessage.class);
+                        Chat chat = doc.getDocument().toObject(Chat.class);
+                        ChatItem chatItem = new ChatItem(chat);
 
                         switch (doc.getType()) {
                             case ADDED:
-                                Log.d(TAG, "Document Change ADDED");
-                                ChatItem newChatItem = new ChatItem(inboxMessage);
-                                chatItemMap.put(inboxMessage.getContactId(), newChatItem);
-                                linkedChatItems.addFirst(newChatItem);
+                                Log.d(TAG, "Document ADDED");
+                                linkedChatItems.addFirst(chatItem);
                                 break;
                             case MODIFIED:
-                                Log.d(TAG, "Document Change MODIFIED");
-                                ChatItem chatItem = Objects.requireNonNull(chatItemMap.get(inboxMessage.getContactId()));
+                                Log.d(TAG, "Document MODIFIED");
                                 linkedChatItems.remove(chatItem);
-                                chatItem.setMessage(inboxMessage);
                                 linkedChatItems.addFirst(chatItem);
                                 break;
                         }
-
-                        chatsAdapter.update(linkedChatItems, false);
-                        chatsAdapter.notifyDataSetChanged();
                     }
+                    chatsAdapter.update(linkedChatItems, false);
+                    chatsAdapter.notifyDataSetChanged();
+                }
+                else {
+                    Log.e(TAG, "Null chats snapshot");
+                    Toast.makeText(context, getString(R.string.failure_chats), Toast.LENGTH_SHORT).show();
                 }
             }
             else {
                 Log.e(TAG, "Chats snapshot listener failed", e);
-                Toast.makeText(context, "Failed to load chats", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getString(R.string.failure_chats), Toast.LENGTH_SHORT).show();
             }
         };
-    }
-
-    private class OnChatItemClickListener implements OnItemClickListener {
-
-        @Override
-        public void onItemClick(@NotNull Item item, @NotNull View view) {
-            ChatItem chatItem = (ChatItem) item;
-
-            Intent chatIntent = new Intent(context, ChatActivity.class);
-            chatIntent.putExtra(getString(R.string.user_id), chatItem.contactId);
-            startActivity(chatIntent);
-        }
     }
 
     private static class ChatItem extends Item<GroupieViewHolder> {
@@ -149,20 +134,15 @@ public class ChatsFragment extends Fragment {
         private final String contactId;
         private final String contactProfileUrl;
         private final String contactName;
-        private String senderId;
-        private String lastMessage;
+        private final String senderId;
+        private final String lastMessage;
 
-        public ChatItem(InboxMessage inboxMessage) {
-            contactId = inboxMessage.getContactId();
-            contactProfileUrl = inboxMessage.getContactProfileUrl();
-            contactName = inboxMessage.getContactName();
-            senderId = inboxMessage.getSenderId();
-            lastMessage = inboxMessage.getText();
-        }
-
-        private void setMessage(Message message) {
-            senderId = message.getSenderId();
-            lastMessage = message.getText();
+        public ChatItem(Chat chat) {
+            contactId = chat.getContactId();
+            contactProfileUrl = chat.getContactProfileUrl();
+            contactName = chat.getContactName();
+            senderId = chat.getLastMessage().getSenderId();
+            lastMessage = chat.getLastMessage().getText();
         }
 
         @Override
@@ -185,7 +165,35 @@ public class ChatsFragment extends Fragment {
 
         @Override
         public int getLayout() {
-            return R.layout.card_user_chats;
+            return R.layout.card_chat;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ChatItem chatItem = (ChatItem) o;
+            return contactId.equals(chatItem.contactId);
+        }
+
+        @Override
+        public int hashCode() {
+            return contactId.hashCode();
+        }
+    }
+
+    private class OnChatItemClickListener implements OnItemClickListener {
+
+        @Override
+        public void onItemClick(@NonNull Item item, @NonNull View view) {
+            ChatItem chatItem = (ChatItem) item;
+
+            Intent chatIntent = new Intent(context, ChatActivity.class);
+            chatIntent.putExtra(getString(R.string.extra_user_id), currentUid);
+            chatIntent.putExtra(getString(R.string.extra_contact_id), chatItem.contactId);
+            chatIntent.putExtra(getString(R.string.extra_contact_name), chatItem.contactName);
+            chatIntent.putExtra(getString(R.string.extra_contact_profile_url), chatItem.contactProfileUrl);
+            startActivity(chatIntent);
         }
     }
 }

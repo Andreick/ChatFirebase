@@ -27,8 +27,7 @@ import androidx.lifecycle.Lifecycle;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-//import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -60,7 +59,6 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onActivityResult(Uri uri) {
                     vSelectData = uri;
-
                     Bitmap bitmap;
                     try {
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
@@ -85,17 +83,16 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        vEditName = findViewById(R.id.edtRname);
-        vEditEmail = findViewById(R.id.edtRemail);
+        vEditName = findViewById(R.id.edit_name);
+        vEditEmail = findViewById(R.id.edit_email);
         vEditPassword = findViewById(R.id.edtRpassword);
-        vEditConfirmPass = findViewById(R.id.edtRconfirmPass);
-        vButtonRegister = findViewById(R.id.btLogin);
+        vEditConfirmPass = findViewById(R.id.edit_confirm_password);
+        vButtonRegister = findViewById(R.id.btn_register);
         vButtonHaveAccount = findViewById(R.id.btHaveAccount);
         vButtonPhoto = findViewById(R.id.btPhoto);
-        vImgPhoto = findViewById(R.id.imgPhoto);
-        loadingBar = findViewById(R.id.progressBar);
+        vImgPhoto = findViewById(R.id.img_register_photo);
+        loadingBar = findViewById(R.id.progress_bar_login);
 
-        // Solicita a escolha de uma imagem
         vButtonPhoto.setOnClickListener(view -> getContent.launch("image/*"));
         vButtonRegister.setOnClickListener(view -> createUser());
         vButtonHaveAccount.setOnClickListener(view -> goToLoginActivity());
@@ -187,7 +184,7 @@ public class RegisterActivity extends AppCompatActivity {
                 .build();
 
         currentUser.updateProfile(profileUpdates)
-                .addOnSuccessListener(this, unused -> saveUserInFirestore())
+                .addOnSuccessListener(this, unused -> saveUserInDatabase())
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "User update failed", e);
                     deletePhotoInStorage();
@@ -195,33 +192,12 @@ public class RegisterActivity extends AppCompatActivity {
                 });
     }
 
-    // Salva o usuário no Firestore
-    private void saveUserInFirestore() {
-        User user = new User(currentUser.getUid(), displayName, photoUrl.toString());
-
-        FirebaseFirestore.getInstance().collection(getString(R.string.collection_users))
-                .document(currentUser.getUid())
-                .set(user)
-                .addOnSuccessListener(unused -> {
-                    if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-                        goToHomeActivity();
-                    }
-                    else {
-                        isRegistered = true;
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to save user in Firestore", e);
-                    deletePhotoInStorage();
-                    deleteUser();
-                });
-    }
-
-    /*private void saveUserInDatabase() {
-        User user = new User(currentUser.getUid(), displayName, photoUrl.toString());
+    // Salva o usuário no Firebase Database
+    private void saveUserInDatabase() {
+        User user = new User(displayName, photoUrl.toString());
 
         FirebaseDatabase.getInstance().getReference(getString(R.string.database_users))
-                .child(user.getId())
+                .child(currentUser.getUid())
                 .setValue(user)
                 .addOnSuccessListener(unused -> {
                     if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
@@ -236,7 +212,7 @@ public class RegisterActivity extends AppCompatActivity {
                     deletePhotoInStorage();
                     deleteUser();
                 });
-    }*/
+    }
 
     // Deleta o usuário do Firebase
     private void deleteUser() {

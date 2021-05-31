@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ChatActivity"
-    android:background="@drawable/fundo">
+    android:background="@drawable/app_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout2"
         android:layout_width="0dp"
         android:layout_height="100dp"
-        android:background="@color/cor_secundaria"
+        android:background="@color/color_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -23,7 +23,7 @@
             android:layout_marginLeft="32dp"
             android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
-            android:background="@drawable/card_fundo_message"
+            android:background="@drawable/chat_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -39,12 +39,12 @@
                 android:paddingLeft="0dp"
                 android:paddingEnd="5dp"
                 android:paddingStart="0dp"
-                android:background="@drawable/card_fundo_message"
+                android:background="@drawable/chat_background"
                 android:ems="10"
                 android:hint="@string/hint_message"
                 android:inputType="textPersonName"
-                android:textColor="@color/cor_secundaria"
-                android:textColorHint="@color/cor_secundaria"
+                android:textColor="@color/color_secondary"
+                android:textColorHint="@color/color_secondary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btSend"
                 app:layout_constraintStart_toStartOf="parent"
@@ -55,11 +55,11 @@
                 android:id="@+id/btSend"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:background="@drawable/enviar"
+                android:background="@drawable/send_message"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/enviar" />
+                app:srcCompat="@drawable/send_message" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -76,7 +76,7 @@
         android:id="@+id/constraintLayout3"
         android:layout_width="0dp"
         android:layout_height="70dp"
-        android:background="@color/cor_secundaria"
+        android:background="@color/color_secondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -87,7 +87,7 @@
             android:layout_height="50dp"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
-            app:civ_border_color="@color/cor_primaria"
+            app:civ_border_color="@color/color_primary"
             app:civ_border_width="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -96,13 +96,17 @@
 
         <TextView
             android:id="@+id/txtNameContact"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:fontFamily="sans-serif-black"
-            android:textColor="@color/cor_primaria"
+            android:singleLine="true"
+            android:textColor="@color/color_primary"
             android:textSize="24sp"
+            app:layout_constraintEnd_toStartOf="@+id/imgCall"
             app:layout_constraintStart_toEndOf="@+id/imgContact"
             app:layout_constraintTop_toTopOf="@+id/imgContact" />
 
@@ -116,6 +120,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_baseline_call_24" />
+
+        <TextView
+            android:id="@+id/txt_chat_conn_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:textColor="@color/color_primary"
+            app:layout_constraintBottom_toBottomOf="@+id/imgContact"
+            app:layout_constraintStart_toEndOf="@+id/imgContact"
+            app:layout_constraintTop_toBottomOf="@+id/txtNameContact" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

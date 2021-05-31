@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CallReceiverActivity"
-    android:background="@color/cor_primaria">
+    android:background="@color/color_primary">
 
     <TextView
         android:id="@+id/txtEmitterName"
@@ -13,66 +13,66 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:fontFamily="sans-serif-black"
-        android:textColor="@color/cor_secundaria"
+        android:textColor="@color/color_secondary"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imgEmitter" />
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgEmitter"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+        app:layout_constraintTop_toBottomOf="@+id/txt_receiver_title" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/txt_receiver_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:letterSpacing="0.3"
-        android:text="Voice Call"
-        android:textColor="@color/cor_secundaria"
+        android:layout_marginTop="48dp"
+        android:text="@string/call_title"
+        android:textColor="@color/color_secondary"
+        android:textScaleX="1.3"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/btAccept"
+        android:id="@+id/bt_receiver_answer"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginStart="100dp"
-        android:layout_marginLeft="100dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginLeft="96dp"
+        app:layout_constraintBottom_toBottomOf="@+id/bt_receiver_hang_up"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imgEmitterSpeaker"
-        app:srcCompat="@drawable/btn_aceitar" />
+        app:srcCompat="@drawable/call_answer_512" />
 
     <ImageView
-        android:id="@+id/btReject"
+        android:id="@+id/bt_receiver_hang_up"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="100dp"
-        android:layout_marginRight="100dp"
+        android:layout_marginEnd="96dp"
+        android:layout_marginRight="96dp"
+        android:layout_marginBottom="64dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imgEmitterSpeaker"
-        app:srcCompat="@drawable/btn_recusar" />
+        app:srcCompat="@drawable/call_hang_up_512" />
 
     <ImageView
         android:id="@+id/imgEmitterSpeaker"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="32dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="64dp"
         android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/bt_receiver_hang_up"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtEmitterName"
-        app:srcCompat="@drawable/btn_viva_voz_desativado" />
+        app:srcCompat="@drawable/speaker_disabled_64" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

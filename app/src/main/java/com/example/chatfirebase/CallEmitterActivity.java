@@ -28,12 +28,11 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
 
     private static final String TAG = "CallEmitterActivity";
 
-    private ImageView vbtReject;
-    private ImageView vbtSpeaker;
-
     private SinchService sinchService;
     private Call call;
     private boolean speakerEnabled;
+
+    private ImageView vbtReject, vbtSpeaker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +41,7 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
 
         ImageView vImgReceiver = findViewById(R.id.imgReceiver);
         TextView vTxtReceiverName = findViewById(R.id.txtReceiverName);
-        vbtReject = findViewById(R.id.btReject2);
+        vbtReject = findViewById(R.id.bt_emitter_hang_up);
         vbtSpeaker = findViewById(R.id.imgEmitterSpeaker);
 
         Intent serviceIntent = new Intent(this, SinchService.class);
@@ -65,14 +64,16 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
 
         vbtReject.setOnClickListener(view -> call.hangup());
         vbtSpeaker.setOnClickListener(view -> {
+            int speakerIcon;
             if (speakerEnabled) {
                 sinchService.getAudioController().disableSpeaker();
-                vbtSpeaker.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.btn_viva_voz_desativado));
+                speakerIcon = R.drawable.speaker_disabled_64;
             }
             else {
                 sinchService.getAudioController().enableSpeaker();
-                vbtSpeaker.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.btn_viva_voz_ativado));
+                speakerIcon = R.drawable.speaker_enabled_64;
             }
+            vbtSpeaker.setImageDrawable(ContextCompat.getDrawable(this, speakerIcon));
             speakerEnabled = !speakerEnabled;
         });
     }
@@ -80,6 +81,7 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
     @Override
     public void onServiceDisconnected(ComponentName name) {
         Log.e(TAG, "Sinch Service disconnected");
+        Toast.makeText(this, getString(R.string.failure_sinch_service), Toast.LENGTH_SHORT).show();
         finish();
     }
 

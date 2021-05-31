@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "813332610321",
-    "project_id": "whatsapp2-cf5f5",
-    "storage_bucket": "whatsapp2-cf5f5.appspot.com"
+    "project_number": "325807116679",
+    "project_id": "chatfirebase-aps-2021",
+    "storage_bucket": "chatfirebase-aps-2021.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:813332610321:android:0f0a13e3e354d53eeb60b0",
+        "mobilesdk_app_id": "1:325807116679:android:42d8703c29d4e0f8c24322",
         "android_client_info": {
           "package_name": "com.example.chatfirebase"
         }
       },
       "oauth_client": [
         {
-          "client_id": "813332610321-8mu718oosn5lnnercpdilb2juu1dhk5t.apps.googleusercontent.com",
+          "client_id": "325807116679-lnlh8aag158k7v1f8oub5scvlrdi6slv.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyD4TB3EV8wcTcMw6nM_QJRzQQZXEW5Pwyo"
+          "current_key": "AIzaSyCx9v7b5mTp1hwUh6b_-MvjYkCJEB6LiU8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "813332610321-8mu718oosn5lnnercpdilb2juu1dhk5t.apps.googleusercontent.com",
+              "client_id": "325807116679-lnlh8aag158k7v1f8oub5scvlrdi6slv.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

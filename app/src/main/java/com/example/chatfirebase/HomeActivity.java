@@ -1,7 +1,6 @@
 package com.example.chatfirebase;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -9,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -18,15 +18,13 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
-
-import org.jetbrains.annotations.NotNull;
 
 public class HomeActivity extends AppCompatActivity {
 
     private static final int NUM_PAGES = 3;
+
+    private ChatFirebaseApplication application;
 
     private ImageView imgProfile;
     private Button buttonLogout;
@@ -45,16 +43,14 @@ public class HomeActivity extends AppCompatActivity {
         tabLayout = findViewById(R.id.tab_bar);
         viewPager = findViewById(R.id.view_pager);
 
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        application = (ChatFirebaseApplication) getApplication();
+        User currentUser = application.getCurrentUser();
 
         if (currentUser == null) {
             Toast.makeText(this, "Failed to load user", Toast.LENGTH_SHORT).show();
             goToLoginActivity();
             return;
         }
-
-        Uri profileUri = currentUser.getPhotoUrl();
-        Picasso.get().load(profileUri).into(imgProfile);
 
         pagerAdapter = new PagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
@@ -85,6 +81,9 @@ public class HomeActivity extends AppCompatActivity {
             }
         }).attach();
 
+        String profileUri = currentUser.getProfileUrl();
+        Picasso.get().load(profileUri).into(imgProfile);
+
         buttonLogout.setOnClickListener(view -> logout());
     }
 
@@ -101,7 +100,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void logout() {
-        ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
         application.close();
         goToLoginActivity();
     }
@@ -113,13 +111,13 @@ public class HomeActivity extends AppCompatActivity {
 
             switch (tab.getPosition()) {
                 case 0:
-                    tvChats.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.cinza));
+                    tvChats.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.color_primary));
                     break;
                 case 1:
-                    tvContacts.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.cinza));
+                    tvContacts.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.color_primary));
                     break;
                 case 2:
-                    tvCalls.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.cinza));
+                    tvCalls.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.color_primary));
                     break;
             }
         }
@@ -129,13 +127,13 @@ public class HomeActivity extends AppCompatActivity {
 
             switch (tab.getPosition()) {
                 case 0:
-                    tvChats.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.cor_primaria));
+                    tvChats.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.gray));
                     break;
                 case 1:
-                    tvContacts.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.cor_primaria));
+                    tvContacts.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.gray));
                     break;
                 case 2:
-                    tvCalls.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.cor_primaria));
+                    tvCalls.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.gray));
                     break;
             }
         }
@@ -152,7 +150,7 @@ public class HomeActivity extends AppCompatActivity {
             super(fragmentActivity);
         }
 
-        @NotNull
+        @NonNull
         @Override
         public Fragment createFragment(int position) {
 

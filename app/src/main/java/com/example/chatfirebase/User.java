@@ -3,59 +3,32 @@ package com.example.chatfirebase;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class User implements Parcelable {
+public class User {
 
-    private String id;
     private String name;
     private String profileUrl;
+    private int connectionStatus;
 
     public User() { }
 
-    public User(String id, String name, String profileUrl) {
-        this.id = id;
+    public User(String name, String profileUrl) {
         this.name = name;
         this.profileUrl = profileUrl;
     }
 
-    protected User(Parcel in) {
-        id = in.readString();
-        name = in.readString();
-        profileUrl = in.readString();
-    }
-
-    public static final Creator<User> CREATOR = new Creator<User>() {
-        @Override
-        public User createFromParcel(Parcel in) {
-            return new User(in);
-        }
-
-        @Override
-        public User[] newArray(int size) {
-            return new User[size];
-        }
-    };
-
-    public String getId(){
-        return id;
-    }
-
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public String getProfileUrl(){
+    public String getProfileUrl() {
         return profileUrl;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public int getConnectionStatus() {
+        return connectionStatus;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(id);
-        parcel.writeString(name);
-        parcel.writeString(profileUrl);
+    public void setConnectionStatus(int connectionStatus) {
+        this.connectionStatus = connectionStatus;
     }
 }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/cor_primaria">
+    android:background="@color/color_primary">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgUserPhoto2"
@@ -13,9 +13,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
+        app:civ_border_color="@color/color_secondary"
         app:civ_border_width="3dp"
-        app:civ_border_color="@color/cor_secundaria"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -27,13 +27,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:fontFamily="@font/alegreya_sans_sc_extrabold"
-        android:textColor="@color/cor_secundaria"
+        android:singleLine="true"
+        android:textColor="@color/color_secondary"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/imgUserPhoto2"
         app:layout_constraintTop_toTopOf="@+id/imgUserPhoto2" />
 
@@ -43,12 +43,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:textColor="@color/cor_secundaria"
-        app:layout_constraintBottom_toBottomOf="@+id/imgUserPhoto2"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="4dp"
+        android:singleLine="true"
+        android:textColor="@color/color_secondary"
+        app:layout_constraintEnd_toEndOf="@+id/txtUserName2"
         app:layout_constraintStart_toEndOf="@+id/imgUserPhoto2"
         app:layout_constraintTop_toBottomOf="@+id/txtUserName2" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

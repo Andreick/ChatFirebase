@@ -15,7 +15,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.sinch.android.rtc.MissingPermissionException;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.SinchError;
@@ -30,25 +31,26 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
 
     private static final String TAG = "CallReceiverActivity";
 
-    ImageView vImgEmitter;
-    TextView vTxtEmitterName;
-    ImageView vbtReject;
-    ImageView vbtAccept;
-    ImageView vbtSpeaker;
-
+    private DatabaseReference usersReference;
     private SinchService sinchService;
     private Call call;
     private boolean speakerEnabled;
+
+    private ImageView vImgEmitter;
+    private TextView vTxtEmitterName;
+    private ImageView vbtAccept, vbtReject, vbtSpeaker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_call_receiver);
 
+        usersReference = FirebaseDatabase.getInstance().getReference(getString(R.string.database_users));
+
         vImgEmitter = findViewById(R.id.imgEmitter);
         vTxtEmitterName = findViewById(R.id.txtEmitterName);
-        vbtReject = findViewById(R.id.btReject);
-        vbtAccept = findViewById(R.id.btAccept);
+        vbtAccept = findViewById(R.id.bt_receiver_answer);
+        vbtReject = findViewById(R.id.bt_receiver_hang_up);
         vbtSpeaker = findViewById(R.id.imgEmitterSpeaker);
 
         Intent serviceIntent = new Intent(this, SinchService.class);
@@ -69,18 +71,23 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
 
         call.addCallListener(new SinchCallListener());
 
-        FirebaseFirestore.getInstance().collection(getString(R.string.collection_users))
-                .document(call.getRemoteUserId())
-                .get()
+        usersReference.child(call.getRemoteUserId()).get()
                 .addOnSuccessListener(snapshot -> {
-                    String profileUrl = (String) snapshot.get(getString(R.string.user_profile_url));
-                    Picasso.get().load(profileUrl).into(vImgEmitter);
+                    User contact = snapshot.getValue(User.class);
 
-                    String username = (String) snapshot.get(getString(R.string.user_name));
-                    vTxtEmitterName.setText(username);
+                    if (contact != null) {
+                        Picasso.get().load(contact.getProfileUrl()).into(vImgEmitter);
+                        vTxtEmitterName.setText(contact.getName());
+                    }
+                    else {
+                        Log.e(TAG, "Null contact");
+                        Toast.makeText(this, getString(R.string.failure_contact), Toast.LENGTH_SHORT).show();
+                        call.hangup();
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Get remote user failure");
+                    Toast.makeText(this, getString(R.string.failure_contact), Toast.LENGTH_SHORT).show();
                     call.hangup();
                 });
 
@@ -94,14 +101,16 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
             }
         });
         vbtSpeaker.setOnClickListener(view -> {
+            int speakerIcon;
             if (speakerEnabled) {
                 sinchService.getAudioController().disableSpeaker();
-                vbtSpeaker.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.btn_viva_voz_desativado));
+                speakerIcon = R.drawable.speaker_disabled_64;
             }
             else {
                 sinchService.getAudioController().enableSpeaker();
-                vbtSpeaker.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.btn_viva_voz_ativado));
+                speakerIcon = R.drawable.speaker_enabled_64;
             }
+            vbtSpeaker.setImageDrawable(ContextCompat.getDrawable(this, speakerIcon));
             speakerEnabled = !speakerEnabled;
         });
     }
@@ -109,6 +118,7 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
     @Override
     public void onServiceDisconnected(ComponentName name) {
         Log.e(TAG, "Sinch Service disconnected");
+        Toast.makeText(this, getString(R.string.failure_sinch_service), Toast.LENGTH_SHORT).show();
         finish();
     }
 

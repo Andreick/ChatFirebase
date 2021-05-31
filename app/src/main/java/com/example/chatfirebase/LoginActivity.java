@@ -31,12 +31,12 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        vEditEmail = findViewById(R.id.edtRemail);
-        vEditPassword = findViewById(R.id.edtPassword);
-        vButtonLogin = findViewById(R.id.btLogin);
+        vEditEmail = findViewById(R.id.edit_email);
+        vEditPassword = findViewById(R.id.edit_password);
+        vButtonLogin = findViewById(R.id.btn_login);
         vButtonLostPass = findViewById(R.id.btLostPassword);
         vButtonRegister = findViewById(R.id.btRegister);
-        loadingBar = findViewById(R.id.progressBar);
+        loadingBar = findViewById(R.id.progress_bar_login);
 
         vButtonRegister.setOnClickListener(view -> goToRegisterActivity());
         vButtonLogin.setOnClickListener(view -> login());

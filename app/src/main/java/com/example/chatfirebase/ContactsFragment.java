@@ -11,29 +11,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
-/*import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;*/
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -41,14 +36,11 @@ public class ContactsFragment extends Fragment {
 
     private static final String TAG = "ContactsFragment";
 
-    private final Set<ContactItem> contactItemSet = new TreeSet<>(new ContactItemComparator());
+    private final Set<ContactItem> contactItemSet = new TreeSet<>();
 
-    private Query contactsQuery;
-    private EventListener<QuerySnapshot> contactsEventListener;
-    private ListenerRegistration contactsRegistration;
-
-    /*private DatabaseReference contactsReference;
-    private ChildEventListener contactsEventListener;*/
+    private String currentUid;
+    private DatabaseReference usersReference;
+    private ChildEventListener contactsEventListener;
 
     private Context context;
     private RecyclerView recyclerView;
@@ -58,11 +50,8 @@ public class ContactsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String currentUid = FirebaseAuth.getInstance().getUid();
-
-        contactsQuery = FirebaseFirestore.getInstance().collection(getString(R.string.collection_users))
-                .whereNotEqualTo(getString(R.string.user_id), currentUid);
-
+        currentUid = FirebaseAuth.getInstance().getUid();
+        usersReference = FirebaseDatabase.getInstance().getReference(getString(R.string.database_users));
         setContactsEventListener();
     }
 
@@ -72,7 +61,7 @@ public class ContactsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NotNull View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         context = view.getContext();
@@ -88,120 +77,144 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        contactsRegistration = contactsQuery.addSnapshotListener(contactsEventListener);
+        usersReference.addChildEventListener(contactsEventListener);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        contactsRegistration.remove();
+        usersReference.removeEventListener(contactsEventListener);
+        contactItemSet.clear();
+        contactsAdapter.clear();
     }
 
     private void setContactsEventListener() {
-        contactsEventListener = (snapshots, e) -> {
-            if (e == null) {
-                if (snapshots != null) {
-                    for (DocumentChange doc : snapshots.getDocumentChanges()) {
-                        User contact = doc.getDocument().toObject(User.class);
+        contactsEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Log.d(TAG, "onChildAdded: " + snapshot.getKey());
+                String uid = snapshot.getKey();
+                User contact = snapshot.getValue(User.class);
 
-                        if (doc.getType() == DocumentChange.Type.ADDED) {
-                            contactItemSet.add(new ContactItem(contact));
-                        }
-
+                if (uid != null && !uid.equals(currentUid)) {
+                    if (contact != null) {
+                        contactItemSet.add(new ContactItem(uid, contact));
                         contactsAdapter.update(contactItemSet);
                         contactsAdapter.notifyDataSetChanged();
                     }
+                    else {
+                        Log.e(TAG, "Null contact");
+                        Toast.makeText(context, getString(R.string.failure_contact), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
-            else {
-                Log.e(TAG, "Contacts snapshot listener failed", e);
-                Toast.makeText(context, "Failed to load contacts", Toast.LENGTH_SHORT).show();
-            }
-        };
-    }
 
-    /*private void fetchContacts() {
-        contactsEventListener = new ChildEventListener() {
             @Override
-            public void onChildAdded(@NonNull @NotNull DataSnapshot snapshot, @Nullable @org.jetbrains.annotations.Nullable String previousChildName) {
-                Log.d(TAG, "onChildAdded: " + snapshot.getKey());
-
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Log.d(TAG, "onChildChanged: " + snapshot.getKey());
+                String uid = snapshot.getKey();
                 User contact = snapshot.getValue(User.class);
 
-                if (contact != null && !contact.getId().equals(currentUid)) {
-                    contactItemSet.add(new ContactItem(contact));
-                    contactsAdapter.update(contactItemSet);
-                    contactsAdapter.notifyDataSetChanged();
+                if (uid != null && !uid.equals(currentUid)) {
+                    if (contact != null) {
+                        ContactItem contactItem = new ContactItem(uid, contact);
+                        contactItemSet.remove(contactItem);
+                        contactItemSet.add(contactItem);
+                        contactsAdapter.update(contactItemSet);
+                        contactsAdapter.notifyDataSetChanged();
+                    }
+                    else {
+                        Log.e(TAG, "Null contact");
+                        Toast.makeText(context, getString(R.string.failure_contact), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 
             @Override
-            public void onChildChanged(@NonNull @NotNull DataSnapshot snapshot, @Nullable @org.jetbrains.annotations.Nullable String previousChildName) {
-                Log.d(TAG, "onChildChanged: " + snapshot.getKey());
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull @NotNull DataSnapshot snapshot) {
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                 Log.d(TAG, "onChildRemoved: " + snapshot.getKey());
             }
 
             @Override
-            public void onChildMoved(@NonNull @NotNull DataSnapshot snapshot, @Nullable @org.jetbrains.annotations.Nullable String previousChildName) {
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Log.d(TAG, "onChildMoved: " + snapshot.getKey());
             }
 
             @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError error) {
                 Log.e(TAG, "Contacts child event listener failed", error.toException());
-                Toast.makeText(HomeActivity.this, "Failed to load contacts", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getString(R.string.failure_contact), Toast.LENGTH_SHORT).show();
             }
         };
-    }*/
+    }
 
-    private static class ContactItem extends Item<GroupieViewHolder> {
+    private class ContactItem extends Item<GroupieViewHolder> implements Comparable<ContactItem> {
 
         private final String contactId;
         private final String contactProfileUrl;
         private final String contactName;
+        private final int contactConnStatus;
 
-        public ContactItem(User contact) {
-            contactId = contact.getId();
+        public ContactItem(String uid, User contact) {
+            contactId = uid;
             contactProfileUrl = contact.getProfileUrl();
             contactName = contact.getName();
+            contactConnStatus = contact.getConnectionStatus();
         }
 
         @Override
         public void bind(GroupieViewHolder viewHolder, int position) {
             ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto);
             TextView txtUserNm = viewHolder.itemView.findViewById(R.id.txtUserName);
+            TextView txtConnStatus = viewHolder.itemView.findViewById(R.id.txt_contact_conn_status);
 
             Picasso.get().load(contactProfileUrl).into(imgPhoto);
             txtUserNm.setText(contactName);
+
+            if (contactConnStatus == UserConnectionStatus.OFFLINE.ordinal()) {
+                txtConnStatus.setText(getText(R.string.user_offline));
+                txtConnStatus.setTextColor(ContextCompat.getColor(ContactsFragment.this.context, R.color.red));
+            }
+            else if (contactConnStatus == UserConnectionStatus.ABSENT.ordinal()) {
+                txtConnStatus.setText(getText(R.string.user_absent));
+                txtConnStatus.setTextColor(ContextCompat.getColor(ContactsFragment.this.context, R.color.orange));
+            }
+            else if (contactConnStatus == UserConnectionStatus.ONLINE.ordinal()) {
+                txtConnStatus.setText(getText(R.string.user_online));
+                txtConnStatus.setTextColor(ContextCompat.getColor(ContactsFragment.this.context, R.color.green));
+            }
         }
 
         @Override
         public int getLayout() {
-            return R.layout.card_user;
+            return R.layout.card_contact;
         }
-    }
-
-    // Compara os ContactItems de acordo com o nome do usuário
-    private static class ContactItemComparator implements Comparator<ContactItem> {
 
         @Override
-        public int compare(ContactItem ci1, ContactItem ci2) {
-            return ci1.contactName.compareTo(ci2.contactName);
+        public int compareTo(ContactItem ci) {
+            if (this == ci) return 0;
+
+            int contactIdDiff = contactId.compareTo(ci.contactId);
+            if (contactIdDiff == 0) return 0;
+
+            int contactNameDiff = contactName.compareTo(ci.contactName);
+            if (contactNameDiff != 0) return contactNameDiff;
+
+            return contactIdDiff;
         }
     }
 
     private class OnContactItemClickListener implements com.xwray.groupie.OnItemClickListener {
 
         @Override
-        public void onItemClick(@NotNull Item item, @NotNull View view) {
+        public void onItemClick(@NonNull Item item, @NonNull View view) {
             ContactItem contactItem = (ContactItem) item;
 
             Intent chatIntent = new Intent(context, ChatActivity.class);
-            chatIntent.putExtra(getString(R.string.user_id), contactItem.contactId);
+            chatIntent.putExtra(getString(R.string.extra_user_id), currentUid);
+            chatIntent.putExtra(getString(R.string.extra_contact_id), contactItem.contactId);
+            chatIntent.putExtra(getString(R.string.extra_contact_name), contactItem.contactName);
+            chatIntent.putExtra(getString(R.string.extra_contact_profile_url), contactItem.contactProfileUrl);
             startActivity(chatIntent);
         }
     }
