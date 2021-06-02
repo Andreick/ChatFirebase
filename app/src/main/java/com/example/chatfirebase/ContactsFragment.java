@@ -29,6 +29,8 @@ import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -36,6 +38,7 @@ public class ContactsFragment extends Fragment {
 
     private static final String TAG = "ContactsFragment";
 
+    private final Map<String, ContactItem> contactItemMap = new HashMap<>();
     private final Set<ContactItem> contactItemSet = new TreeSet<>();
 
     private String currentUid;
@@ -94,11 +97,13 @@ public class ContactsFragment extends Fragment {
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Log.d(TAG, "onChildAdded: " + snapshot.getKey());
                 String uid = snapshot.getKey();
-                User contact = snapshot.getValue(User.class);
 
                 if (uid != null && !uid.equals(currentUid)) {
+                    User contact = snapshot.getValue(User.class);
                     if (contact != null) {
-                        contactItemSet.add(new ContactItem(uid, contact));
+                        ContactItem contactItem = new ContactItem(uid, contact);
+                        contactItemMap.put(uid, contactItem);
+                        contactItemSet.add(contactItem);
                         contactsAdapter.update(contactItemSet);
                         contactsAdapter.notifyDataSetChanged();
                     }
@@ -113,18 +118,19 @@ public class ContactsFragment extends Fragment {
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Log.d(TAG, "onChildChanged: " + snapshot.getKey());
                 String uid = snapshot.getKey();
-                User contact = snapshot.getValue(User.class);
 
                 if (uid != null && !uid.equals(currentUid)) {
-                    if (contact != null) {
-                        ContactItem contactItem = new ContactItem(uid, contact);
+                    User changedContact = snapshot.getValue(User.class);
+                    ContactItem contactItem = contactItemMap.get(uid);
+                    if (changedContact != null && contactItem != null) {
                         contactItemSet.remove(contactItem);
+                        contactItem.update(changedContact);
                         contactItemSet.add(contactItem);
                         contactsAdapter.update(contactItemSet);
                         contactsAdapter.notifyDataSetChanged();
                     }
                     else {
-                        Log.e(TAG, "Null contact");
+                        Log.e(TAG, "Null contact or null contact item");
                         Toast.makeText(context, getString(R.string.failure_contact), Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -153,7 +159,7 @@ public class ContactsFragment extends Fragment {
         private final String contactId;
         private final String contactProfileUrl;
         private final String contactName;
-        private final int contactConnStatus;
+        private int contactConnStatus;
 
         public ContactItem(String uid, User contact) {
             contactId = uid;
@@ -162,27 +168,37 @@ public class ContactsFragment extends Fragment {
             contactConnStatus = contact.getConnectionStatus();
         }
 
+        public void update(User contact) {
+            contactConnStatus = contact.getConnectionStatus();
+        }
+
         @Override
         public void bind(GroupieViewHolder viewHolder, int position) {
             ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto);
+            ImageView imgConnStatus = viewHolder.itemView.findViewById(R.id.img_contact_conn_status);
             TextView txtUserNm = viewHolder.itemView.findViewById(R.id.txtUserName);
             TextView txtConnStatus = viewHolder.itemView.findViewById(R.id.txt_contact_conn_status);
 
-            Picasso.get().load(contactProfileUrl).into(imgPhoto);
+            Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder_600).into(imgPhoto);
             txtUserNm.setText(contactName);
 
-            if (contactConnStatus == UserConnectionStatus.OFFLINE.ordinal()) {
-                txtConnStatus.setText(getText(R.string.user_offline));
-                txtConnStatus.setTextColor(ContextCompat.getColor(ContactsFragment.this.context, R.color.red));
+            int connColor;
+
+            if (contactConnStatus == UserConnectionStatus.ONLINE.ordinal()) {
+                txtConnStatus.setText(getText(R.string.user_online));
+                connColor = R.color.green;
             }
             else if (contactConnStatus == UserConnectionStatus.ABSENT.ordinal()) {
                 txtConnStatus.setText(getText(R.string.user_absent));
-                txtConnStatus.setTextColor(ContextCompat.getColor(ContactsFragment.this.context, R.color.orange));
+                connColor = R.color.orange;
             }
-            else if (contactConnStatus == UserConnectionStatus.ONLINE.ordinal()) {
-                txtConnStatus.setText(getText(R.string.user_online));
-                txtConnStatus.setTextColor(ContextCompat.getColor(ContactsFragment.this.context, R.color.green));
+            else {
+                txtConnStatus.setText(getText(R.string.user_offline));
+                connColor = R.color.red;
             }
+
+            txtConnStatus.setTextColor(ContextCompat.getColor(ContactsFragment.this.context, connColor));
+            imgConnStatus.setImageDrawable(ContextCompat.getDrawable(ContactsFragment.this.context, connColor));
         }
 
         @Override
@@ -194,13 +210,13 @@ public class ContactsFragment extends Fragment {
         public int compareTo(ContactItem ci) {
             if (this == ci) return 0;
 
-            int contactIdDiff = contactId.compareTo(ci.contactId);
-            if (contactIdDiff == 0) return 0;
+            int connStatusDiff = ci.contactConnStatus - contactConnStatus;
+            if (connStatusDiff != 0) return connStatusDiff;
 
             int contactNameDiff = contactName.compareTo(ci.contactName);
             if (contactNameDiff != 0) return contactNameDiff;
 
-            return contactIdDiff;
+            return contactId.compareTo(ci.contactId);
         }
     }
 

@@ -44,6 +44,8 @@
     <string name="call_title">Voice Call</string>
     <string name="on_call_progressing" tools:ignore="TypographyEllipsis">Calling...</string>
     <string name="on_call_established">Call established</string>
+    <string name="call_speaker_enabled">Speaker enabled</string>
+    <string name="call_speaker_disabled">Speaker disabled</string>
     <string name="call_hang_up">Call ended</string>
     <string name="call_notification_title">Incoming call</string>
     <string name="call_notification_text">tap to see</string>

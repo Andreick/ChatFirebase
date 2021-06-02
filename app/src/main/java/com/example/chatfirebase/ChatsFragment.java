@@ -151,7 +151,7 @@ public class ChatsFragment extends Fragment {
             TextView username = viewHolder.itemView.findViewById(R.id.txtUserName2);
             TextView message = viewHolder.itemView.findViewById(R.id.txtLastMessage2);
 
-            Picasso.get().load(contactProfileUrl).into(imgPhoto);
+            Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder_600).into(imgPhoto);
             username.setText(contactName);
 
             String text = lastMessage;

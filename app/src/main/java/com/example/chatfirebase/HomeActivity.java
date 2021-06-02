@@ -82,7 +82,7 @@ public class HomeActivity extends AppCompatActivity {
         }).attach();
 
         String profileUri = currentUser.getProfileUrl();
-        Picasso.get().load(profileUri).into(imgProfile);
+        Picasso.get().load(profileUri).placeholder(R.drawable.profile_placeholder_600).into(imgProfile);
 
         buttonLogout.setOnClickListener(view -> logout());
     }

@@ -104,7 +104,7 @@ public class ChatActivity extends AppCompatActivity {
         rvChat.setLayoutManager(new LinearLayoutManager(this));
         rvChat.setAdapter(chatAdapter);
 
-        Picasso.get().load(contactProfileUrl).into(imgContact);
+        Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder_600).into(imgContact);
         txtNameContact.setText(contactName);
 
         vbtSend.setOnClickListener(view -> sendMessage());

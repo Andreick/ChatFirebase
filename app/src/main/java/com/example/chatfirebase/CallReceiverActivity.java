@@ -76,7 +76,9 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
                     User contact = snapshot.getValue(User.class);
 
                     if (contact != null) {
-                        Picasso.get().load(contact.getProfileUrl()).into(vImgEmitter);
+                        Picasso.get().load(contact.getProfileUrl())
+                                .placeholder(R.drawable.profile_placeholder_600)
+                                .into(vImgEmitter);
                         vTxtEmitterName.setText(contact.getName());
                     }
                     else {
@@ -104,10 +106,12 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
             int speakerIcon;
             if (speakerEnabled) {
                 sinchService.getAudioController().disableSpeaker();
+                Toast.makeText(this, getString(R.string.call_speaker_disabled), Toast.LENGTH_SHORT).show();
                 speakerIcon = R.drawable.speaker_disabled_64;
             }
             else {
                 sinchService.getAudioController().enableSpeaker();
+                Toast.makeText(this, getString(R.string.call_speaker_enabled), Toast.LENGTH_SHORT).show();
                 speakerIcon = R.drawable.speaker_enabled_64;
             }
             vbtSpeaker.setImageDrawable(ContextCompat.getDrawable(this, speakerIcon));

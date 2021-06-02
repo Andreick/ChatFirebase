@@ -48,7 +48,7 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
         bindService(serviceIntent, this, 0);
 
         String profileUrl = getIntent().getStringExtra(getString(R.string.user_profile_url));
-        Picasso.get().load(profileUrl).into(vImgReceiver);
+        Picasso.get().load(profileUrl).placeholder(R.drawable.profile_placeholder_600).into(vImgReceiver);
 
         String username = getIntent().getStringExtra(getString(R.string.user_name));
         vTxtReceiverName.setText(username);
@@ -67,10 +67,12 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
             int speakerIcon;
             if (speakerEnabled) {
                 sinchService.getAudioController().disableSpeaker();
+                Toast.makeText(this, getString(R.string.call_speaker_disabled), Toast.LENGTH_SHORT).show();
                 speakerIcon = R.drawable.speaker_disabled_64;
             }
             else {
                 sinchService.getAudioController().enableSpeaker();
+                Toast.makeText(this, getString(R.string.call_speaker_enabled), Toast.LENGTH_SHORT).show();
                 speakerIcon = R.drawable.speaker_enabled_64;
             }
             vbtSpeaker.setImageDrawable(ContextCompat.getDrawable(this, speakerIcon));
