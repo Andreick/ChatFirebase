@@ -13,6 +13,9 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
+import com.example.chatfirebase.data.User;
+import com.example.chatfirebase.data.UserConnectionStatus;
+import com.example.chatfirebase.services.SinchService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;

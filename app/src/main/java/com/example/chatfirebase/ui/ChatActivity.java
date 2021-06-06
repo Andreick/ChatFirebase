@@ -1,12 +1,9 @@
-package com.example.chatfirebase;
+package com.example.chatfirebase.ui;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.AbsoluteSizeSpan;
-import android.text.style.DynamicDrawableSpan;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.ImageSpan;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -19,6 +16,13 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.chatfirebase.ChatFirebaseApplication;
+import com.example.chatfirebase.R;
+import com.example.chatfirebase.data.Chat;
+import com.example.chatfirebase.data.Message;
+import com.example.chatfirebase.data.User;
+import com.example.chatfirebase.data.UserConnectionStatus;
+import com.example.chatfirebase.services.SinchService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -92,19 +96,19 @@ public class ChatActivity extends AppCompatActivity {
 
         setMessagesEventListener();
 
-        imgContact = findViewById(R.id.imgContact);
-        txtNameContact = findViewById(R.id.txtNameContact);
-        txtConnStatus = findViewById(R.id.txt_chat_conn_status);
-        rvChat = findViewById(R.id.lsViewChat);
-        editChat = findViewById(R.id.edtChat);
-        vbtSend = findViewById(R.id.btSend);
-        vbtCall = findViewById(R.id.imgCall);
+        imgContact = findViewById(R.id.civ_chat_photo);
+        txtNameContact = findViewById(R.id.tv_chat_name);
+        txtConnStatus = findViewById(R.id.tv_chat_conn_status);
+        rvChat = findViewById(R.id.rv_chat);
+        editChat = findViewById(R.id.et_message);
+        vbtSend = findViewById(R.id.civ_send);
+        vbtCall = findViewById(R.id.iv_call);
 
         chatAdapter = new GroupAdapter<>();
         rvChat.setLayoutManager(new LinearLayoutManager(this));
         rvChat.setAdapter(chatAdapter);
 
-        Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder_600).into(imgContact);
+        Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(imgContact);
         txtNameContact.setText(contactName);
 
         vbtSend.setOnClickListener(view -> sendMessage());
@@ -168,9 +172,10 @@ public class ChatActivity extends AppCompatActivity {
                 if (snapshots != null) {
                     for (DocumentChange doc: snapshots.getDocumentChanges()) {
                         Message message = doc.getDocument().toObject(Message.class);
+                        MessageItem messageItem = new MessageItem(message);
 
                         if (doc.getType() == DocumentChange.Type.ADDED) {
-                            linkedMessages.addLast(new MessageItem(message));
+                            linkedMessages.addLast(messageItem);
                             rvChat.post(() -> rvChat.smoothScrollToPosition(linkedMessages.size() - 1));
                             chatAdapter.replaceAll(linkedMessages);
                         }
@@ -238,10 +243,9 @@ public class ChatActivity extends AppCompatActivity {
 
         @Override
         public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
-            TextView txtMessage = viewHolder.itemView.findViewById(R.id.txt_message);
+            TextView txtMessage = viewHolder.itemView.findViewById(R.id.tv_message);
 
-            SpannableString message = new SpannableString(text + "\n" + date + " " + " ");
-            int readIcon = R.drawable.message_unread_12;
+            SpannableString message = new SpannableString(text + "\n" + date + "     "/* + " " + " "*/);
             int dateStart = text.length() + 1;
             int dateEnd = dateStart + date.length();
 
@@ -249,10 +253,8 @@ public class ChatActivity extends AppCompatActivity {
                     dateStart, dateEnd, 0);
             message.setSpan(new ForegroundColorSpan(ContextCompat.getColor(ChatActivity.this, R.color.eerie_black)),
                     dateStart, dateEnd, 0);
-            message.setSpan(new ImageSpan(ChatActivity.this, readIcon, DynamicDrawableSpan.ALIGN_BASELINE),
-                    dateEnd + 1, message.length(), 0);
-            message.setSpan(new ForegroundColorSpan(Color.RED),
-                    dateEnd + 1, message.length(), 0);
+            message.setSpan(new AbsoluteSizeSpan(16, true),
+                    dateEnd, message.length(), 0);
 
             txtMessage.setText(message);
         }

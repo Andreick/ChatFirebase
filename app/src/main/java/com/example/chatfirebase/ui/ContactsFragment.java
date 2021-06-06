@@ -1,4 +1,4 @@
-package com.example.chatfirebase;
+package com.example.chatfirebase.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +18,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.chatfirebase.R;
+import com.example.chatfirebase.data.User;
+import com.example.chatfirebase.data.UserConnectionStatus;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -174,12 +177,12 @@ public class ContactsFragment extends Fragment {
 
         @Override
         public void bind(GroupieViewHolder viewHolder, int position) {
-            ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto);
-            ImageView imgConnStatus = viewHolder.itemView.findViewById(R.id.img_contact_conn_status);
-            TextView txtUserNm = viewHolder.itemView.findViewById(R.id.txtUserName);
-            TextView txtConnStatus = viewHolder.itemView.findViewById(R.id.txt_contact_conn_status);
+            ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.civ_card_contact_photo);
+            ImageView imgConnStatus = viewHolder.itemView.findViewById(R.id.civ_contact_conn_status);
+            TextView txtUserNm = viewHolder.itemView.findViewById(R.id.tv_contact_username);
+            TextView txtConnStatus = viewHolder.itemView.findViewById(R.id.iv_contact_conn_status);
 
-            Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder_600).into(imgPhoto);
+            Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(imgPhoto);
             txtUserNm.setText(contactName);
 
             int connColor;

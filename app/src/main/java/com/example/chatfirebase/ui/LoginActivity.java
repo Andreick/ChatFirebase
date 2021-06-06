@@ -1,4 +1,4 @@
-package com.example.chatfirebase;
+package com.example.chatfirebase.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +13,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle;
 
+import com.example.chatfirebase.ChatFirebaseApplication;
+import com.example.chatfirebase.R;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
@@ -31,12 +33,12 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        vEditEmail = findViewById(R.id.edit_email);
-        vEditPassword = findViewById(R.id.edit_password);
+        vEditEmail = findViewById(R.id.et_login_email);
+        vEditPassword = findViewById(R.id.et_login_password);
         vButtonLogin = findViewById(R.id.btn_login);
-        vButtonLostPass = findViewById(R.id.btLostPassword);
-        vButtonRegister = findViewById(R.id.btRegister);
-        loadingBar = findViewById(R.id.progress_bar_login);
+        vButtonLostPass = findViewById(R.id.tv_login_lost_password);
+        vButtonRegister = findViewById(R.id.tv_login_register);
+        loadingBar = findViewById(R.id.pb_login);
 
         vButtonRegister.setOnClickListener(view -> goToRegisterActivity());
         vButtonLogin.setOnClickListener(view -> login());

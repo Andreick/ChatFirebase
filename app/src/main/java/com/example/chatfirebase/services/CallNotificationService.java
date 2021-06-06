@@ -1,4 +1,4 @@
-package com.example.chatfirebase;
+package com.example.chatfirebase.services;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -7,6 +7,9 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+
+import com.example.chatfirebase.ui.CallReceiverActivity;
+import com.example.chatfirebase.R;
 
 public class CallNotificationService extends Service {
 
@@ -25,7 +28,7 @@ public class CallNotificationService extends Service {
                 fullScreenIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), getString(R.string.channel_id))
-                .setSmallIcon(R.drawable.ic_baseline_call_24)
+                .setSmallIcon(R.drawable.ic_call_icon)
                 .setContentTitle(getString(R.string.call_notification_title))
                 .setContentText(getString(R.string.call_notification_text))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

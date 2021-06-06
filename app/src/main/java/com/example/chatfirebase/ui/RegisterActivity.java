@@ -1,4 +1,4 @@
-package com.example.chatfirebase;
+package com.example.chatfirebase.ui;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -24,6 +24,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle;
 
+import com.example.chatfirebase.ChatFirebaseApplication;
+import com.example.chatfirebase.R;
+import com.example.chatfirebase.data.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -83,15 +86,15 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        vEditName = findViewById(R.id.edit_name);
-        vEditEmail = findViewById(R.id.edit_email);
-        vEditPassword = findViewById(R.id.edtRpassword);
-        vEditConfirmPass = findViewById(R.id.edit_confirm_password);
+        vEditName = findViewById(R.id.et_register_name);
+        vEditEmail = findViewById(R.id.et_register_email);
+        vEditPassword = findViewById(R.id.et_register_password);
+        vEditConfirmPass = findViewById(R.id.et_register_confirm_password);
         vButtonRegister = findViewById(R.id.btn_register);
-        vButtonHaveAccount = findViewById(R.id.btHaveAccount);
-        vButtonPhoto = findViewById(R.id.btPhoto);
-        vImgPhoto = findViewById(R.id.img_register_photo);
-        loadingBar = findViewById(R.id.progress_bar_login);
+        vButtonHaveAccount = findViewById(R.id.tv_register_have_account);
+        vButtonPhoto = findViewById(R.id.btn_register_photo);
+        vImgPhoto = findViewById(R.id.civ_register_photo);
+        loadingBar = findViewById(R.id.pb_register);
 
         vButtonPhoto.setOnClickListener(view -> getContent.launch("image/*"));
         vButtonRegister.setOnClickListener(view -> createUser());

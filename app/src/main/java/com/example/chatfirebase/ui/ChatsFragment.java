@@ -1,4 +1,4 @@
-package com.example.chatfirebase;
+package com.example.chatfirebase.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.chatfirebase.R;
+import com.example.chatfirebase.data.Chat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
@@ -147,11 +149,11 @@ public class ChatsFragment extends Fragment {
 
         @Override
         public void bind(GroupieViewHolder viewHolder, int position) {
-            ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.imgUserPhoto2);
-            TextView username = viewHolder.itemView.findViewById(R.id.txtUserName2);
-            TextView message = viewHolder.itemView.findViewById(R.id.txtLastMessage2);
+            ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.civ_card_chat_photo);
+            TextView username = viewHolder.itemView.findViewById(R.id.tv_chat_username);
+            TextView message = viewHolder.itemView.findViewById(R.id.tv_chat_last_message);
 
-            Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder_600).into(imgPhoto);
+            Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(imgPhoto);
             username.setText(contactName);
 
             String text = lastMessage;

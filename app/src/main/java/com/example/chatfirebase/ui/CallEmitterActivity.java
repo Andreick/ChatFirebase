@@ -1,4 +1,4 @@
-package com.example.chatfirebase;
+package com.example.chatfirebase.ui;
 
 import android.content.ComponentName;
 import android.content.Intent;
@@ -15,6 +15,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.chatfirebase.R;
+import com.example.chatfirebase.services.SinchService;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.SinchError;
 import com.sinch.android.rtc.calling.Call;
@@ -39,16 +41,16 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_call_emitter);
 
-        ImageView vImgReceiver = findViewById(R.id.imgReceiver);
-        TextView vTxtReceiverName = findViewById(R.id.txtReceiverName);
-        vbtReject = findViewById(R.id.bt_emitter_hang_up);
-        vbtSpeaker = findViewById(R.id.imgEmitterSpeaker);
+        ImageView vImgReceiver = findViewById(R.id.civ_receiver_photo);
+        TextView vTxtReceiverName = findViewById(R.id.tv_receiver_name);
+        vbtReject = findViewById(R.id.iv_emitter_hang_up);
+        vbtSpeaker = findViewById(R.id.iv_emitter_speaker);
 
         Intent serviceIntent = new Intent(this, SinchService.class);
         bindService(serviceIntent, this, 0);
 
         String profileUrl = getIntent().getStringExtra(getString(R.string.user_profile_url));
-        Picasso.get().load(profileUrl).placeholder(R.drawable.profile_placeholder_600).into(vImgReceiver);
+        Picasso.get().load(profileUrl).placeholder(R.drawable.profile_placeholder).into(vImgReceiver);
 
         String username = getIntent().getStringExtra(getString(R.string.user_name));
         vTxtReceiverName.setText(username);
@@ -68,12 +70,12 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
             if (speakerEnabled) {
                 sinchService.getAudioController().disableSpeaker();
                 Toast.makeText(this, getString(R.string.call_speaker_disabled), Toast.LENGTH_SHORT).show();
-                speakerIcon = R.drawable.speaker_disabled_64;
+                speakerIcon = R.drawable.disabled_speaker;
             }
             else {
                 sinchService.getAudioController().enableSpeaker();
                 Toast.makeText(this, getString(R.string.call_speaker_enabled), Toast.LENGTH_SHORT).show();
-                speakerIcon = R.drawable.speaker_enabled_64;
+                speakerIcon = R.drawable.enabled_speaker;
             }
             vbtSpeaker.setImageDrawable(ContextCompat.getDrawable(this, speakerIcon));
             speakerEnabled = !speakerEnabled;

@@ -7,10 +7,10 @@
     android:layout_height="match_parent"
     android:background="@color/color_secondary"
     android:visibility="visible"
-    tools:context=".HomeActivity">
+    tools:context=".ui.HomeActivity">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/imgProfile"
+        android:id="@+id/civ_home_photo"
         android:layout_width="73dp"
         android:layout_height="73dp"
         android:layout_marginStart="32dp"
@@ -19,18 +19,19 @@
         app:civ_border_color="@color/color_primary"
         app:civ_border_width="3dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/profile_placeholder" />
 
     <Button
-        android:id="@+id/btLogout"
+        android:id="@+id/btn_logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
         android:text="@string/bt_logout"
-        app:layout_constraintBottom_toBottomOf="@+id/imgProfile"
+        app:layout_constraintBottom_toBottomOf="@+id/civ_home_photo"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imgProfile" />
+        app:layout_constraintTop_toTopOf="@+id/civ_home_photo" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -41,7 +42,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imgProfile">
+        app:layout_constraintTop_toBottomOf="@+id/civ_home_photo">
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_bar"
@@ -49,10 +50,26 @@
             android:layout_height="36dp"
             app:tabBackground="@color/color_secondary"
             app:tabGravity="fill"
-            app:tabIndicatorColor="@color/color_primary" />
+            app:tabIndicatorColor="@color/color_primary">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/tab_chats" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/tab_contacts" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/tab_calls" />
+        </com.google.android.material.tabs.TabLayout>
 
         <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/view_pager"
+            android:id="@+id/vp_home"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"

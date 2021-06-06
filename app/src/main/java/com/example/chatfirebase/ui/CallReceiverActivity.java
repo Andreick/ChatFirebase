@@ -1,4 +1,4 @@
-package com.example.chatfirebase;
+package com.example.chatfirebase.ui;
 
 import android.content.ComponentName;
 import android.content.Intent;
@@ -15,6 +15,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.chatfirebase.R;
+import com.example.chatfirebase.data.User;
+import com.example.chatfirebase.services.SinchService;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.sinch.android.rtc.MissingPermissionException;
@@ -47,11 +50,11 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
 
         usersReference = FirebaseDatabase.getInstance().getReference(getString(R.string.database_users));
 
-        vImgEmitter = findViewById(R.id.imgEmitter);
-        vTxtEmitterName = findViewById(R.id.txtEmitterName);
-        vbtAccept = findViewById(R.id.bt_receiver_answer);
-        vbtReject = findViewById(R.id.bt_receiver_hang_up);
-        vbtSpeaker = findViewById(R.id.imgEmitterSpeaker);
+        vImgEmitter = findViewById(R.id.civ_emitter_photo);
+        vTxtEmitterName = findViewById(R.id.tv_emitter_name);
+        vbtAccept = findViewById(R.id.iv_receiver_answer);
+        vbtReject = findViewById(R.id.iv_receiver_hang_up);
+        vbtSpeaker = findViewById(R.id.iv_emitter_speaker);
 
         Intent serviceIntent = new Intent(this, SinchService.class);
         bindService(serviceIntent, this, 0);
@@ -77,7 +80,7 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
 
                     if (contact != null) {
                         Picasso.get().load(contact.getProfileUrl())
-                                .placeholder(R.drawable.profile_placeholder_600)
+                                .placeholder(R.drawable.profile_placeholder)
                                 .into(vImgEmitter);
                         vTxtEmitterName.setText(contact.getName());
                     }
@@ -107,12 +110,12 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
             if (speakerEnabled) {
                 sinchService.getAudioController().disableSpeaker();
                 Toast.makeText(this, getString(R.string.call_speaker_disabled), Toast.LENGTH_SHORT).show();
-                speakerIcon = R.drawable.speaker_disabled_64;
+                speakerIcon = R.drawable.disabled_speaker;
             }
             else {
                 sinchService.getAudioController().enableSpeaker();
                 Toast.makeText(this, getString(R.string.call_speaker_enabled), Toast.LENGTH_SHORT).show();
-                speakerIcon = R.drawable.speaker_enabled_64;
+                speakerIcon = R.drawable.enabled_speaker;
             }
             vbtSpeaker.setImageDrawable(ContextCompat.getDrawable(this, speakerIcon));
             speakerEnabled = !speakerEnabled;

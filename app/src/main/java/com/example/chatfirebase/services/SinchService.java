@@ -1,4 +1,4 @@
-package com.example.chatfirebase;
+package com.example.chatfirebase.services;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,6 +13,9 @@ import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
+import com.example.chatfirebase.ui.CallEmitterActivity;
+import com.example.chatfirebase.R;
+import com.example.chatfirebase.data.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.sinch.android.rtc.AudioController;
 import com.sinch.android.rtc.ClientRegistration;
@@ -98,7 +101,7 @@ public class SinchService extends Service {
 
     public class SinchServiceBinder extends Binder {
 
-        SinchService getService() {
+        public SinchService getService() {
             return SinchService.this;
         }
     }

@@ -1,4 +1,4 @@
-package com.example.chatfirebase;
+package com.example.chatfirebase.data;
 
 public enum UserConnectionStatus {
     OFFLINE,

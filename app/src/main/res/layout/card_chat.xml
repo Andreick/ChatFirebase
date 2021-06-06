@@ -7,7 +7,7 @@
     android:background="@color/color_primary">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/imgUserPhoto2"
+        android:id="@+id/civ_card_chat_photo"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="8dp"
@@ -19,14 +19,15 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        tools:src="@drawable/profile_placeholder" />
 
     <TextView
-        android:id="@+id/txtUserName2"
+        android:id="@+id/tv_chat_username"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:fontFamily="@font/alegreya_sans_sc_extrabold"
@@ -34,11 +35,12 @@
         android:textColor="@color/color_secondary"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imgUserPhoto2"
-        app:layout_constraintTop_toTopOf="@+id/imgUserPhoto2" />
+        app:layout_constraintStart_toEndOf="@+id/civ_card_chat_photo"
+        app:layout_constraintTop_toTopOf="@+id/civ_card_chat_photo"
+        tools:text="Contact Name" />
 
     <TextView
-        android:id="@+id/txtLastMessage2"
+        android:id="@+id/tv_chat_last_message"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -46,8 +48,9 @@
         android:layout_marginTop="4dp"
         android:singleLine="true"
         android:textColor="@color/color_secondary"
-        app:layout_constraintEnd_toEndOf="@+id/txtUserName2"
-        app:layout_constraintStart_toEndOf="@+id/imgUserPhoto2"
-        app:layout_constraintTop_toBottomOf="@+id/txtUserName2" />
+        app:layout_constraintEnd_toEndOf="@+id/tv_chat_username"
+        app:layout_constraintStart_toEndOf="@+id/civ_card_chat_photo"
+        app:layout_constraintTop_toBottomOf="@+id/tv_chat_username"
+        tools:text="Last message Last message Last message Last message Last message Last message" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

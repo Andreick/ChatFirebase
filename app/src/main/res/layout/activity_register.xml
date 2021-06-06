@@ -4,25 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterActivity"
+    tools:context=".ui.RegisterActivity"
     android:background="@drawable/app_background">
 
     <ProgressBar
-        android:id="@+id/progress_bar_register"
+        android:id="@+id/pb_register"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
         android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/btn_register"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_register" />
+        app:layout_constraintTop_toBottomOf="@+id/et_register_confirm_password"
+        tools:visibility="visible" />
 
     <TextView
-        android:id="@+id/txt_register_title"
+        android:id="@+id/tv_register_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="32dp"
         android:fontFamily="sans-serif-black"
         android:text="@string/title_register"
         android:textColor="@color/color_secondary"
@@ -32,12 +33,11 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/edit_email"
+        android:id="@+id/et_register_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:ems="10"
-        android:fontFamily="sans-serif"
         android:hint="@string/hint_email"
         android:inputType="textEmailAddress"
         android:textColor="@color/color_secondary"
@@ -45,9 +45,8 @@
         android:textColorHint="@color/color_secondary"
         android:textColorLink="@color/color_secondary"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_name"
+        app:layout_constraintTop_toBottomOf="@+id/et_register_name"
         tools:ignore="Autofill" />
 
     <Button
@@ -56,23 +55,22 @@
         android:layout_height="35dp"
         android:layout_marginStart="50dp"
         android:layout_marginLeft="50dp"
-        android:layout_marginTop="32dp"
         android:layout_marginEnd="50dp"
         android:layout_marginRight="50dp"
+        android:layout_marginBottom="24dp"
         android:background="@color/color_details"
         android:text="@string/new_register"
         android:textColor="@color/color_secondary"
+        app:layout_constraintBottom_toTopOf="@+id/tv_register_have_account"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_confirm_password" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/edit_name"
+        android:id="@+id/et_register_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:ems="10"
-        android:fontFamily="sans-serif"
         android:hint="@string/hint_name"
         android:inputType="textPersonName"
         android:textColor="@color/color_secondary"
@@ -80,13 +78,12 @@
         android:textColorHint="@color/color_secondary"
         android:textColorLink="@color/color_secondary"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btPhoto"
+        app:layout_constraintTop_toBottomOf="@+id/btn_register_photo"
         tools:ignore="Autofill" />
 
     <EditText
-        android:id="@+id/edtRpassword"
+        android:id="@+id/et_register_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
@@ -100,11 +97,11 @@
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_email"
+        app:layout_constraintTop_toBottomOf="@+id/et_register_email"
         tools:ignore="Autofill" />
 
     <EditText
-        android:id="@+id/edit_confirm_password"
+        android:id="@+id/et_register_confirm_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
@@ -117,41 +114,40 @@
         android:textColorLink="@color/color_secondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtRpassword"
+        app:layout_constraintTop_toBottomOf="@+id/et_register_password"
         tools:ignore="Autofill" />
 
     <TextView
-        android:id="@+id/btHaveAccount"
+        android:id="@+id/tv_register_have_account"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="24dp"
         android:text="@string/have_account"
         android:textColor="@color/color_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progress_bar_register" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/btPhoto"
+        android:id="@+id/btn_register_photo"
         android:layout_width="130dp"
         android:layout_height="130dp"
-        android:layout_marginTop="32dp"
         android:background="@drawable/btn_rounded_photo"
         android:text="@string/bt_photo"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/civ_register_photo"
         app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_register_title" />
+        app:layout_constraintStart_toStartOf="@+id/civ_register_photo"
+        app:layout_constraintTop_toTopOf="@+id/civ_register_photo" />
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/img_register_photo"
+        android:id="@+id/civ_register_photo"
         android:layout_width="130dp"
         android:layout_height="130dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="24dp"
         app:civ_border_color="@color/color_secondary"
         app:civ_border_width="3dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_register_title" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_register_title" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

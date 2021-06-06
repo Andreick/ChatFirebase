@@ -1,4 +1,4 @@
-package com.example.chatfirebase;
+package com.example.chatfirebase.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +16,9 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.chatfirebase.ChatFirebaseApplication;
+import com.example.chatfirebase.R;
+import com.example.chatfirebase.data.User;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.squareup.picasso.Picasso;
@@ -38,10 +41,10 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        imgProfile = findViewById(R.id.imgProfile);
-        buttonLogout = findViewById(R.id.btLogout);
+        imgProfile = findViewById(R.id.civ_home_photo);
+        buttonLogout = findViewById(R.id.btn_logout);
         tabLayout = findViewById(R.id.tab_bar);
-        viewPager = findViewById(R.id.view_pager);
+        viewPager = findViewById(R.id.vp_home);
 
         application = (ChatFirebaseApplication) getApplication();
         User currentUser = application.getCurrentUser();
@@ -82,7 +85,7 @@ public class HomeActivity extends AppCompatActivity {
         }).attach();
 
         String profileUri = currentUser.getProfileUrl();
-        Picasso.get().load(profileUri).placeholder(R.drawable.profile_placeholder_600).into(imgProfile);
+        Picasso.get().load(profileUri).placeholder(R.drawable.profile_placeholder).into(imgProfile);
 
         buttonLogout.setOnClickListener(view -> logout());
     }

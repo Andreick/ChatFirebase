@@ -1,7 +1,4 @@
-package com.example.chatfirebase;
-
-import android.os.Parcel;
-import android.os.Parcelable;
+package com.example.chatfirebase.data;
 
 public class User {
 

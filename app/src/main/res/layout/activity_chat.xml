@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChatActivity"
+    tools:context=".ui.ChatActivity"
     android:background="@drawable/app_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout2"
+        android:id="@+id/cl_message"
         android:layout_width="0dp"
         android:layout_height="100dp"
         android:background="@color/color_secondary"
@@ -30,7 +30,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <EditText
-                android:id="@+id/edtChat"
+                android:id="@+id/et_message"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="8dp"
@@ -46,34 +46,34 @@
                 android:textColor="@color/color_secondary"
                 android:textColorHint="@color/color_secondary"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/btSend"
+                app:layout_constraintEnd_toStartOf="@+id/civ_send"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="Autofill" />
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/btSend"
+                android:id="@+id/civ_send"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:background="@drawable/send_message_500"
+                android:src="@drawable/send_message_500"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/send_message_500" />
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/lsViewChat"
+        android:id="@+id/rv_chat"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        app:layout_constraintBottom_toTopOf="@+id/cl_message"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
+        app:layout_constraintTop_toBottomOf="@+id/cl_contact" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout3"
+        android:id="@+id/cl_contact"
         android:layout_width="0dp"
         android:layout_height="70dp"
         android:background="@color/color_secondary"
@@ -82,7 +82,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/imgContact"
+            android:id="@+id/civ_chat_photo"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginStart="16dp"
@@ -91,10 +91,11 @@
             app:civ_border_width="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/profile_placeholder" />
 
         <TextView
-            android:id="@+id/txtNameContact"
+            android:id="@+id/tv_chat_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -105,12 +106,13 @@
             android:singleLine="true"
             android:textColor="@color/color_primary"
             android:textSize="24sp"
-            app:layout_constraintEnd_toStartOf="@+id/imgCall"
-            app:layout_constraintStart_toEndOf="@+id/imgContact"
-            app:layout_constraintTop_toTopOf="@+id/imgContact" />
+            app:layout_constraintEnd_toStartOf="@+id/iv_call"
+            app:layout_constraintStart_toEndOf="@+id/civ_chat_photo"
+            app:layout_constraintTop_toTopOf="@+id/civ_chat_photo"
+            tools:text="Contact Name" />
 
         <ImageView
-            android:id="@+id/imgCall"
+            android:id="@+id/iv_call"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginEnd="32dp"
@@ -118,18 +120,18 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_baseline_call_24" />
+            app:srcCompat="@drawable/ic_call_icon" />
 
         <TextView
-            android:id="@+id/txt_chat_conn_status"
+            android:id="@+id/tv_chat_conn_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginTop="30dp"
             android:textColor="@color/color_primary"
-            app:layout_constraintBottom_toBottomOf="@+id/imgContact"
-            app:layout_constraintStart_toEndOf="@+id/imgContact"
-            app:layout_constraintTop_toBottomOf="@+id/txtNameContact" />
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@+id/tv_chat_name"
+            app:layout_constraintTop_toTopOf="@+id/tv_chat_name"
+            tools:text="Status" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

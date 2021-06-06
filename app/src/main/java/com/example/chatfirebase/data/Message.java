@@ -1,6 +1,6 @@
-package com.example.chatfirebase;
+package com.example.chatfirebase.data;
 
-class Message {
+public class Message {
 
     private String senderId;
     private String text;
