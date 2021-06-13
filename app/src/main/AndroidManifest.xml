@@ -34,7 +34,7 @@
             android:name=".ui.CallReceiverActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-        <activity android:name=".ui.ChatActivity" />
+        <activity android:name=".ui.TalkActivity" />
         <activity
             android:name=".ui.LoginActivity"
             android:screenOrientation="portrait"

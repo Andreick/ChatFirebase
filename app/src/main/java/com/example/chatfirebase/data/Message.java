@@ -5,19 +5,15 @@ public class Message {
     private String senderId;
     private String text;
     private long timestamp;
+    private boolean read;
 
     public Message() { }
 
     public Message(String senderId, String text) {
         this.senderId = senderId;
         this.text = text;
-        this.timestamp = System.currentTimeMillis();
-    }
-
-    public Message(String senderId, String text, long timestamp) {
-        this.senderId = senderId;
-        this.text = text;
-        this.timestamp = timestamp;
+        timestamp = System.currentTimeMillis();
+        read = false;
     }
 
     public String getSenderId() {
@@ -30,5 +26,9 @@ public class Message {
 
     public long getTimestamp() {
         return timestamp;
+    }
+
+    public boolean isRead() {
+        return read;
     }
 }

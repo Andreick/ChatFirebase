@@ -32,9 +32,11 @@ import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 
 public class ContactsFragment extends Fragment {
@@ -42,7 +44,8 @@ public class ContactsFragment extends Fragment {
     private static final String TAG = "ContactsFragment";
 
     private final Map<String, ContactItem> contactItemMap = new HashMap<>();
-    private final Set<ContactItem> contactItemSet = new TreeSet<>();
+    private final TreeSet<ContactItem> contactItemSet = new TreeSet<>();
+    private final List<ContactItem> contactItems = new ArrayList<>();
 
     private String currentUid;
     private DatabaseReference usersReference;
@@ -107,6 +110,7 @@ public class ContactsFragment extends Fragment {
                         ContactItem contactItem = new ContactItem(uid, contact);
                         contactItemMap.put(uid, contactItem);
                         contactItemSet.add(contactItem);
+                        Collections.sort(contactItems);
                         contactsAdapter.update(contactItemSet);
                         contactsAdapter.notifyDataSetChanged();
                     }
@@ -229,7 +233,7 @@ public class ContactsFragment extends Fragment {
         public void onItemClick(@NonNull Item item, @NonNull View view) {
             ContactItem contactItem = (ContactItem) item;
 
-            Intent chatIntent = new Intent(context, ChatActivity.class);
+            Intent chatIntent = new Intent(context, TalkActivity.class);
             chatIntent.putExtra(getString(R.string.extra_user_id), currentUid);
             chatIntent.putExtra(getString(R.string.extra_contact_id), contactItem.contactId);
             chatIntent.putExtra(getString(R.string.extra_contact_name), contactItem.contactName);

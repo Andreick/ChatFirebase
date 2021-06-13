@@ -12,18 +12,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatfirebase.R;
-import com.example.chatfirebase.data.Chat;
+import com.example.chatfirebase.data.Message;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
@@ -31,13 +33,18 @@ import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 import com.xwray.groupie.OnItemClickListener;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ChatsFragment extends Fragment {
 
     private static final String TAG = "ChatsFragment";
 
-    private final LinkedList<ChatItem> linkedChatItems = new LinkedList<>();
+    private final Map<String, ChatItem> chatItemMap = new HashMap<>();
+    private final List<ChatItem> chatItems = new ArrayList<>();
 
     private String currentUid;
     private Query chatsQuery;
@@ -54,10 +61,10 @@ public class ChatsFragment extends Fragment {
 
         currentUid = FirebaseAuth.getInstance().getUid();
 
-        chatsQuery = FirebaseFirestore.getInstance().collection(getString(R.string.collection_chats))
+        chatsQuery = FirebaseFirestore.getInstance().collection(getString(R.string.collection_talks))
                 .document(currentUid)
-                .collection(getString(R.string.collection_chat))
-                .orderBy(getString(R.string.chat_last_message_timestamp), Query.Direction.ASCENDING);
+                .collection(getString(R.string.collection_talks_chats))
+                .orderBy(getString(R.string.chat_last_message_timestamp), Query.Direction.DESCENDING);
 
         setChatsEventListener();
     }
@@ -91,7 +98,8 @@ public class ChatsFragment extends Fragment {
     public void onStop() {
         super.onStop();
         chatsRegistration.remove();
-        linkedChatItems.clear();
+        chatItemMap.clear();
+        chatItems.clear();
         chatsAdapter.clear();
     }
 
@@ -101,22 +109,30 @@ public class ChatsFragment extends Fragment {
             if (e == null) {
                 if (snapshots != null) {
                     for (DocumentChange doc : snapshots.getDocumentChanges()) {
-                        Chat chat = doc.getDocument().toObject(Chat.class);
-                        ChatItem chatItem = new ChatItem(chat);
+                        String contactId = doc.getDocument().getId();
 
                         switch (doc.getType()) {
                             case ADDED:
-                                Log.d(TAG, "Document ADDED");
-                                linkedChatItems.addFirst(chatItem);
+                                Log.d(TAG, "Chat " + contactId + " ADDED");
+                                ChatItem chatItem = new ChatItem(context, contactId, doc.getDocument());
+                                chatItemMap.put(contactId, chatItem);
+                                chatItems.add(chatItem);
                                 break;
                             case MODIFIED:
-                                Log.d(TAG, "Document MODIFIED");
-                                linkedChatItems.remove(chatItem);
-                                linkedChatItems.addFirst(chatItem);
+                                Log.d(TAG, "Chat" + contactId + " MODIFIED");
+                                ChatItem modifiedChatItem = chatItemMap.get(contactId);
+                                if (modifiedChatItem != null) {
+                                    Message lastMessage = doc.getDocument()
+                                            .get(getString(R.string.chat_last_message), Message.class);
+                                    modifiedChatItem.setLastMessage(lastMessage);
+                                    Collections.sort(chatItems);
+                                }
+                                else Log.e(TAG, "Null chat item");
                                 break;
                         }
                     }
-                    chatsAdapter.update(linkedChatItems, false);
+
+                    chatsAdapter.update(chatItems, false);
                     chatsAdapter.notifyDataSetChanged();
                 }
                 else {
@@ -131,38 +147,50 @@ public class ChatsFragment extends Fragment {
         };
     }
 
-    private static class ChatItem extends Item<GroupieViewHolder> {
+    private static class ChatItem extends Item<GroupieViewHolder> implements Comparable<ChatItem> {
 
+        private final Context context;
         private final String contactId;
         private final String contactProfileUrl;
         private final String contactName;
-        private final String senderId;
-        private final String lastMessage;
+        private Message lastMessage;
 
-        public ChatItem(Chat chat) {
-            contactId = chat.getContactId();
-            contactProfileUrl = chat.getContactProfileUrl();
-            contactName = chat.getContactName();
-            senderId = chat.getLastMessage().getSenderId();
-            lastMessage = chat.getLastMessage().getText();
+        public ChatItem(Context context, String contactId, QueryDocumentSnapshot docSnap) {
+            this.context = context;
+            this.contactId = contactId;
+            contactProfileUrl = docSnap.getString(context.getString(R.string.user_profile_url));
+            contactName = docSnap.getString(context.getString(R.string.user_name));
+            lastMessage = docSnap.get(context.getString(R.string.chat_last_message), Message.class);
+        }
+
+        public void setLastMessage(Message message) {
+            lastMessage = message;
         }
 
         @Override
         public void bind(GroupieViewHolder viewHolder, int position) {
-            ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.civ_card_chat_photo);
-            TextView username = viewHolder.itemView.findViewById(R.id.tv_chat_username);
-            TextView message = viewHolder.itemView.findViewById(R.id.tv_chat_last_message);
+            ImageView civPhoto = viewHolder.itemView.findViewById(R.id.civ_card_chat_photo);
+            ImageView ivMessageRead = viewHolder.itemView.findViewById(R.id.iv_chat_message_read);
+            TextView tvContactName = viewHolder.itemView.findViewById(R.id.tv_chat_username);
+            TextView tvContactLastMessage = viewHolder.itemView.findViewById(R.id.tv_contact_last_message);
+            TextView tvUserLastMessage = viewHolder.itemView.findViewById(R.id.tv_user_last_message);
 
-            Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(imgPhoto);
-            username.setText(contactName);
+            Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(civPhoto);
+            tvContactName.setText(contactName);
 
-            String text = lastMessage;
+            String text = lastMessage.getText();
 
-            if (contactId.equals(senderId)) {
-                text = contactName + ": " + text;
+            if (contactId.equals(lastMessage.getSenderId())) {
+                ivMessageRead.setImageDrawable(null);
+                tvUserLastMessage.setText(null);
+                tvContactLastMessage.setText(text);
             }
-
-            message.setText(text);
+            else {
+                int readIcon = lastMessage.isRead() ? R.drawable.ic_message_read_icon : R.drawable.ic_message_unread_icon;
+                tvContactLastMessage.setText(null);
+                tvUserLastMessage.setText(text);
+                ivMessageRead.setImageDrawable(ContextCompat.getDrawable(context, readIcon));
+            }
         }
 
         @Override
@@ -171,16 +199,13 @@ public class ChatsFragment extends Fragment {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            ChatItem chatItem = (ChatItem) o;
-            return contactId.equals(chatItem.contactId);
-        }
+        public int compareTo(ChatItem ci) {
+            if (this == ci) return 0;
 
-        @Override
-        public int hashCode() {
-            return contactId.hashCode();
+            int timestampDiff = Long.compare(ci.lastMessage.getTimestamp(), lastMessage.getTimestamp());
+            if (timestampDiff != 0) return timestampDiff;
+
+            return contactId.compareTo(ci.contactId);
         }
     }
 
@@ -190,7 +215,7 @@ public class ChatsFragment extends Fragment {
         public void onItemClick(@NonNull Item item, @NonNull View view) {
             ChatItem chatItem = (ChatItem) item;
 
-            Intent chatIntent = new Intent(context, ChatActivity.class);
+            Intent chatIntent = new Intent(context, TalkActivity.class);
             chatIntent.putExtra(getString(R.string.extra_user_id), currentUid);
             chatIntent.putExtra(getString(R.string.extra_contact_id), chatItem.contactId);
             chatIntent.putExtra(getString(R.string.extra_contact_name), chatItem.contactName);

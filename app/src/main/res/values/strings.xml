@@ -71,15 +71,16 @@
 
     <!-- Message Class Properties -->
     <string name="message_timestamp">timestamp</string>
-
-    <!-- Chat Class Properties -->
-    <string name="chat_last_message_timestamp">lastMessage.timestamp</string>
+    <string name="message_read">read</string>
 
     <!-- Firestore Collections -->
-    <string name="collection_users">users</string>
-    <string name="collection_conversations">conversations</string>
-    <string name="collection_chats">chats</string>
-    <string name="collection_chat">chat</string>
+    <string name="collection_talks">talks</string>
+    <string name="collection_talks_chats">chats</string>
+
+    <!-- Chat Document Fields -->
+    <string name="chat_last_message">lastMessage</string>
+    <string name="chat_last_message_timestamp">lastMessage.timestamp</string>
+    <string name="chat_last_message_read">lastMessage.read</string>
 
     <!-- Firebase Database References -->
     <string name="database_users">users</string>

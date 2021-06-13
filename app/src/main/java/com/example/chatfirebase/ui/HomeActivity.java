@@ -18,7 +18,6 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.chatfirebase.ChatFirebaseApplication;
 import com.example.chatfirebase.R;
-import com.example.chatfirebase.data.User;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.squareup.picasso.Picasso;
@@ -47,9 +46,8 @@ public class HomeActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.vp_home);
 
         application = (ChatFirebaseApplication) getApplication();
-        User currentUser = application.getCurrentUser();
 
-        if (currentUser == null) {
+        if (application.getCurrentUser() == null) {
             Toast.makeText(this, "Failed to load user", Toast.LENGTH_SHORT).show();
             goToLoginActivity();
             return;
@@ -84,7 +82,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         }).attach();
 
-        String profileUri = currentUser.getProfileUrl();
+        String profileUri = application.getCurrentUser().getProfileUrl();
         Picasso.get().load(profileUri).placeholder(R.drawable.profile_placeholder).into(imgProfile);
 
         buttonLogout.setOnClickListener(view -> logout());

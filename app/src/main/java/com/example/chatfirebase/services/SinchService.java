@@ -110,15 +110,15 @@ public class SinchService extends Service {
         return (sinchClient != null && sinchClient.isStarted());
     }
 
-    public void callUser(String uid, User contact) {
+    public void callUser(String uid, String contactName, String contactProfileUrl) {
         if (sinchIsStarted()) {
             if (call == null) {
                 try {
                     call = sinchClient.getCallClient().callUser(uid);
 
                     Intent emitterIntent = new Intent(SinchService.this, CallEmitterActivity.class);
-                    emitterIntent.putExtra(getString(R.string.user_name), contact.getName());
-                    emitterIntent.putExtra(getString(R.string.user_profile_url), contact.getProfileUrl());
+                    emitterIntent.putExtra(getString(R.string.user_name), contactName);
+                    emitterIntent.putExtra(getString(R.string.user_profile_url), contactProfileUrl);
 
                     emitterIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(emitterIntent);
