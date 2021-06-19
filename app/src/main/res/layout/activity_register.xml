@@ -58,7 +58,7 @@
         android:layout_marginEnd="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginBottom="24dp"
-        android:background="@color/color_details"
+        android:background="@color/yellow"
         android:text="@string/new_register"
         android:textColor="@color/color_secondary"
         app:layout_constraintBottom_toTopOf="@+id/tv_register_have_account"

@@ -2,13 +2,14 @@
 <resources>
     <color name="color_primary">#EFEFEF</color>
     <color name="color_secondary">#151515</color>
-    <color name="color_details">#FDC800</color>
+    <color name="black">#000000</color>
+    <color name="nero">#252525</color>
+    <color name="jet">#343434</color>
+    <color name="gray">#808080</color>
+    <color name="white">#FFFFFF</color>
+    <color name="yellow">#FDC800</color>
     <color name="light_green">#37DB1B</color>
-    <color name="gray">#909090</color>
     <color name="orange">#F18F34</color>
     <color name="red">#E91E63</color>
     <color name="green">#009688</color>
-    <color name="eerie_black">#222222</color>
-    <color name="black">#000000</color>
-    <color name="white">#FFFFFF</color>
 </resources>

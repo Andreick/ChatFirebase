@@ -47,7 +47,7 @@ public class ContactsFragment extends Fragment {
     private final TreeSet<ContactItem> contactItemSet = new TreeSet<>();
     private final List<ContactItem> contactItems = new ArrayList<>();
 
-    private String currentUid;
+    private static String currentUid;
     private DatabaseReference usersReference;
     private ChildEventListener contactsEventListener;
 
@@ -161,7 +161,7 @@ public class ContactsFragment extends Fragment {
         };
     }
 
-    private class ContactItem extends Item<GroupieViewHolder> implements Comparable<ContactItem> {
+    private static class ContactItem extends Item<GroupieViewHolder> implements Comparable<ContactItem> {
 
         private final String contactId;
         private final String contactProfileUrl;
@@ -189,23 +189,24 @@ public class ContactsFragment extends Fragment {
             Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(imgPhoto);
             txtUserNm.setText(contactName);
 
+            Context context = viewHolder.itemView.getContext();
             int connColor;
 
             if (contactConnStatus == UserConnectionStatus.ONLINE.ordinal()) {
-                txtConnStatus.setText(getText(R.string.user_online));
+                txtConnStatus.setText(context.getText(R.string.user_online));
                 connColor = R.color.green;
             }
             else if (contactConnStatus == UserConnectionStatus.ABSENT.ordinal()) {
-                txtConnStatus.setText(getText(R.string.user_absent));
+                txtConnStatus.setText(context.getText(R.string.user_absent));
                 connColor = R.color.orange;
             }
             else {
-                txtConnStatus.setText(getText(R.string.user_offline));
+                txtConnStatus.setText(context.getText(R.string.user_offline));
                 connColor = R.color.red;
             }
 
-            txtConnStatus.setTextColor(ContextCompat.getColor(ContactsFragment.this.context, connColor));
-            imgConnStatus.setImageDrawable(ContextCompat.getDrawable(ContactsFragment.this.context, connColor));
+            txtConnStatus.setTextColor(ContextCompat.getColor(context, connColor));
+            imgConnStatus.setImageDrawable(ContextCompat.getDrawable(context, connColor));
         }
 
         @Override
@@ -227,18 +228,19 @@ public class ContactsFragment extends Fragment {
         }
     }
 
-    private class OnContactItemClickListener implements com.xwray.groupie.OnItemClickListener {
+    private static class OnContactItemClickListener implements com.xwray.groupie.OnItemClickListener {
 
         @Override
         public void onItemClick(@NonNull Item item, @NonNull View view) {
             ContactItem contactItem = (ContactItem) item;
+            Context context = view.getContext();
 
             Intent chatIntent = new Intent(context, TalkActivity.class);
-            chatIntent.putExtra(getString(R.string.extra_user_id), currentUid);
-            chatIntent.putExtra(getString(R.string.extra_contact_id), contactItem.contactId);
-            chatIntent.putExtra(getString(R.string.extra_contact_name), contactItem.contactName);
-            chatIntent.putExtra(getString(R.string.extra_contact_profile_url), contactItem.contactProfileUrl);
-            startActivity(chatIntent);
+            chatIntent.putExtra(context.getString(R.string.extra_user_id), currentUid);
+            chatIntent.putExtra(context.getString(R.string.extra_contact_id), contactItem.contactId);
+            chatIntent.putExtra(context.getString(R.string.extra_contact_name), contactItem.contactName);
+            chatIntent.putExtra(context.getString(R.string.extra_contact_profile_url), contactItem.contactProfileUrl);
+            context.startActivity(chatIntent);
         }
     }
 }

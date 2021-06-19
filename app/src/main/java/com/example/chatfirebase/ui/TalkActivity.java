@@ -1,10 +1,6 @@
 package com.example.chatfirebase.ui;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -162,7 +158,7 @@ public class TalkActivity extends AppCompatActivity {
                                 Message message = doc.getDocument().toObject(Message.class);
                                 MessageItem messageItem;
                                 if (currentUid.equals(message.getSenderId())) {
-                                    messageItem = new SenderMessageItem(this, message);
+                                    messageItem = new SenderMessageItem(message);
                                     senderMessageItemMap.put(messageId, (SenderMessageItem) messageItem);
                                 }
                                 else {
@@ -174,14 +170,14 @@ public class TalkActivity extends AppCompatActivity {
                                         DocumentReference messageRef = talkContactReference.document(messageId);
                                         batch.update(messageRef, getString(R.string.message_read), true);
                                     }
-                                    messageItem = new ReceiverMessageItem(this, message);
+                                    messageItem = new ReceiverMessageItem(message);
                                 }
                                 messageItems.add(messageItem);
                                 break;
                             case MODIFIED:
                                 Log.d(TAG, "Message " + messageId + " MODIFIED");
                                 SenderMessageItem senderMessageItem = senderMessageItemMap.get(messageId);
-                                if (senderMessageItem != null) senderMessageItem.setRead(true);
+                                if (senderMessageItem != null) senderMessageItem.setRead();
                                 else Log.e(TAG, "Null sender message item");
                                 break;
                         }
@@ -277,36 +273,28 @@ public class TalkActivity extends AppCompatActivity {
 
     private abstract static class MessageItem extends Item<GroupieViewHolder> {
 
-        protected final Context context;
-        protected final String text;
-        protected final String date;
+        private final String text;
+        private final String date;
 
-        private MessageItem(Context context, Message message) {
-            this.context = context;
+        private MessageItem(Message message) {
             text = message.getText();
             date = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(message.getTimestamp());
+        }
+
+        @Override
+        public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
+            TextView tvText = viewHolder.itemView.findViewById(R.id.tv_message_text);
+            TextView tvDate = viewHolder.itemView.findViewById(R.id.tv_message_date);
+
+            tvText.setText(text);
+            tvDate.setText(date);
         }
     }
 
     private static class ReceiverMessageItem extends MessageItem {
 
-        private ReceiverMessageItem(Context context, Message message) {
-            super(context, message);
-        }
-
-        @Override
-        public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
-            TextView tvMessage = viewHolder.itemView.findViewById(R.id.tv_receiver_message);
-
-            SpannableString message = new SpannableString(text + "\n" + date);
-            int dateStart = message.length() - date.length();
-
-            message.setSpan(new AbsoluteSizeSpan(12, true),
-                    dateStart, message.length(), 0);
-            message.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.eerie_black)),
-                    dateStart, message.length(), 0);
-
-            tvMessage.setText(message);
+        private ReceiverMessageItem(Message message) {
+            super(message);
         }
 
         @Override
@@ -319,35 +307,22 @@ public class TalkActivity extends AppCompatActivity {
 
         private boolean read;
 
-        private SenderMessageItem(Context context, Message message) {
-            super(context, message);
+        private SenderMessageItem(Message message) {
+            super(message);
             read = message.isRead();
         }
 
-        public void setRead(boolean read) {
-            this.read = read;
+        public void setRead() {
+            read = true;
         }
 
         @Override
         public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
-            TextView tvMessage = viewHolder.itemView.findViewById(R.id.tv_sender_message);
-            ImageView ivReadIcon = viewHolder.itemView.findViewById(R.id.iv_read_icon);
-
-            SpannableString message = new SpannableString(text + "\n" + date + "     ");
-            int dateStart = text.length() + 1;
-            int dateEnd = dateStart + date.length();
-
-            message.setSpan(new AbsoluteSizeSpan(12, true),
-                    dateStart, message.length(), 0);
-            message.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.eerie_black)),
-                    dateStart, dateEnd, 0);
-            /*message.setSpan(new AbsoluteSizeSpan(14, true),
-                    dateEnd, message.length(), 0);*/
+            super.bind(viewHolder, position);
+            ImageView ivRead = viewHolder.itemView.findViewById(R.id.iv_sender_read_icon);
 
             int readIcon = read ? R.drawable.ic_message_read_icon : R.drawable.ic_message_unread_icon;
-
-            tvMessage.setText(message);
-            ivReadIcon.setImageDrawable(ContextCompat.getDrawable(context, readIcon));
+            ivRead.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(), readIcon));
         }
 
         @Override

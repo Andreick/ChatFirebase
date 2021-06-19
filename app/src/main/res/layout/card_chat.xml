@@ -10,13 +10,13 @@
         android:id="@+id/tv_user_last_message"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
-        android:layout_marginLeft="2dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
         android:layout_marginTop="4dp"
         android:singleLine="true"
-        android:textColor="@color/color_secondary"
+        android:textColor="@color/nero"
         app:layout_constraintEnd_toEndOf="@+id/tv_chat_username"
-        app:layout_constraintStart_toEndOf="@+id/iv_chat_message_read"
+        app:layout_constraintStart_toEndOf="@+id/iv_chat_read_icon"
         app:layout_constraintTop_toBottomOf="@+id/tv_chat_username" />
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -60,19 +60,20 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="4dp"
         android:singleLine="true"
-        android:textColor="@color/color_secondary"
+        android:textColor="@color/nero"
         app:layout_constraintEnd_toEndOf="@+id/tv_chat_username"
         app:layout_constraintStart_toEndOf="@+id/civ_card_chat_photo"
         app:layout_constraintTop_toBottomOf="@+id/tv_chat_username" />
 
     <ImageView
-        android:id="@+id/iv_chat_message_read"
-        android:layout_width="14dp"
-        android:layout_height="14dp"
+        android:id="@+id/iv_chat_read_icon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         app:layout_constraintBottom_toBottomOf="@+id/tv_user_last_message"
         app:layout_constraintStart_toStartOf="@+id/tv_contact_last_message"
         app:layout_constraintTop_toTopOf="@+id/tv_user_last_message"
         app:layout_constraintVertical_bias="0.65"
+        tools:ignore="ContentDescription"
         tools:srcCompat="@drawable/ic_message_unread_icon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

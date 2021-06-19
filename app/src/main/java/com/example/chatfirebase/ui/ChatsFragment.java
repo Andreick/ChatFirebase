@@ -25,7 +25,6 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
@@ -46,7 +45,7 @@ public class ChatsFragment extends Fragment {
     private final Map<String, ChatItem> chatItemMap = new HashMap<>();
     private final List<ChatItem> chatItems = new ArrayList<>();
 
-    private String currentUid;
+    private static String currentUid;
     private Query chatsQuery;
     private EventListener<QuerySnapshot> chatsEventListener;
     private ListenerRegistration chatsRegistration;
@@ -114,7 +113,13 @@ public class ChatsFragment extends Fragment {
                         switch (doc.getType()) {
                             case ADDED:
                                 Log.d(TAG, "Chat " + contactId + " ADDED");
-                                ChatItem chatItem = new ChatItem(context, contactId, doc.getDocument());
+                                String contactProfileUrl = doc.getDocument()
+                                        .getString(context.getString(R.string.user_profile_url));
+                                String contactName = doc.getDocument()
+                                        .getString(context.getString(R.string.user_name));
+                                Message lastMessage = doc.getDocument()
+                                        .get(context.getString(R.string.chat_last_message), Message.class);
+                                ChatItem chatItem = new ChatItem(contactId, contactProfileUrl, contactName, lastMessage);
                                 chatItemMap.put(contactId, chatItem);
                                 chatItems.add(chatItem);
                                 break;
@@ -122,9 +127,9 @@ public class ChatsFragment extends Fragment {
                                 Log.d(TAG, "Chat" + contactId + " MODIFIED");
                                 ChatItem modifiedChatItem = chatItemMap.get(contactId);
                                 if (modifiedChatItem != null) {
-                                    Message lastMessage = doc.getDocument()
+                                    Message modifiedLastMessage = doc.getDocument()
                                             .get(getString(R.string.chat_last_message), Message.class);
-                                    modifiedChatItem.setLastMessage(lastMessage);
+                                    modifiedChatItem.setLastMessage(modifiedLastMessage);
                                     Collections.sort(chatItems);
                                 }
                                 else Log.e(TAG, "Null chat item");
@@ -149,18 +154,16 @@ public class ChatsFragment extends Fragment {
 
     private static class ChatItem extends Item<GroupieViewHolder> implements Comparable<ChatItem> {
 
-        private final Context context;
         private final String contactId;
         private final String contactProfileUrl;
         private final String contactName;
         private Message lastMessage;
 
-        public ChatItem(Context context, String contactId, QueryDocumentSnapshot docSnap) {
-            this.context = context;
+        public ChatItem(String contactId, String contactProfileUrl, String contactName, Message lastMessage) {
             this.contactId = contactId;
-            contactProfileUrl = docSnap.getString(context.getString(R.string.user_profile_url));
-            contactName = docSnap.getString(context.getString(R.string.user_name));
-            lastMessage = docSnap.get(context.getString(R.string.chat_last_message), Message.class);
+            this.contactProfileUrl = contactProfileUrl;
+            this.contactName = contactName;
+            this.lastMessage = lastMessage;
         }
 
         public void setLastMessage(Message message) {
@@ -170,7 +173,7 @@ public class ChatsFragment extends Fragment {
         @Override
         public void bind(GroupieViewHolder viewHolder, int position) {
             ImageView civPhoto = viewHolder.itemView.findViewById(R.id.civ_card_chat_photo);
-            ImageView ivMessageRead = viewHolder.itemView.findViewById(R.id.iv_chat_message_read);
+            ImageView ivMessageRead = viewHolder.itemView.findViewById(R.id.iv_chat_read_icon);
             TextView tvContactName = viewHolder.itemView.findViewById(R.id.tv_chat_username);
             TextView tvContactLastMessage = viewHolder.itemView.findViewById(R.id.tv_contact_last_message);
             TextView tvUserLastMessage = viewHolder.itemView.findViewById(R.id.tv_user_last_message);
@@ -178,18 +181,16 @@ public class ChatsFragment extends Fragment {
             Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(civPhoto);
             tvContactName.setText(contactName);
 
-            String text = lastMessage.getText();
-
             if (contactId.equals(lastMessage.getSenderId())) {
                 ivMessageRead.setImageDrawable(null);
                 tvUserLastMessage.setText(null);
-                tvContactLastMessage.setText(text);
+                tvContactLastMessage.setText(lastMessage.getText());
             }
             else {
                 int readIcon = lastMessage.isRead() ? R.drawable.ic_message_read_icon : R.drawable.ic_message_unread_icon;
                 tvContactLastMessage.setText(null);
-                tvUserLastMessage.setText(text);
-                ivMessageRead.setImageDrawable(ContextCompat.getDrawable(context, readIcon));
+                tvUserLastMessage.setText(lastMessage.getText());
+                ivMessageRead.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(), readIcon));
             }
         }
 
@@ -209,18 +210,19 @@ public class ChatsFragment extends Fragment {
         }
     }
 
-    private class OnChatItemClickListener implements OnItemClickListener {
+    private static class OnChatItemClickListener implements OnItemClickListener {
 
         @Override
         public void onItemClick(@NonNull Item item, @NonNull View view) {
             ChatItem chatItem = (ChatItem) item;
+            Context context = view.getContext();
 
             Intent chatIntent = new Intent(context, TalkActivity.class);
-            chatIntent.putExtra(getString(R.string.extra_user_id), currentUid);
-            chatIntent.putExtra(getString(R.string.extra_contact_id), chatItem.contactId);
-            chatIntent.putExtra(getString(R.string.extra_contact_name), chatItem.contactName);
-            chatIntent.putExtra(getString(R.string.extra_contact_profile_url), chatItem.contactProfileUrl);
-            startActivity(chatIntent);
+            chatIntent.putExtra(context.getString(R.string.extra_user_id), currentUid);
+            chatIntent.putExtra(context.getString(R.string.extra_contact_id), chatItem.contactId);
+            chatIntent.putExtra(context.getString(R.string.extra_contact_name), chatItem.contactName);
+            chatIntent.putExtra(context.getString(R.string.extra_contact_profile_url), chatItem.contactProfileUrl);
+            context.startActivity(chatIntent);
         }
     }
 }
