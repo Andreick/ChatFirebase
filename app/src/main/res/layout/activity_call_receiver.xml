@@ -14,7 +14,7 @@
         android:layout_marginTop="16dp"
         android:fontFamily="sans-serif-black"
         android:textColor="@color/color_secondary"
-        android:textSize="24sp"
+        android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/civ_emitter_photo"
@@ -22,9 +22,9 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/civ_emitter_photo"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_marginTop="48dp"
+        android:layout_width="228dp"
+        android:layout_height="228dp"
+        android:layout_marginTop="32dp"
         android:src="@drawable/profile_placeholder"
         app:civ_border_color="@color/white"
         app:civ_border_width="6dp"
@@ -36,7 +36,7 @@
         android:id="@+id/tv_receiver_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="48dp"
         android:text="@string/call_title"
         android:textColor="@color/color_secondary"
         android:textScaleX="1.3"
@@ -53,7 +53,8 @@
         android:layout_marginRight="24dp"
         app:layout_constraintBottom_toBottomOf="@+id/iv_receiver_hang_up"
         app:layout_constraintEnd_toStartOf="@+id/iv_emitter_speaker"
-        app:srcCompat="@drawable/call_answer_512" />
+        app:srcCompat="@drawable/call_answer_512"
+        tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/iv_receiver_hang_up"
@@ -64,7 +65,8 @@
         android:layout_marginBottom="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/iv_emitter_speaker"
-        app:srcCompat="@drawable/call_hang_up_512" />
+        app:srcCompat="@drawable/call_hang_up_512"
+        tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/iv_emitter_speaker"
@@ -73,10 +75,22 @@
         android:layout_marginTop="32dp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/receiver_chronometer"
+        app:srcCompat="@drawable/disabled_speaker"
+        tools:ignore="ContentDescription"
+        tools:visibility="visible" />
+
+    <Chronometer
+        android:id="@+id/receiver_chronometer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="16sp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_emitter_name"
-        app:srcCompat="@drawable/disabled_speaker"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

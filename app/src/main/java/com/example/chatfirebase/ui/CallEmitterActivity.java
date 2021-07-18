@@ -6,8 +6,10 @@ import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
+import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +37,7 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
     private boolean speakerEnabled;
 
     private ImageView vbtReject, vbtSpeaker;
+    private Chronometer chronometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +48,13 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
         TextView vTxtReceiverName = findViewById(R.id.tv_receiver_name);
         vbtReject = findViewById(R.id.iv_emitter_hang_up);
         vbtSpeaker = findViewById(R.id.iv_emitter_speaker);
+        chronometer = findViewById(R.id.emitter_chronometer);
 
         Intent serviceIntent = new Intent(this, SinchService.class);
         bindService(serviceIntent, this, 0);
 
         String profileUrl = getIntent().getStringExtra(getString(R.string.user_profile_url));
         Picasso.get().load(profileUrl).placeholder(R.drawable.profile_placeholder).into(vImgReceiver);
-
         String username = getIntent().getStringExtra(getString(R.string.user_name));
         vTxtReceiverName.setText(username);
     }
@@ -104,6 +107,9 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
         @Override
         public void onCallEstablished(Call establishedCall) {
             CallEmitterActivity.this.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+            chronometer.setBase(SystemClock.elapsedRealtime());
+            chronometer.setVisibility(View.VISIBLE);
+            chronometer.start();
             vbtSpeaker.setVisibility(View.VISIBLE);
             Toast.makeText(CallEmitterActivity.this, getString(R.string.on_call_established), Toast.LENGTH_SHORT).show();
         }

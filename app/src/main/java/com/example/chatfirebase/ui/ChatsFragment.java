@@ -89,12 +89,14 @@ public class ChatsFragment extends Fragment {
 
     @Override
     public void onStart() {
+        Log.d(TAG, "onStart()");
         super.onStart();
         chatsRegistration = chatsQuery.addSnapshotListener(chatsEventListener);
     }
 
     @Override
     public void onStop() {
+        Log.d(TAG, "onStop()");
         super.onStop();
         chatsRegistration.remove();
         chatItemMap.clear();

@@ -85,12 +85,14 @@ public class ContactsFragment extends Fragment {
 
     @Override
     public void onStart() {
+        Log.d(TAG, "onStart()");
         super.onStart();
         usersReference.addChildEventListener(contactsEventListener);
     }
 
     @Override
     public void onStop() {
+        Log.d(TAG, "onStop()");
         super.onStop();
         usersReference.removeEventListener(contactsEventListener);
         contactItemSet.clear();

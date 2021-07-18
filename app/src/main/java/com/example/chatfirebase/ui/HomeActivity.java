@@ -101,6 +101,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void logout() {
+        viewPager.setAdapter(null);
         application.close();
         goToLoginActivity();
     }
