@@ -37,6 +37,7 @@ public class SinchService extends Service {
 
     private final IBinder binder = new SinchServiceBinder();
     private SinchClient sinchClient;
+    private String currentUid;
     private Intent notificationIntent;
     private Call call;
 
@@ -54,12 +55,12 @@ public class SinchService extends Service {
 
     private void startClient() {
         if (sinchClient == null) {
-            String userId = FirebaseAuth.getInstance().getUid();
+            currentUid = FirebaseAuth.getInstance().getUid();
 
-            if (!TextUtils.isEmpty(userId)) {
+            if (!TextUtils.isEmpty(currentUid)) {
                 sinchClient = Sinch.getSinchClientBuilder()
                         .context(this)
-                        .userId(userId)
+                        .userId(currentUid)
                         .applicationKey(getString(R.string.sinch_key))
                         .applicationSecret(getString(R.string.sinch_secret))
                         .environmentHost(getString(R.string.sinch_hostname))
@@ -110,15 +111,17 @@ public class SinchService extends Service {
         return (sinchClient != null && sinchClient.isStarted());
     }
 
-    public void callUser(String uid, String contactName, String contactProfileUrl) {
+    public void callUser(String contactId, String contactName, String contactProfileUrl) {
         if (sinchIsStarted()) {
             if (call == null) {
                 try {
-                    call = sinchClient.getCallClient().callUser(uid);
+                    call = sinchClient.getCallClient().callUser(contactId);
 
                     Intent emitterIntent = new Intent(SinchService.this, CallEmitterActivity.class);
-                    emitterIntent.putExtra(getString(R.string.user_name), contactName);
-                    emitterIntent.putExtra(getString(R.string.user_profile_url), contactProfileUrl);
+                    emitterIntent.putExtra(getString(R.string.extra_user_id), currentUid);
+                    emitterIntent.putExtra(getString(R.string.extra_contact_id), contactId);
+                    emitterIntent.putExtra(getString(R.string.extra_contact_name), contactName);
+                    emitterIntent.putExtra(getString(R.string.extra_contact_profile_url), contactProfileUrl);
 
                     emitterIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(emitterIntent);

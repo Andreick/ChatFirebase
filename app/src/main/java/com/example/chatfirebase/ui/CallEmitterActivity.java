@@ -17,8 +17,15 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.chatfirebase.ChatFirebaseApplication;
 import com.example.chatfirebase.R;
+import com.example.chatfirebase.data.CallInfo;
+import com.example.chatfirebase.data.User;
 import com.example.chatfirebase.services.SinchService;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.SinchError;
 import com.sinch.android.rtc.calling.Call;
@@ -26,7 +33,9 @@ import com.sinch.android.rtc.calling.CallEndCause;
 import com.sinch.android.rtc.calling.CallListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CallEmitterActivity extends AppCompatActivity implements ServiceConnection {
 
@@ -34,6 +43,8 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
 
     private SinchService sinchService;
     private Call call;
+    private String contactName;
+    private String contactProfileUrl;
     private boolean speakerEnabled;
 
     private ImageView vbtReject, vbtSpeaker;
@@ -53,10 +64,11 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
         Intent serviceIntent = new Intent(this, SinchService.class);
         bindService(serviceIntent, this, 0);
 
-        String profileUrl = getIntent().getStringExtra(getString(R.string.user_profile_url));
-        Picasso.get().load(profileUrl).placeholder(R.drawable.profile_placeholder).into(vImgReceiver);
-        String username = getIntent().getStringExtra(getString(R.string.user_name));
-        vTxtReceiverName.setText(username);
+        contactName = getIntent().getStringExtra(getString(R.string.extra_contact_name));
+        contactProfileUrl = getIntent().getStringExtra(getString(R.string.extra_contact_profile_url));
+
+        Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(vImgReceiver);
+        vTxtReceiverName.setText(contactName);
     }
 
     @Override
@@ -97,6 +109,28 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
         // Do not do anything
     }
 
+    private void registerCall(boolean answered) {
+        long timestamp = System.currentTimeMillis();
+        String contactId = getIntent().getStringExtra(getString(R.string.extra_contact_id));
+        String currentUid = getIntent().getStringExtra(getString(R.string.extra_user_id));
+        User currentUser = ((ChatFirebaseApplication) getApplication()).getCurrentUser();
+
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        CollectionReference talksReference = firestore.collection(getString(R.string.collection_talks));
+        WriteBatch batch = firestore.batch();
+
+        DocumentReference callCurrentUserReference = talksReference.document(currentUid).collection(getString(R.string.collection_talks_calls)).document();
+        batch.set(callCurrentUserReference, new CallInfo(currentUid, contactName, contactProfileUrl, timestamp, answered));
+
+        DocumentReference callContactReference = talksReference.document(contactId).collection(getString(R.string.collection_talks_calls)).document();
+        batch.set(callContactReference, new CallInfo(currentUid, currentUser.getName(), currentUser.getProfileUrl(), timestamp, answered));
+
+        batch.commit().addOnFailureListener(e -> {
+            Log.e(TAG, "Register call batch failed", e);
+            Toast.makeText(this, getString(R.string.failure_call), Toast.LENGTH_SHORT).show();
+        });
+    }
+
     private class SinchCallListener implements CallListener {
 
         @Override
@@ -120,9 +154,11 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
             CallEmitterActivity.this.setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
 
             CallEndCause endCause = endedCall.getDetails().getEndCause();
+            boolean answered = false;
             switch (endCause) {
                 case HUNG_UP:
                     Toast.makeText(CallEmitterActivity.this, getString(R.string.call_hang_up), Toast.LENGTH_SHORT).show();
+                    answered = true;
                     break;
                 case FAILURE:
                     SinchError e = endedCall.getDetails().getError();
@@ -132,6 +168,7 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
                     Toast.makeText(CallEmitterActivity.this, endCause.toString(), Toast.LENGTH_SHORT).show();
             }
 
+            CallEmitterActivity.this.registerCall(answered);
             CallEmitterActivity.this.finish();
         }
 

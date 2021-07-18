@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.chatfirebase.ChatFirebaseApplication;
 import com.example.chatfirebase.R;
 import com.example.chatfirebase.data.Message;
+import com.example.chatfirebase.data.User;
 import com.example.chatfirebase.data.UserConnectionStatus;
 import com.example.chatfirebase.services.SinchService;
 import com.google.firebase.database.DataSnapshot;
@@ -45,13 +46,13 @@ public class TalkActivity extends AppCompatActivity {
 
     private static final String TAG = "TalkActivity";
 
-    private final Map<String, Object> contact = new HashMap<>();
-    private final Map<String, Object> currentUser = new HashMap<>();
     private final Map<String, SenderMessageItem> senderMessageItemMap = new HashMap<>();
     private final List<MessageItem> messageItems = new ArrayList<>();
 
     private String contactId;
     private String currentUid;
+    private String contactName;
+    private String contactProfileUrl;
     private FirebaseFirestore firebaseFirestore;
     private CollectionReference talkContactReference;
     private CollectionReference talkCurrentUserReference;
@@ -75,16 +76,10 @@ public class TalkActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_talk);
 
-        String contactName = getIntent().getStringExtra(getString(R.string.extra_contact_name));
-        String contactProfileUrl = getIntent().getStringExtra(getString(R.string.extra_contact_profile_url));
         contactId = getIntent().getStringExtra(getString(R.string.extra_contact_id));
-        contact.put(getString(R.string.user_name), contactName);
-        contact.put(getString(R.string.user_profile_url), contactProfileUrl);
-
-        ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
         currentUid = getIntent().getStringExtra(getString(R.string.extra_user_id));
-        currentUser.put(getString(R.string.user_name), application.getCurrentUser().getName());
-        currentUser.put(getString(R.string.user_profile_url), application.getCurrentUser().getProfileUrl());
+        contactName = getIntent().getStringExtra(getString(R.string.extra_contact_name));
+        contactProfileUrl = getIntent().getStringExtra(getString(R.string.extra_contact_profile_url));
 
         firebaseFirestore = FirebaseFirestore.getInstance();
         CollectionReference talksReference = firebaseFirestore.collection(getString(R.string.collection_talks));
@@ -104,7 +99,7 @@ public class TalkActivity extends AppCompatActivity {
         setMessagesEventListener();
         setContactStatusEventListener();
 
-        sinchService = application.getSinchService();
+        sinchService = ((ChatFirebaseApplication) getApplication()).getSinchService();
 
         imgContact = findViewById(R.id.civ_chat_photo);
         txtNameContact = findViewById(R.id.tv_chat_name);
@@ -255,8 +250,18 @@ public class TalkActivity extends AppCompatActivity {
             batch.set(messageContactReference, message);
 
             if (messageItems.isEmpty()) {
-                batch.set(chatContactReference, currentUser);
-                batch.set(chatCurrentUserReference, contact);
+                Map<String, Object> user = new HashMap<>();
+                String name = getString(R.string.user_name);
+                String profileUrl = getString(R.string.user_profile_url);
+
+                User currentUser = ((ChatFirebaseApplication) getApplication()).getCurrentUser();
+                user.put(name, currentUser.getName());
+                user.put(profileUrl, currentUser.getProfileUrl());
+                batch.set(chatContactReference, user);
+
+                user.put(name, contactName);
+                user.put(profileUrl, contactProfileUrl);
+                batch.set(chatCurrentUserReference, user);
             }
 
             batch.update(chatContactReference, getString(R.string.chat_last_message), message);
