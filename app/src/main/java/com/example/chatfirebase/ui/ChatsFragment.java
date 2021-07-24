@@ -32,6 +32,7 @@ import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 import com.xwray.groupie.OnItemClickListener;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -177,11 +178,13 @@ public class ChatsFragment extends Fragment {
             ImageView civPhoto = viewHolder.itemView.findViewById(R.id.civ_card_chat_photo);
             ImageView ivMessageRead = viewHolder.itemView.findViewById(R.id.iv_chat_read_icon);
             TextView tvContactName = viewHolder.itemView.findViewById(R.id.tv_chat_username);
+            TextView tvDate = viewHolder.itemView.findViewById(R.id.tv_chat_timestamp);
             TextView tvContactLastMessage = viewHolder.itemView.findViewById(R.id.tv_contact_last_message);
             TextView tvUserLastMessage = viewHolder.itemView.findViewById(R.id.tv_user_last_message);
 
             Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(civPhoto);
             tvContactName.setText(contactName);
+            tvDate.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(lastMessage.getTimestamp()));
 
             if (contactId.equals(lastMessage.getSenderId())) {
                 ivMessageRead.setImageDrawable(null);

@@ -108,20 +108,22 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
     }
 
     private void registerCall(boolean answered) {
-        long timestamp = System.currentTimeMillis();
         String contactId = getIntent().getStringExtra(getString(R.string.extra_contact_id));
         String currentUid = getIntent().getStringExtra(getString(R.string.extra_user_id));
         User currentUser = ((ChatFirebaseApplication) getApplication()).getCurrentUser();
 
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        CollectionReference talksReference = firestore.collection(getString(R.string.collection_talks));
-        WriteBatch batch = firestore.batch();
+        CollectionReference talksReference = FirebaseFirestore.getInstance().collection(getString(R.string.collection_talks));
+        WriteBatch batch = FirebaseFirestore.getInstance().batch();
+
+        CallInfo callInfo = new CallInfo(currentUid, answered);
 
         DocumentReference callCurrentUserReference = talksReference.document(currentUid).collection(getString(R.string.collection_talks_calls)).document();
-        batch.set(callCurrentUserReference, new CallInfo(contactId, contactName, contactProfileUrl, timestamp, answered));
+        callInfo.setContact(contactId, contactName, contactProfileUrl);
+        batch.set(callCurrentUserReference, callInfo);
 
         DocumentReference callContactReference = talksReference.document(contactId).collection(getString(R.string.collection_talks_calls)).document();
-        batch.set(callContactReference, new CallInfo(currentUid, currentUser.getName(), currentUser.getProfileUrl(), timestamp, answered));
+        callInfo.setContact(currentUid, currentUser.getName(), currentUser.getProfileUrl());
+        batch.set(callContactReference, callInfo);
 
         batch.commit().addOnFailureListener(e -> {
             Log.e(TAG, "Register call batch failed", e);

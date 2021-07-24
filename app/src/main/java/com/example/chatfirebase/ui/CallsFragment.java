@@ -128,33 +128,48 @@ public class CallsFragment extends Fragment {
 
     private static class CallItem extends Item<GroupieViewHolder> {
 
-        private final String contactId;
-        private final String contactName;
-        private final String contactProfileUrl;
-        private final String date;
-        private final boolean answered;
+        private final CallInfo callInfo;
 
         public CallItem(CallInfo callInfo) {
-            contactId = callInfo.getContactId();
-            contactName = callInfo.getContactName();
-            contactProfileUrl = callInfo.getContactProfileUrl();
-            date = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(callInfo.getTimestamp());
-            answered = callInfo.isAnswered();
+            this.callInfo = callInfo;
         }
 
         @Override
         public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
             ImageView civPhoto = viewHolder.itemView.findViewById(R.id.civ_card_call_photo);
+            ImageView ivCallStatus = viewHolder.itemView.findViewById(R.id.iv_card_call_status);
             ImageView ivCall = viewHolder.itemView.findViewById(R.id.iv_card_call);
             TextView tvContactName = viewHolder.itemView.findViewById(R.id.tv_call_username);
             TextView tvDate = viewHolder.itemView.findViewById(R.id.tv_call_timestamp);
 
-            Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(civPhoto);
-            ivCall.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(), R.drawable.ic_call_black_icon));
-            tvContactName.setText(contactName);
-            tvDate.setText(date);
+            Picasso.get().load(callInfo.getContactProfileUrl()).placeholder(R.drawable.profile_placeholder).into(civPhoto);
+            ivCall.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(), R.drawable.ic_call_green_icon));
+            tvContactName.setText(callInfo.getContactName());
+            tvDate.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(callInfo.getTimestamp()));
 
-            ivCall.setOnClickListener(view -> sinchService.callUser(contactId, contactName, contactProfileUrl));
+            if (currentUid.equals(callInfo.getCallerId())) {
+                if (callInfo.isAnswered()) {
+                    ivCallStatus.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(),
+                            R.drawable.ic_call_made));
+                }
+                else {
+                    ivCallStatus.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(),
+                            R.drawable.ic_call_made_missed));
+                }
+            }
+            else {
+                if (callInfo.isAnswered()) {
+                    ivCallStatus.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(),
+                            R.drawable.ic_call_received));
+                }
+                else {
+                    ivCallStatus.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(),
+                            R.drawable.ic_call_received_missed));
+                }
+            }
+
+            ivCall.setOnClickListener(view -> sinchService.callUser(callInfo.getContactId(),
+                    callInfo.getContactName(), callInfo.getContactProfileUrl()));
         }
 
         @Override

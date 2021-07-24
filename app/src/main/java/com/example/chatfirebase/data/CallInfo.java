@@ -2,20 +2,37 @@ package com.example.chatfirebase.data;
 
 public class CallInfo {
 
+    private String callerId;
+    private long timestamp;
+    private boolean answered;
     private String contactId;
     private String contactName;
     private String contactProfileUrl;
-    private long timestamp;
-    private boolean answered;
 
     public CallInfo() { }
 
-    public CallInfo(String callerId, String contactName, String contactProfileUrl, long timestamp, boolean answered) {
-        this.contactId = callerId;
+    public CallInfo(String callerId, boolean answered) {
+        this.callerId = callerId;
+        this.answered = answered;
+        timestamp = System.currentTimeMillis();
+    }
+
+    public void setContact(String contactId, String contactName, String contactProfileUrl) {
+        this.contactId = contactId;
         this.contactName = contactName;
         this.contactProfileUrl = contactProfileUrl;
-        this.timestamp = timestamp;
-        this.answered = answered;
+    }
+
+    public String getCallerId() {
+        return callerId;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public boolean isAnswered() {
+        return answered;
     }
 
     public String getContactId() {
@@ -28,13 +45,5 @@ public class CallInfo {
 
     public String getContactProfileUrl() {
         return contactProfileUrl;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public boolean isAnswered() {
-        return answered;
     }
 }

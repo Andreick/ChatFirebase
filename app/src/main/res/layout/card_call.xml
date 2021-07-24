@@ -7,13 +7,13 @@
     android:background="@color/color_primary">
 
     <ImageView
-        android:id="@+id/iv_card_call2"
+        android:id="@+id/iv_card_call_status"
         android:layout_width="16dp"
         android:layout_height="16dp"
         app:layout_constraintBottom_toBottomOf="@+id/tv_call_timestamp"
         app:layout_constraintStart_toStartOf="@+id/tv_call_username"
         app:layout_constraintTop_toTopOf="@+id/tv_call_timestamp"
-        app:srcCompat="@drawable/ic_call_black_icon" />
+        app:srcCompat="@drawable/ic_call_made" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/civ_card_call_photo"
@@ -57,7 +57,7 @@
         android:layout_marginTop="4dp"
         android:singleLine="true"
         android:textColor="@color/color_secondary"
-        app:layout_constraintStart_toEndOf="@+id/iv_card_call2"
+        app:layout_constraintStart_toEndOf="@+id/iv_card_call_status"
         app:layout_constraintTop_toBottomOf="@+id/tv_call_username"
         tools:text="July 12, 5:50 PM" />
 
@@ -67,9 +67,9 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/civ_card_call_photo"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/civ_card_call_photo"
-        app:srcCompat="@drawable/ic_call_black_icon" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_call_green_icon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

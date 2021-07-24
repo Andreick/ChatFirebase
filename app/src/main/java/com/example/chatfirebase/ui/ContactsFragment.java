@@ -161,19 +161,15 @@ public class ContactsFragment extends Fragment {
     private static class ContactItem extends Item<GroupieViewHolder> implements Comparable<ContactItem> {
 
         private final String contactId;
-        private final String contactProfileUrl;
-        private final String contactName;
-        private int contactConnStatus;
+        private final User contact;
 
-        public ContactItem(String uid, User contact) {
-            contactId = uid;
-            contactProfileUrl = contact.getProfileUrl();
-            contactName = contact.getName();
-            contactConnStatus = contact.getConnectionStatus();
+        public ContactItem(String contactId, User contact) {
+            this.contactId = contactId;
+            this.contact = contact;
         }
 
         public void update(User contact) {
-            contactConnStatus = contact.getConnectionStatus();
+            this.contact.setConnectionStatus(contact.getConnectionStatus());
         }
 
         @Override
@@ -183,17 +179,17 @@ public class ContactsFragment extends Fragment {
             TextView txtUserNm = viewHolder.itemView.findViewById(R.id.tv_contact_username);
             TextView txtConnStatus = viewHolder.itemView.findViewById(R.id.tv_contact_conn_status);
 
-            Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(imgPhoto);
-            txtUserNm.setText(contactName);
+            Picasso.get().load(contact.getProfileUrl()).placeholder(R.drawable.profile_placeholder).into(imgPhoto);
+            txtUserNm.setText(contact.getName());
 
             Context context = viewHolder.itemView.getContext();
             int connColor;
 
-            if (contactConnStatus == UserConnectionStatus.ONLINE.ordinal()) {
+            if (contact.getConnectionStatus() == UserConnectionStatus.ONLINE.ordinal()) {
                 txtConnStatus.setText(context.getText(R.string.user_online));
                 connColor = R.color.green;
             }
-            else if (contactConnStatus == UserConnectionStatus.ABSENT.ordinal()) {
+            else if (contact.getConnectionStatus() == UserConnectionStatus.ABSENT.ordinal()) {
                 txtConnStatus.setText(context.getText(R.string.user_absent));
                 connColor = R.color.orange;
             }
@@ -215,10 +211,10 @@ public class ContactsFragment extends Fragment {
         public int compareTo(ContactItem ci) {
             if (this == ci) return 0;
 
-            int connStatusDiff = ci.contactConnStatus - contactConnStatus;
+            int connStatusDiff = ci.contact.getConnectionStatus() - contact.getConnectionStatus();
             if (connStatusDiff != 0) return connStatusDiff;
 
-            int contactNameDiff = contactName.compareTo(ci.contactName);
+            int contactNameDiff = contact.getName().compareTo(ci.contact.getName());
             if (contactNameDiff != 0) return contactNameDiff;
 
             return contactId.compareTo(ci.contactId);
@@ -235,8 +231,8 @@ public class ContactsFragment extends Fragment {
             Intent chatIntent = new Intent(context, TalkActivity.class);
             chatIntent.putExtra(context.getString(R.string.extra_user_id), currentUid);
             chatIntent.putExtra(context.getString(R.string.extra_contact_id), contactItem.contactId);
-            chatIntent.putExtra(context.getString(R.string.extra_contact_name), contactItem.contactName);
-            chatIntent.putExtra(context.getString(R.string.extra_contact_profile_url), contactItem.contactProfileUrl);
+            chatIntent.putExtra(context.getString(R.string.extra_contact_name), contactItem.contact.getName());
+            chatIntent.putExtra(context.getString(R.string.extra_contact_profile_url), contactItem.contact.getProfileUrl());
             context.startActivity(chatIntent);
         }
     }

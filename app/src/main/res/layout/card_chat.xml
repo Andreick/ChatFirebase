@@ -47,7 +47,7 @@
         android:singleLine="true"
         android:textColor="@color/color_secondary"
         android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tv_chat_timestamp"
         app:layout_constraintStart_toEndOf="@+id/civ_card_chat_photo"
         app:layout_constraintTop_toTopOf="@+id/civ_card_chat_photo"
         tools:text="Contact Name" />
@@ -75,5 +75,17 @@
         app:layout_constraintVertical_bias="0.65"
         tools:ignore="ContentDescription"
         tools:srcCompat="@drawable/ic_message_unread_icon" />
+
+    <TextView
+        android:id="@+id/tv_chat_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_chat_username"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_chat_username"
+        tools:text="July 12, 5:50 PM" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
