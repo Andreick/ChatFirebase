@@ -13,9 +13,8 @@ import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
-import com.example.chatfirebase.ui.CallEmitterActivity;
 import com.example.chatfirebase.R;
-import com.example.chatfirebase.data.User;
+import com.example.chatfirebase.ui.CallEmitterActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.sinch.android.rtc.AudioController;
 import com.sinch.android.rtc.ClientRegistration;
@@ -147,8 +146,6 @@ public class SinchService extends Service {
     public void callEnded() {
         call = null;
     }
-
-    public void retryStartAfterPermissionGranted() { SinchService.this.startClient(); }
 
     private class SinchCallClientListener implements CallClientListener {
 

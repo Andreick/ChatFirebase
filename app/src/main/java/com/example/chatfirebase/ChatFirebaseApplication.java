@@ -57,7 +57,7 @@ public class ChatFirebaseApplication extends Application implements LifecycleObs
 
                 currentUserReference = FirebaseDatabase.getInstance().getReference(getString(R.string.database_users))
                         .child(firebaseUser.getUid())
-                        .child(getString(R.string.user_connection_status));
+                        .child(getString(R.string.connection_status));
 
                 currentUserReference.onDisconnect().setValue(UserConnectionStatus.OFFLINE.ordinal())
                         .addOnFailureListener(e -> Log.d(TAG, "Could not establish onDisconnect event"));

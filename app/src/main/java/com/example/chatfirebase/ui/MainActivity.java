@@ -6,8 +6,6 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.chatfirebase.ChatFirebaseApplication;
-import com.example.chatfirebase.ui.HomeActivity;
-import com.example.chatfirebase.ui.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {

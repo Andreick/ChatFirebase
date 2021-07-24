@@ -106,13 +106,13 @@
             android:singleLine="true"
             android:textColor="@color/color_primary"
             android:textSize="24sp"
-            app:layout_constraintEnd_toStartOf="@+id/iv_call"
+            app:layout_constraintEnd_toStartOf="@+id/iv_talk_call"
             app:layout_constraintStart_toEndOf="@+id/civ_chat_photo"
             app:layout_constraintTop_toTopOf="@+id/civ_chat_photo"
             tools:text="Contact Name" />
 
         <ImageView
-            android:id="@+id/iv_call"
+            android:id="@+id/iv_talk_call"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginEnd="32dp"
@@ -120,7 +120,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_call_icon" />
+            app:srcCompat="@drawable/ic_call_white_icon" />
 
         <TextView
             android:id="@+id/tv_chat_conn_status"

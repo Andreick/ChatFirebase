@@ -2,7 +2,7 @@ package com.example.chatfirebase.data;
 
 public class CallInfo {
 
-    private String callerId;
+    private String contactId;
     private String contactName;
     private String contactProfileUrl;
     private long timestamp;
@@ -11,15 +11,15 @@ public class CallInfo {
     public CallInfo() { }
 
     public CallInfo(String callerId, String contactName, String contactProfileUrl, long timestamp, boolean answered) {
-        this.callerId = callerId;
+        this.contactId = callerId;
         this.contactName = contactName;
         this.contactProfileUrl = contactProfileUrl;
         this.timestamp = timestamp;
         this.answered = answered;
     }
 
-    public String getCallerId() {
-        return callerId;
+    public String getContactId() {
+        return contactId;
     }
 
     public String getContactName() {

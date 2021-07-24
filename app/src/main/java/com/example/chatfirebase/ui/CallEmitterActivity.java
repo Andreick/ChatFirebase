@@ -33,9 +33,7 @@ import com.sinch.android.rtc.calling.CallEndCause;
 import com.sinch.android.rtc.calling.CallListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CallEmitterActivity extends AppCompatActivity implements ServiceConnection {
 
@@ -120,7 +118,7 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
         WriteBatch batch = firestore.batch();
 
         DocumentReference callCurrentUserReference = talksReference.document(currentUid).collection(getString(R.string.collection_talks_calls)).document();
-        batch.set(callCurrentUserReference, new CallInfo(currentUid, contactName, contactProfileUrl, timestamp, answered));
+        batch.set(callCurrentUserReference, new CallInfo(contactId, contactName, contactProfileUrl, timestamp, answered));
 
         DocumentReference callContactReference = talksReference.document(contactId).collection(getString(R.string.collection_talks_calls)).document();
         batch.set(callContactReference, new CallInfo(currentUid, currentUser.getName(), currentUser.getProfileUrl(), timestamp, answered));

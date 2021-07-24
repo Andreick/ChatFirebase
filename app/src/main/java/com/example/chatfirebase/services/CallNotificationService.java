@@ -28,7 +28,7 @@ public class CallNotificationService extends Service {
                 fullScreenIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), getString(R.string.channel_id))
-                .setSmallIcon(R.drawable.ic_call_icon)
+                .setSmallIcon(R.drawable.ic_call_white_icon)
                 .setContentTitle(getString(R.string.call_notification_title))
                 .setContentText(getString(R.string.call_notification_text))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

@@ -32,10 +32,7 @@ import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -45,7 +42,6 @@ public class ContactsFragment extends Fragment {
 
     private final Map<String, ContactItem> contactItemMap = new HashMap<>();
     private final TreeSet<ContactItem> contactItemSet = new TreeSet<>();
-    private final List<ContactItem> contactItems = new ArrayList<>();
 
     private static String currentUid;
     private DatabaseReference usersReference;
@@ -85,15 +81,15 @@ public class ContactsFragment extends Fragment {
 
     @Override
     public void onStart() {
-        Log.d(TAG, "onStart()");
         super.onStart();
+        Log.d(TAG, "onStart()");
         usersReference.addChildEventListener(contactsEventListener);
     }
 
     @Override
     public void onStop() {
-        Log.d(TAG, "onStop()");
         super.onStop();
+        Log.d(TAG, "onStop()");
         usersReference.removeEventListener(contactsEventListener);
         contactItemSet.clear();
         contactsAdapter.clear();
@@ -112,7 +108,6 @@ public class ContactsFragment extends Fragment {
                         ContactItem contactItem = new ContactItem(uid, contact);
                         contactItemMap.put(uid, contactItem);
                         contactItemSet.add(contactItem);
-                        Collections.sort(contactItems);
                         contactsAdapter.update(contactItemSet);
                         contactsAdapter.notifyDataSetChanged();
                     }
@@ -182,11 +177,11 @@ public class ContactsFragment extends Fragment {
         }
 
         @Override
-        public void bind(GroupieViewHolder viewHolder, int position) {
+        public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
             ImageView imgPhoto = viewHolder.itemView.findViewById(R.id.civ_card_contact_photo);
             ImageView imgConnStatus = viewHolder.itemView.findViewById(R.id.civ_contact_conn_status);
             TextView txtUserNm = viewHolder.itemView.findViewById(R.id.tv_contact_username);
-            TextView txtConnStatus = viewHolder.itemView.findViewById(R.id.iv_contact_conn_status);
+            TextView txtConnStatus = viewHolder.itemView.findViewById(R.id.tv_contact_conn_status);
 
             Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(imgPhoto);
             txtUserNm.setText(contactName);

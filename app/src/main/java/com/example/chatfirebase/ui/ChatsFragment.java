@@ -89,15 +89,15 @@ public class ChatsFragment extends Fragment {
 
     @Override
     public void onStart() {
-        Log.d(TAG, "onStart()");
         super.onStart();
+        Log.d(TAG, "onStart()");
         chatsRegistration = chatsQuery.addSnapshotListener(chatsEventListener);
     }
 
     @Override
     public void onStop() {
-        Log.d(TAG, "onStop()");
         super.onStop();
+        Log.d(TAG, "onStop()");
         chatsRegistration.remove();
         chatItemMap.clear();
         chatItems.clear();
@@ -116,9 +116,9 @@ public class ChatsFragment extends Fragment {
                             case ADDED:
                                 Log.d(TAG, "Chat " + contactId + " ADDED");
                                 String contactProfileUrl = doc.getDocument()
-                                        .getString(context.getString(R.string.user_profile_url));
+                                        .getString(context.getString(R.string.profile_url));
                                 String contactName = doc.getDocument()
-                                        .getString(context.getString(R.string.user_name));
+                                        .getString(context.getString(R.string.name));
                                 Message lastMessage = doc.getDocument()
                                         .get(context.getString(R.string.chat_last_message), Message.class);
                                 ChatItem chatItem = new ChatItem(contactId, contactProfileUrl, contactName, lastMessage);
@@ -132,13 +132,13 @@ public class ChatsFragment extends Fragment {
                                     Message modifiedLastMessage = doc.getDocument()
                                             .get(getString(R.string.chat_last_message), Message.class);
                                     modifiedChatItem.setLastMessage(modifiedLastMessage);
-                                    Collections.sort(chatItems);
                                 }
                                 else Log.e(TAG, "Null chat item");
                                 break;
                         }
                     }
 
+                    Collections.sort(chatItems);
                     chatsAdapter.update(chatItems, false);
                     chatsAdapter.notifyDataSetChanged();
                 }
@@ -173,7 +173,7 @@ public class ChatsFragment extends Fragment {
         }
 
         @Override
-        public void bind(GroupieViewHolder viewHolder, int position) {
+        public void bind(@NonNull GroupieViewHolder viewHolder, int position) {
             ImageView civPhoto = viewHolder.itemView.findViewById(R.id.civ_card_chat_photo);
             ImageView ivMessageRead = viewHolder.itemView.findViewById(R.id.iv_chat_read_icon);
             TextView tvContactName = viewHolder.itemView.findViewById(R.id.tv_chat_username);

@@ -53,6 +53,7 @@
 
     <!-- Failure Strings -->
     <string name="failure_chats">Failed to load chats</string>
+    <string name="failure_calls">Failed to load calls</string>
     <string name="failure_contact">Failed to load contact</string>
     <string name="failure_messages">Failed to load messages</string>
     <string name="failure_message">Failed to send message</string>
@@ -66,13 +67,13 @@
     <string name="extra_contact_profile_url">cprofileUrl</string>
 
     <!-- User Class Properties -->
-    <string name="user_name">name</string>
-    <string name="user_profile_url">profileUrl</string>
-    <string name="user_connection_status">connectionStatus</string>
+    <string name="name">name</string>
+    <string name="profile_url">profileUrl</string>
+    <string name="connection_status">connectionStatus</string>
 
     <!-- Message Class Properties -->
-    <string name="message_timestamp">timestamp</string>
-    <string name="message_read">read</string>
+    <string name="timestamp">timestamp</string>
+    <string name="read">read</string>
 
     <!-- Firestore Collections -->
     <string name="collection_talks">talks</string>

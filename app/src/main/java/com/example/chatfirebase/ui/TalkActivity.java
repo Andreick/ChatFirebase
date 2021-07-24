@@ -90,11 +90,11 @@ public class TalkActivity extends AppCompatActivity {
         chatContactReference = contactReference.collection(getString(R.string.collection_talks_chats)).document(currentUid);
         chatCurrentUserReference = currentUserReference.collection(getString(R.string.collection_talks_chats)).document(contactId);
 
-        messagesQuery = talkCurrentUserReference.orderBy(getString(R.string.message_timestamp), Query.Direction.ASCENDING);
+        messagesQuery = talkCurrentUserReference.orderBy(getString(R.string.timestamp), Query.Direction.ASCENDING);
 
         contactStatusQuery = FirebaseDatabase.getInstance().getReference(getString(R.string.database_users))
                 .child(contactId)
-                .child(getString(R.string.user_connection_status));
+                .child(getString(R.string.connection_status));
 
         setMessagesEventListener();
         setContactStatusEventListener();
@@ -107,7 +107,7 @@ public class TalkActivity extends AppCompatActivity {
         rvMessages = findViewById(R.id.rv_chat);
         editMessage = findViewById(R.id.et_message);
         vbtSend = findViewById(R.id.civ_send);
-        vbtCall = findViewById(R.id.iv_call);
+        vbtCall = findViewById(R.id.iv_talk_call);
 
         messagesAdapter = new GroupAdapter<>();
         rvMessages.setLayoutManager(new LinearLayoutManager(this));
@@ -163,7 +163,7 @@ public class TalkActivity extends AppCompatActivity {
                                             messagesRead = true;
                                         }
                                         DocumentReference messageRef = talkContactReference.document(messageId);
-                                        batch.update(messageRef, getString(R.string.message_read), true);
+                                        batch.update(messageRef, getString(R.string.read), true);
                                     }
                                     messageItem = new ReceiverMessageItem(message);
                                 }
@@ -251,8 +251,8 @@ public class TalkActivity extends AppCompatActivity {
 
             if (messageItems.isEmpty()) {
                 Map<String, Object> user = new HashMap<>();
-                String name = getString(R.string.user_name);
-                String profileUrl = getString(R.string.user_profile_url);
+                String name = getString(R.string.name);
+                String profileUrl = getString(R.string.profile_url);
 
                 User currentUser = ((ChatFirebaseApplication) getApplication()).getCurrentUser();
                 user.put(name, currentUser.getName());
