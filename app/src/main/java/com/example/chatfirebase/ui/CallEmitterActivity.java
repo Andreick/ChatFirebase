@@ -23,7 +23,6 @@ import com.example.chatfirebase.data.CallInfo;
 import com.example.chatfirebase.data.User;
 import com.example.chatfirebase.services.SinchService;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 import com.sinch.android.rtc.PushPair;
@@ -107,7 +106,7 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
         // Do not do anything
     }
 
-    private void registerCall(boolean answered) {
+    private void registerCall(CallEndCause endCause) {
         String contactId = getIntent().getStringExtra(getString(R.string.extra_contact_id));
         String currentUid = getIntent().getStringExtra(getString(R.string.extra_user_id));
         User currentUser = ((ChatFirebaseApplication) getApplication()).getCurrentUser();
@@ -115,15 +114,14 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
         CollectionReference talksReference = FirebaseFirestore.getInstance().collection(getString(R.string.collection_talks));
         WriteBatch batch = FirebaseFirestore.getInstance().batch();
 
-        CallInfo callInfo = new CallInfo(currentUid, answered);
+        CallInfo callInfo = new CallInfo(currentUid, endCause.getValue(), true);
 
-        DocumentReference callCurrentUserReference = talksReference.document(currentUid).collection(getString(R.string.collection_talks_calls)).document();
         callInfo.setContact(contactId, contactName, contactProfileUrl);
-        batch.set(callCurrentUserReference, callInfo);
+        batch.set(talksReference.document(currentUid).collection(getString(R.string.collection_talks_calls)).document(), callInfo);
 
-        DocumentReference callContactReference = talksReference.document(contactId).collection(getString(R.string.collection_talks_calls)).document();
         callInfo.setContact(currentUid, currentUser.getName(), currentUser.getProfileUrl());
-        batch.set(callContactReference, callInfo);
+        callInfo.setViewed(endCause == CallEndCause.DENIED || endCause == CallEndCause.HUNG_UP);
+        batch.set(talksReference.document(contactId).collection(getString(R.string.collection_talks_calls)).document(), callInfo);
 
         batch.commit().addOnFailureListener(e -> {
             Log.e(TAG, "Register call batch failed", e);
@@ -154,11 +152,12 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
             CallEmitterActivity.this.setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
 
             CallEndCause endCause = endedCall.getDetails().getEndCause();
-            boolean answered = false;
             switch (endCause) {
+                case DENIED:
+                    Toast.makeText(CallEmitterActivity.this, getString(R.string.call_denied), Toast.LENGTH_SHORT).show();
+                    break;
                 case HUNG_UP:
                     Toast.makeText(CallEmitterActivity.this, getString(R.string.call_hang_up), Toast.LENGTH_SHORT).show();
-                    answered = true;
                     break;
                 case FAILURE:
                     SinchError e = endedCall.getDetails().getError();
@@ -168,13 +167,12 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
                     Toast.makeText(CallEmitterActivity.this, endCause.toString(), Toast.LENGTH_SHORT).show();
             }
 
-            CallEmitterActivity.this.registerCall(answered);
+            CallEmitterActivity.this.registerCall(endCause);
             CallEmitterActivity.this.finish();
         }
 
         @Override
         public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
-
         }
     }
 }

@@ -126,6 +126,7 @@ public class ContactsFragment extends Fragment {
                 if (uid != null && !uid.equals(currentUid)) {
                     User changedContact = snapshot.getValue(User.class);
                     ContactItem contactItem = contactItemMap.get(uid);
+
                     if (changedContact != null && contactItem != null) {
                         contactItemSet.remove(contactItem);
                         contactItem.update(changedContact);

@@ -27,6 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.sinch.android.rtc.calling.CallEndCause;
 import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.GroupieViewHolder;
@@ -47,6 +48,7 @@ public class CallsFragment extends Fragment {
     private Query callsQuery;
     private EventListener<QuerySnapshot> callsEventListener;
     private ListenerRegistration callsRegistration;
+    private int numberNotViewedCalls;
 
     private Context context;
     private RecyclerView recyclerView;
@@ -88,6 +90,7 @@ public class CallsFragment extends Fragment {
     public void onStart() {
         super.onStart();
         Log.d(TAG, "onStart()");
+        numberNotViewedCalls = 0;
         callsRegistration = callsQuery.addSnapshotListener(callsEventListener);
     }
 
@@ -103,16 +106,20 @@ public class CallsFragment extends Fragment {
         callsEventListener = (snapshots, e) -> {
             if (e == null) {
                 if (snapshots != null) {
+
                     for (DocumentChange doc : snapshots.getDocumentChanges()) {
 
                         if (doc.getType() == DocumentChange.Type.ADDED) {
                             Log.d(TAG, "Call " + doc.getDocument().getId() + " ADDED");
                             CallInfo callInfo = doc.getDocument().toObject(CallInfo.class);
                             linkedCallItems.add(0, new CallItem(callInfo));
+                            if (!callInfo.isViewed()) numberNotViewedCalls++;
                         }
                     }
 
                     callsAdapter.replaceAll(linkedCallItems);
+                    boolean callsViewed = ((CallsListener) context).updateCallsTab(numberNotViewedCalls);
+                    if (callsViewed) numberNotViewedCalls = 0;
                 }
                 else {
                     Log.e(TAG, "Null calls snapshot");
@@ -147,20 +154,20 @@ public class CallsFragment extends Fragment {
             tvContactName.setText(callInfo.getContactName());
             tvDate.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(callInfo.getTimestamp()));
 
-            if (currentUid.equals(callInfo.getCallerId())) {
-                if (callInfo.isAnswered()) {
+            if (callInfo.getEndCause() == CallEndCause.HUNG_UP.getValue()) {
+                if (currentUid.equals(callInfo.getCallerId())) {
                     ivCallStatus.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(),
                             R.drawable.ic_call_made));
                 }
                 else {
                     ivCallStatus.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(),
-                            R.drawable.ic_call_made_missed));
+                            R.drawable.ic_call_received));
                 }
             }
             else {
-                if (callInfo.isAnswered()) {
+                if (currentUid.equals(callInfo.getCallerId())) {
                     ivCallStatus.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(),
-                            R.drawable.ic_call_received));
+                            R.drawable.ic_call_made_missed));
                 }
                 else {
                     ivCallStatus.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(),
@@ -176,5 +183,9 @@ public class CallsFragment extends Fragment {
         public int getLayout() {
             return R.layout.card_call;
         }
+    }
+
+    public interface CallsListener {
+        boolean updateCallsTab(int numberCalls);
     }
 }

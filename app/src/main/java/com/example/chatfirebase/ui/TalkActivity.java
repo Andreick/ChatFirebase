@@ -27,6 +27,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -53,7 +54,6 @@ public class TalkActivity extends AppCompatActivity {
     private String currentUid;
     private String contactName;
     private String contactProfileUrl;
-    private FirebaseFirestore firebaseFirestore;
     private CollectionReference talkContactReference;
     private CollectionReference talkCurrentUserReference;
     private DocumentReference chatContactReference;
@@ -81,8 +81,7 @@ public class TalkActivity extends AppCompatActivity {
         contactName = getIntent().getStringExtra(getString(R.string.extra_contact_name));
         contactProfileUrl = getIntent().getStringExtra(getString(R.string.extra_contact_profile_url));
 
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        CollectionReference talksReference = firebaseFirestore.collection(getString(R.string.collection_talks));
+        CollectionReference talksReference = FirebaseFirestore.getInstance().collection(getString(R.string.collection_talks));
         DocumentReference contactReference = talksReference.document(contactId);
         DocumentReference currentUserReference = talksReference.document(currentUid);
         talkContactReference = contactReference.collection(currentUid);
@@ -153,17 +152,22 @@ public class TalkActivity extends AppCompatActivity {
                                 Message message = doc.getDocument().toObject(Message.class);
                                 MessageItem messageItem;
                                 if (currentUid.equals(message.getSenderId())) {
+                                    Log.d(TAG, "currentUid equals senderId");
                                     messageItem = new SenderMessageItem(message);
                                     senderMessageItemMap.put(messageId, (SenderMessageItem) messageItem);
                                 }
                                 else {
                                     if (!message.isRead()) {
+                                        Log.d(TAG, "message not read");
                                         if (!messagesRead) {
-                                            batch = firebaseFirestore.batch();
+                                            Log.d(TAG, "!messagesRead");
+                                            batch = FirebaseFirestore.getInstance().batch();
                                             messagesRead = true;
                                         }
-                                        DocumentReference messageRef = talkContactReference.document(messageId);
-                                        batch.update(messageRef, getString(R.string.read), true);
+                                        batch.update(talkContactReference.document(messageId),
+                                                getString(R.string.read), true);
+                                        batch.update(talkCurrentUserReference.document(messageId),
+                                                getString(R.string.read), true);
                                     }
                                     messageItem = new ReceiverMessageItem(message);
                                 }
@@ -179,8 +183,10 @@ public class TalkActivity extends AppCompatActivity {
                     }
 
                     if (messagesRead) {
-                        batch.update(chatContactReference, getString(R.string.chat_last_message_read), true);
-                        batch.commit().addOnFailureListener(e -> Log.e(TAG, "Failed to update read messages batch", e));
+                        batch.update(chatContactReference, getString(R.string.last_message_read), true);
+                        batch.update(chatCurrentUserReference, getString(R.string.unreadMessages), 0);
+                        batch.commit()
+                                .addOnFailureListener(e -> Log.e(TAG, "Failed to update read messages batch", e));
                     }
                     rvMessages.post(() -> rvMessages.smoothScrollToPosition(messageItems.size()));
                     messagesAdapter.replaceAll(messageItems);
@@ -241,7 +247,7 @@ public class TalkActivity extends AppCompatActivity {
         if (!text.isEmpty()) {
             Message message = new Message(currentUid, text);
 
-            WriteBatch batch = firebaseFirestore.batch();
+            WriteBatch batch = FirebaseFirestore.getInstance().batch();
 
             DocumentReference messageUserReference = talkCurrentUserReference.document();
             batch.set(messageUserReference, message);
@@ -250,22 +256,25 @@ public class TalkActivity extends AppCompatActivity {
             batch.set(messageContactReference, message);
 
             if (messageItems.isEmpty()) {
-                Map<String, Object> user = new HashMap<>();
+                Map<String, Object> chatInfo = new HashMap<>();
                 String name = getString(R.string.name);
                 String profileUrl = getString(R.string.profile_url);
 
                 User currentUser = ((ChatFirebaseApplication) getApplication()).getCurrentUser();
-                user.put(name, currentUser.getName());
-                user.put(profileUrl, currentUser.getProfileUrl());
-                batch.set(chatContactReference, user);
+                chatInfo.put(name, currentUser.getName());
+                chatInfo.put(profileUrl, currentUser.getProfileUrl());
+                batch.set(chatContactReference, chatInfo);
 
-                user.put(name, contactName);
-                user.put(profileUrl, contactProfileUrl);
-                batch.set(chatCurrentUserReference, user);
+                //chatInfo.put(getString(R.string.unreadMessages), 0);
+                chatInfo.put(name, contactName);
+                chatInfo.put(profileUrl, contactProfileUrl);
+                batch.set(chatCurrentUserReference, chatInfo);
             }
 
-            batch.update(chatContactReference, getString(R.string.chat_last_message), message);
-            batch.update(chatCurrentUserReference, getString(R.string.chat_last_message), message);
+            batch.update(chatContactReference, getString(R.string.last_message), message);
+            batch.update(chatContactReference, getString(R.string.unreadMessages), FieldValue.increment(1));
+
+            batch.update(chatCurrentUserReference, getString(R.string.last_message), message);
 
             batch.commit().addOnFailureListener(e -> {
                 Log.e(TAG, "Send message batch failed", e);

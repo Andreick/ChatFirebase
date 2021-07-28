@@ -52,7 +52,9 @@
             android:layout_height="36dp"
             app:tabBackground="@color/color_secondary"
             app:tabGravity="fill"
-            app:tabIndicatorColor="@color/color_primary">
+            app:tabIndicatorColor="@color/color_primary"
+            app:tabSelectedTextColor="@color/color_primary"
+            app:tabTextColor="@color/gray">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"

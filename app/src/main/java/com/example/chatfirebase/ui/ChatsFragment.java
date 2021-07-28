@@ -50,6 +50,7 @@ public class ChatsFragment extends Fragment {
     private Query chatsQuery;
     private EventListener<QuerySnapshot> chatsEventListener;
     private ListenerRegistration chatsRegistration;
+    private int numberUnreadMessages;
 
     private Context context;
     private RecyclerView recyclerView;
@@ -64,7 +65,7 @@ public class ChatsFragment extends Fragment {
         chatsQuery = FirebaseFirestore.getInstance().collection(getString(R.string.collection_talks))
                 .document(currentUid)
                 .collection(getString(R.string.collection_talks_chats))
-                .orderBy(getString(R.string.chat_last_message_timestamp), Query.Direction.DESCENDING);
+                .orderBy(getString(R.string.last_message_timestamp), Query.Direction.DESCENDING);
 
         setChatsEventListener();
     }
@@ -92,6 +93,7 @@ public class ChatsFragment extends Fragment {
     public void onStart() {
         super.onStart();
         Log.d(TAG, "onStart()");
+        numberUnreadMessages = 0;
         chatsRegistration = chatsQuery.addSnapshotListener(chatsEventListener);
     }
 
@@ -110,29 +112,33 @@ public class ChatsFragment extends Fragment {
         chatsEventListener = (snapshots, e) -> {
             if (e == null) {
                 if (snapshots != null) {
+
                     for (DocumentChange doc : snapshots.getDocumentChanges()) {
                         String contactId = doc.getDocument().getId();
+                        Object oUnreadMessages = doc.getDocument().get(getString(R.string.unreadMessages));
 
                         switch (doc.getType()) {
                             case ADDED:
                                 Log.d(TAG, "Chat " + contactId + " ADDED");
-                                String contactProfileUrl = doc.getDocument()
-                                        .getString(context.getString(R.string.profile_url));
                                 String contactName = doc.getDocument()
                                         .getString(context.getString(R.string.name));
+                                String contactProfileUrl = doc.getDocument()
+                                        .getString(context.getString(R.string.profile_url));
                                 Message lastMessage = doc.getDocument()
-                                        .get(context.getString(R.string.chat_last_message), Message.class);
-                                ChatItem chatItem = new ChatItem(contactId, contactProfileUrl, contactName, lastMessage);
+                                        .get(context.getString(R.string.last_message), Message.class);
+                                ChatItem chatItem = new ChatItem(contactId, contactName, contactProfileUrl, lastMessage);
                                 chatItemMap.put(contactId, chatItem);
                                 chatItems.add(chatItem);
+                                if (oUnreadMessages != null) numberUnreadMessages += ((long) oUnreadMessages);
                                 break;
                             case MODIFIED:
                                 Log.d(TAG, "Chat" + contactId + " MODIFIED");
                                 ChatItem modifiedChatItem = chatItemMap.get(contactId);
                                 if (modifiedChatItem != null) {
                                     Message modifiedLastMessage = doc.getDocument()
-                                            .get(getString(R.string.chat_last_message), Message.class);
+                                            .get(getString(R.string.last_message), Message.class);
                                     modifiedChatItem.setLastMessage(modifiedLastMessage);
+                                    if (oUnreadMessages != null && ((long) oUnreadMessages) > 0) numberUnreadMessages++;
                                 }
                                 else Log.e(TAG, "Null chat item");
                                 break;
@@ -142,6 +148,7 @@ public class ChatsFragment extends Fragment {
                     Collections.sort(chatItems);
                     chatsAdapter.update(chatItems, false);
                     chatsAdapter.notifyDataSetChanged();
+                    ((ChatsListener) context).updateChatsTab(numberUnreadMessages);
                 }
                 else {
                     Log.e(TAG, "Null chats snapshot");
@@ -158,14 +165,14 @@ public class ChatsFragment extends Fragment {
     private static class ChatItem extends Item<GroupieViewHolder> implements Comparable<ChatItem> {
 
         private final String contactId;
-        private final String contactProfileUrl;
         private final String contactName;
+        private final String contactProfileUrl;
         private Message lastMessage;
 
-        public ChatItem(String contactId, String contactProfileUrl, String contactName, Message lastMessage) {
+        public ChatItem(String contactId, String contactName, String contactProfileUrl, Message lastMessage) {
             this.contactId = contactId;
-            this.contactProfileUrl = contactProfileUrl;
             this.contactName = contactName;
+            this.contactProfileUrl = contactProfileUrl;
             this.lastMessage = lastMessage;
         }
 
@@ -229,5 +236,9 @@ public class ChatsFragment extends Fragment {
             chatIntent.putExtra(context.getString(R.string.extra_contact_profile_url), chatItem.contactProfileUrl);
             context.startActivity(chatIntent);
         }
+    }
+
+    public interface ChatsListener {
+        void updateChatsTab(int numberUnreadMessages);
     }
 }

@@ -20,7 +20,6 @@ import androidx.core.content.ContextCompat;
 import com.example.chatfirebase.R;
 import com.example.chatfirebase.data.User;
 import com.example.chatfirebase.services.SinchService;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.sinch.android.rtc.MissingPermissionException;
 import com.sinch.android.rtc.PushPair;
@@ -36,7 +35,6 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
 
     private static final String TAG = "CallReceiverActivity";
 
-    private DatabaseReference usersReference;
     private SinchService sinchService;
     private Call call;
     private boolean speakerEnabled;
@@ -50,8 +48,6 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_call_receiver);
-
-        usersReference = FirebaseDatabase.getInstance().getReference(getString(R.string.database_users));
 
         vImgEmitter = findViewById(R.id.civ_emitter_photo);
         vTxtEmitterName = findViewById(R.id.tv_emitter_name);
@@ -78,7 +74,8 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
 
         call.addCallListener(new SinchCallListener());
 
-        usersReference.child(call.getRemoteUserId()).get()
+        FirebaseDatabase.getInstance().getReference(getString(R.string.database_users))
+                .child(call.getRemoteUserId()).get()
                 .addOnSuccessListener(snapshot -> {
                     User contact = snapshot.getValue(User.class);
 

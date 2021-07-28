@@ -4,16 +4,18 @@ public class CallInfo {
 
     private String callerId;
     private long timestamp;
-    private boolean answered;
+    private int endCause;
+    private boolean viewed;
     private String contactId;
     private String contactName;
     private String contactProfileUrl;
 
     public CallInfo() { }
 
-    public CallInfo(String callerId, boolean answered) {
+    public CallInfo(String callerId, int endCause, boolean viewed) {
         this.callerId = callerId;
-        this.answered = answered;
+        this.endCause = endCause;
+        this.viewed = viewed;
         timestamp = System.currentTimeMillis();
     }
 
@@ -31,8 +33,16 @@ public class CallInfo {
         return timestamp;
     }
 
-    public boolean isAnswered() {
-        return answered;
+    public int getEndCause() {
+        return endCause;
+    }
+
+    public boolean isViewed() {
+        return viewed;
+    }
+
+    public void setViewed(boolean viewed) {
+        this.viewed = viewed;
     }
 
     public String getContactId() {

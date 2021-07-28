@@ -2,10 +2,9 @@ package com.example.chatfirebase.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,67 +17,78 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.chatfirebase.ChatFirebaseApplication;
 import com.example.chatfirebase.R;
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.squareup.picasso.Picasso;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements ChatsFragment.ChatsListener,
+        CallsFragment.CallsListener {
 
+    private static final String TAG = "HomeActivity";
     private static final int NUM_PAGES = 3;
 
+    private String currentUid;
     private ChatFirebaseApplication application;
 
     private ImageView imgProfile;
     private Button buttonLogout;
-    private TextView tvChats, tvContacts, tvCalls;
-    private TabLayout tabLayout;
     private ViewPager2 viewPager;
     private FragmentStateAdapter pagerAdapter;
+    private TabLayout tabLayout;
+    private BadgeDrawable chatsBadge, callsBadge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        imgProfile = findViewById(R.id.civ_home_photo);
-        buttonLogout = findViewById(R.id.btn_logout);
-        tabLayout = findViewById(R.id.tab_bar);
-        viewPager = findViewById(R.id.vp_home);
+        currentUid = FirebaseAuth.getInstance().getUid();
 
-        application = (ChatFirebaseApplication) getApplication();
-
-        if (application.getCurrentUser() == null) {
+        if (currentUid == null) {
             Toast.makeText(this, "Failed to load user", Toast.LENGTH_SHORT).show();
             goToLoginActivity();
             return;
         }
 
+        application = (ChatFirebaseApplication) getApplication();
+
+        imgProfile = findViewById(R.id.civ_home_photo);
+        buttonLogout = findViewById(R.id.btn_logout);
+        tabLayout = findViewById(R.id.tab_bar);
+        viewPager = findViewById(R.id.vp_home);
+
         pagerAdapter = new PagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(pagerAdapter.getItemCount());
 
         tabLayout.addOnTabSelectedListener(new TabSelectedListener());
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
 
-            tab.setCustomView(R.layout.custom_tab);
-            View view = tab.getCustomView();
+            if (position == 1) {
+                tab.setText(R.string.tab_contacts);
+                return;
+            }
 
-            if (view != null) {
+            BadgeDrawable badge = tab.getOrCreateBadge();
+            badge.setVisible(false);
+            badge.setBadgeTextColor(ContextCompat.getColor(this, R.color.color_secondary));
+            badge.setBackgroundColor(ContextCompat.getColor(this, R.color.yellow));
 
-                switch (position) {
-                    case 0:
-                        tvChats = view.findViewById(R.id.tv_tab);
-                        tvChats.setText(R.string.tab_chats);
-                        break;
-                    case 1:
-                        tvContacts = view.findViewById(R.id.tv_tab);
-                        tvContacts.setText(R.string.tab_contacts);
-                        break;
-                    case 2:
-                        tvCalls = view.findViewById(R.id.tv_tab);
-                        tvCalls.setText(R.string.tab_calls);
-                        break;
-                }
+            switch (position) {
+                case 0:
+                    tab.setText(R.string.tab_chats);
+                    chatsBadge = badge;
+                    break;
+                case 2:
+                    tab.setText(R.string.tab_calls);
+                    callsBadge = badge;
+                    break;
             }
         }).attach();
 
@@ -106,43 +116,68 @@ public class HomeActivity extends AppCompatActivity {
         goToLoginActivity();
     }
 
+    @Override
+    public void updateChatsTab(int numberUnreadMessages) {
+        updateTabBadge(chatsBadge, numberUnreadMessages);
+    }
+
+    @Override
+    public boolean updateCallsTab(int numberNotViewedCalls) {
+        if (tabLayout.getSelectedTabPosition() == 2) {
+            setCallsViewed();
+            return true;
+        }
+        updateTabBadge(callsBadge, numberNotViewedCalls);
+        return false;
+    }
+
+    private void updateTabBadge(BadgeDrawable badge, int number) {
+        if (number > 0) {
+            badge.setNumber(number);
+            badge.setVisible(true);
+        }
+        else badge.setVisible(false);
+    }
+
+    private void setCallsViewed() {
+        FirebaseFirestore.getInstance().collection(getString(R.string.collection_talks))
+                .document(currentUid).collection(getString(R.string.collection_talks_calls))
+                .whereEqualTo(getString(R.string.viewed), false)
+                .get()
+                .addOnSuccessListener(snapshots -> {
+                    WriteBatch batch = FirebaseFirestore.getInstance().batch();
+
+                    for (QueryDocumentSnapshot doc : snapshots) {
+                        batch.update(doc.getReference(), getString(R.string.viewed), true);
+                    }
+
+                    batch.commit().addOnFailureListener(e -> {
+                        Log.e(TAG, "Update call batch failed", e);
+                        Toast.makeText(HomeActivity.this,
+                                getString(R.string.failure_calls), Toast.LENGTH_SHORT).show();
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to query calls not viewed", e);
+                    Toast.makeText(HomeActivity.this,
+                            getString(R.string.failure_calls), Toast.LENGTH_SHORT).show();
+                });
+    }
+
     private class TabSelectedListener implements TabLayout.OnTabSelectedListener {
 
         @Override
         public void onTabSelected(TabLayout.Tab tab) {
-
-            switch (tab.getPosition()) {
-                case 0:
-                    tvChats.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.color_primary));
-                    break;
-                case 1:
-                    tvContacts.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.color_primary));
-                    break;
-                case 2:
-                    tvCalls.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.color_primary));
-                    break;
-            }
+            setCallsViewed();
+            callsBadge.setVisible(false);
         }
 
         @Override
         public void onTabUnselected(TabLayout.Tab tab) {
-
-            switch (tab.getPosition()) {
-                case 0:
-                    tvChats.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.gray));
-                    break;
-                case 1:
-                    tvContacts.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.gray));
-                    break;
-                case 2:
-                    tvCalls.setTextColor(ContextCompat.getColor(HomeActivity.this, R.color.gray));
-                    break;
-            }
         }
 
         @Override
         public void onTabReselected(TabLayout.Tab tab) {
-
         }
     }
 

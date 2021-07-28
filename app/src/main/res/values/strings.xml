@@ -48,6 +48,7 @@
     <string name="call_speaker_enabled">Speaker enabled</string>
     <string name="call_speaker_disabled">Speaker disabled</string>
     <string name="call_hang_up">Call ended</string>
+    <string name="call_denied">Call denied</string>
     <string name="call_notification_title">Incoming call</string>
     <string name="call_notification_text">tap to see</string>
 
@@ -66,24 +67,22 @@
     <string name="extra_contact_name">cname</string>
     <string name="extra_contact_profile_url">cprofileUrl</string>
 
-    <!-- User Class Properties -->
+    <!-- Fields -->
     <string name="name">name</string>
     <string name="profile_url">profileUrl</string>
     <string name="connection_status">connectionStatus</string>
-
-    <!-- Message Class Properties -->
     <string name="timestamp">timestamp</string>
     <string name="read">read</string>
+    <string name="last_message">lastMessage</string>
+    <string name="last_message_timestamp">lastMessage.timestamp</string>
+    <string name="last_message_read">lastMessage.read</string>
+    <string name="viewed">viewed</string>
+    <string name="unreadMessages">unreadMessages</string>
 
     <!-- Firestore Collections -->
     <string name="collection_talks">talks</string>
     <string name="collection_talks_chats">chats</string>
     <string name="collection_talks_calls">calls</string>
-
-    <!-- Chat Document Fields -->
-    <string name="chat_last_message">lastMessage</string>
-    <string name="chat_last_message_timestamp">lastMessage.timestamp</string>
-    <string name="chat_last_message_read">lastMessage.read</string>
 
     <!-- Firebase Database References -->
     <string name="database_users">users</string>
