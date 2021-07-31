@@ -50,7 +50,7 @@ public class ChatsFragment extends Fragment {
     private Query chatsQuery;
     private EventListener<QuerySnapshot> chatsEventListener;
     private ListenerRegistration chatsRegistration;
-    private int numberUnreadMessages;
+    private int totalUnreadMessages;
 
     private Context context;
     private RecyclerView recyclerView;
@@ -93,7 +93,7 @@ public class ChatsFragment extends Fragment {
     public void onStart() {
         super.onStart();
         Log.d(TAG, "onStart()");
-        numberUnreadMessages = 0;
+        totalUnreadMessages = 0;
         chatsRegistration = chatsQuery.addSnapshotListener(chatsEventListener);
     }
 
@@ -115,7 +115,7 @@ public class ChatsFragment extends Fragment {
 
                     for (DocumentChange doc : snapshots.getDocumentChanges()) {
                         String contactId = doc.getDocument().getId();
-                        Object oUnreadMessages = doc.getDocument().get(getString(R.string.unreadMessages));
+                        Object unreadMessages = doc.getDocument().get(getString(R.string.unreadMessages));
 
                         switch (doc.getType()) {
                             case ADDED:
@@ -126,10 +126,12 @@ public class ChatsFragment extends Fragment {
                                         .getString(context.getString(R.string.profile_url));
                                 Message lastMessage = doc.getDocument()
                                         .get(context.getString(R.string.last_message), Message.class);
-                                ChatItem chatItem = new ChatItem(contactId, contactName, contactProfileUrl, lastMessage);
+                                int messagesCount = (unreadMessages == null) ? 0 : (int) (long) unreadMessages;
+                                ChatItem chatItem = new ChatItem(contactId, contactName, contactProfileUrl,
+                                        lastMessage, messagesCount);
                                 chatItemMap.put(contactId, chatItem);
                                 chatItems.add(chatItem);
-                                if (oUnreadMessages != null) numberUnreadMessages += ((long) oUnreadMessages);
+                                totalUnreadMessages += messagesCount;
                                 break;
                             case MODIFIED:
                                 Log.d(TAG, "Chat" + contactId + " MODIFIED");
@@ -138,7 +140,12 @@ public class ChatsFragment extends Fragment {
                                     Message modifiedLastMessage = doc.getDocument()
                                             .get(getString(R.string.last_message), Message.class);
                                     modifiedChatItem.setLastMessage(modifiedLastMessage);
-                                    if (oUnreadMessages != null && ((long) oUnreadMessages) > 0) numberUnreadMessages++;
+                                    if (unreadMessages != null) {
+                                        if ((long) unreadMessages > 0) {
+                                            modifiedChatItem.incrementMessagesCount();
+                                            totalUnreadMessages++;
+                                        }
+                                    }
                                 }
                                 else Log.e(TAG, "Null chat item");
                                 break;
@@ -148,7 +155,7 @@ public class ChatsFragment extends Fragment {
                     Collections.sort(chatItems);
                     chatsAdapter.update(chatItems, false);
                     chatsAdapter.notifyDataSetChanged();
-                    ((ChatsListener) context).updateChatsTab(numberUnreadMessages);
+                    ((ChatsListener) context).updateChatsTab(totalUnreadMessages);
                 }
                 else {
                     Log.e(TAG, "Null chats snapshot");
@@ -168,16 +175,22 @@ public class ChatsFragment extends Fragment {
         private final String contactName;
         private final String contactProfileUrl;
         private Message lastMessage;
+        private int messagesCount;
 
-        public ChatItem(String contactId, String contactName, String contactProfileUrl, Message lastMessage) {
+        public ChatItem(String contactId, String contactName, String contactProfileUrl, Message lastMessage, int messagesCount) {
             this.contactId = contactId;
             this.contactName = contactName;
             this.contactProfileUrl = contactProfileUrl;
             this.lastMessage = lastMessage;
+            this.messagesCount = messagesCount;
         }
 
         public void setLastMessage(Message message) {
             lastMessage = message;
+        }
+
+        public void incrementMessagesCount() {
+            messagesCount++;
         }
 
         @Override
@@ -188,14 +201,22 @@ public class ChatsFragment extends Fragment {
             TextView tvDate = viewHolder.itemView.findViewById(R.id.tv_chat_timestamp);
             TextView tvContactLastMessage = viewHolder.itemView.findViewById(R.id.tv_contact_last_message);
             TextView tvUserLastMessage = viewHolder.itemView.findViewById(R.id.tv_user_last_message);
+            TextView tvChatBadge = viewHolder.itemView.findViewById(R.id.tv_chat_badge);
 
             Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(civPhoto);
             tvContactName.setText(contactName);
             tvDate.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(lastMessage.getTimestamp()));
 
+            if (messagesCount > 0) {
+                if (messagesCount < 100) tvChatBadge.setText(String.valueOf(messagesCount));
+                else tvChatBadge.setText(R.string.max_badge_number);
+                tvChatBadge.setVisibility(View.VISIBLE);
+            }
+            else tvChatBadge.setVisibility(View.INVISIBLE);
+
             if (contactId.equals(lastMessage.getSenderId())) {
-                ivMessageRead.setImageDrawable(null);
                 tvUserLastMessage.setText(null);
+                ivMessageRead.setImageDrawable(null);
                 tvContactLastMessage.setText(lastMessage.getText());
             }
             else {

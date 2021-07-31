@@ -99,4 +99,6 @@
     <string name="sinch_hostname">clientapi.sinch.com</string>
     <string name="sinch_key" tools:ignore="TypographyDashes">8c26ee5f-5ed7-4f00-9720-2da9bbfb127c</string>
     <string name="sinch_secret">dxYgmyu/XE+jGNBoAsmJtA==</string>
+
+    <string name="max_badge_number">+99</string>
 </resources>

@@ -12,12 +12,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginLeft="4dp"
-        android:layout_marginTop="4dp"
         android:singleLine="true"
         android:textColor="@color/nero"
-        app:layout_constraintEnd_toEndOf="@+id/tv_chat_username"
+        app:layout_constraintEnd_toEndOf="@+id/tv_contact_last_message"
         app:layout_constraintStart_toEndOf="@+id/iv_chat_read_icon"
-        app:layout_constraintTop_toBottomOf="@+id/tv_chat_username" />
+        app:layout_constraintTop_toTopOf="@+id/tv_contact_last_message" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/civ_card_chat_photo"
@@ -59,9 +58,11 @@
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:singleLine="true"
         android:textColor="@color/nero"
-        app:layout_constraintEnd_toEndOf="@+id/tv_chat_username"
+        app:layout_constraintEnd_toStartOf="@+id/tv_chat_badge"
         app:layout_constraintStart_toEndOf="@+id/civ_card_chat_photo"
         app:layout_constraintTop_toBottomOf="@+id/tv_chat_username" />
 
@@ -83,9 +84,29 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:gravity="center"
+        android:textColor="@color/gray"
         app:layout_constraintBottom_toBottomOf="@+id/tv_chat_username"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_chat_username"
         tools:text="July 12, 5:50 PM" />
+
+    <TextView
+        android:id="@+id/tv_chat_badge"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/chat_badge"
+        android:gravity="center"
+        android:textColor="@color/color_secondary"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_user_last_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_user_last_message"
+        tools:ignore="SmallSp"
+        tools:text="+99"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
