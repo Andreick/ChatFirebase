@@ -122,13 +122,13 @@ public class HomeActivity extends AppCompatActivity implements ChatsFragment.Cha
     }
 
     @Override
-    public boolean updateCallsTab(int numberNotViewedCalls) {
+    public int updateCallsTab(int numberNotViewedCalls) {
         if (tabLayout.getSelectedTabPosition() == 2) {
             setCallsViewed();
-            return true;
+            return 0;
         }
         updateTabBadge(callsBadge, numberNotViewedCalls);
-        return false;
+        return numberNotViewedCalls;
     }
 
     private void updateTabBadge(BadgeDrawable badge, int number) {
@@ -168,8 +168,10 @@ public class HomeActivity extends AppCompatActivity implements ChatsFragment.Cha
 
         @Override
         public void onTabSelected(TabLayout.Tab tab) {
-            setCallsViewed();
-            callsBadge.setVisible(false);
+            if (tab.getPosition() == 2) {
+                setCallsViewed();
+                callsBadge.setVisible(false);
+            }
         }
 
         @Override

@@ -113,13 +113,13 @@ public class CallsFragment extends Fragment {
                             Log.d(TAG, "Call " + doc.getDocument().getId() + " ADDED");
                             CallInfo callInfo = doc.getDocument().toObject(CallInfo.class);
                             linkedCallItems.add(0, new CallItem(callInfo));
-                            if (!callInfo.isViewed()) numberNotViewedCalls++;
+                            if (!callInfo.isViewed()) {
+                                numberNotViewedCalls = ((CallsListener) context).updateCallsTab(++numberNotViewedCalls);
+                            }
                         }
                     }
 
                     callsAdapter.replaceAll(linkedCallItems);
-                    boolean callsViewed = ((CallsListener) context).updateCallsTab(numberNotViewedCalls);
-                    if (callsViewed) numberNotViewedCalls = 0;
                 }
                 else {
                     Log.e(TAG, "Null calls snapshot");
@@ -186,6 +186,6 @@ public class CallsFragment extends Fragment {
     }
 
     public interface CallsListener {
-        boolean updateCallsTab(int numberCalls);
+        int updateCallsTab(int numberCalls);
     }
 }
