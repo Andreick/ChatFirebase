@@ -79,6 +79,7 @@
         android:background="@color/yellow"
         android:text="@string/bt_login"
         android:textColor="@color/color_secondary"
+        app:backgroundTint="@color/yellow"
         app:layout_constraintBottom_toTopOf="@+id/tv_login_register"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
