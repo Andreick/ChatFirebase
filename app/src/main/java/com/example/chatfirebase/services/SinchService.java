@@ -126,7 +126,8 @@ public class SinchService extends Service {
                     startActivity(emitterIntent);
                 }
                 catch (MissingPermissionException e) {
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.permission_microphone_phone), Toast.LENGTH_LONG).show();
+                    Log.e(TAG, e.getMessage());
                 }
             }
         }

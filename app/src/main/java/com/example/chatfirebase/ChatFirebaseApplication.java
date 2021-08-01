@@ -36,7 +36,7 @@ public class ChatFirebaseApplication extends Application implements LifecycleObs
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     private void userAbsent() {
-        updateUserStatus(UserConnectionStatus.ABSENT);
+        updateUserStatus(UserConnectionStatus.AWAY);
     }
 
     private void updateUserStatus(UserConnectionStatus status) {

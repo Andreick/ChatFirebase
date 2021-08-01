@@ -81,12 +81,12 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
             int speakerIcon;
             if (speakerEnabled) {
                 sinchService.getAudioController().disableSpeaker();
-                Toast.makeText(this, getString(R.string.call_speaker_disabled), Toast.LENGTH_SHORT).show();
+                displayMessage(getString(R.string.call_speaker_disabled));
                 speakerIcon = R.drawable.disabled_speaker;
             }
             else {
                 sinchService.getAudioController().enableSpeaker();
-                Toast.makeText(this, getString(R.string.call_speaker_enabled), Toast.LENGTH_SHORT).show();
+                displayMessage(getString(R.string.call_speaker_enabled));
                 speakerIcon = R.drawable.enabled_speaker;
             }
             vbtSpeaker.setImageDrawable(ContextCompat.getDrawable(this, speakerIcon));
@@ -97,7 +97,7 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
     @Override
     public void onServiceDisconnected(ComponentName name) {
         Log.e(TAG, "Sinch Service disconnected");
-        Toast.makeText(this, getString(R.string.failure_sinch_service), Toast.LENGTH_SHORT).show();
+        displayMessage(getString(R.string.failure_sinch_service));
         finish();
     }
 
@@ -125,54 +125,68 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
 
         batch.commit().addOnFailureListener(e -> {
             Log.e(TAG, "Register call batch failed", e);
-            Toast.makeText(this, getString(R.string.failure_call), Toast.LENGTH_SHORT).show();
+            displayMessage(getString(R.string.failure_call));
         });
+    }
+
+    private void displayMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     private class SinchCallListener implements CallListener {
 
         @Override
         public void onCallProgressing(Call progressingCall) {
-            Toast.makeText(CallEmitterActivity.this, getString(R.string.on_call_progressing), Toast.LENGTH_SHORT).show();
+            displayMessage(getString(R.string.on_call_progressing));
         }
 
         @Override
         public void onCallEstablished(Call establishedCall) {
-            CallEmitterActivity.this.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+            setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
             chronometer.setBase(SystemClock.elapsedRealtime());
             chronometer.setVisibility(View.VISIBLE);
             chronometer.start();
             vbtSpeaker.setVisibility(View.VISIBLE);
-            Toast.makeText(CallEmitterActivity.this, getString(R.string.on_call_established), Toast.LENGTH_SHORT).show();
+            displayMessage(getString(R.string.on_call_established));
         }
 
         @Override
         public void onCallEnded(Call endedCall) {
             sinchService.callEnded();
-            CallEmitterActivity.this.setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+            setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
 
             CallEndCause endCause = endedCall.getDetails().getEndCause();
             switch (endCause) {
                 case DENIED:
-                    Toast.makeText(CallEmitterActivity.this, getString(R.string.call_denied), Toast.LENGTH_SHORT).show();
+                    displayMessage(getString(R.string.call_denied));
+                    break;
+                case CANCELED:
+                    displayMessage(getString(R.string.call_canceled));
                     break;
                 case HUNG_UP:
-                    Toast.makeText(CallEmitterActivity.this, getString(R.string.call_hang_up), Toast.LENGTH_SHORT).show();
+                    displayMessage(getString(R.string.call_hang_up));
+                    break;
+                case TIMEOUT:
+                    displayMessage(getString(R.string.call_timeout));
+                    break;
+                case NO_ANSWER:
+                    displayMessage(getString(R.string.call_no_answer));
                     break;
                 case FAILURE:
                     SinchError e = endedCall.getDetails().getError();
-                    Toast.makeText(CallEmitterActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    displayMessage(e.getMessage());
                     break;
                 default:
-                    Toast.makeText(CallEmitterActivity.this, endCause.toString(), Toast.LENGTH_SHORT).show();
+                    displayMessage(endCause.toString());
             }
 
-            CallEmitterActivity.this.registerCall(endCause);
-            CallEmitterActivity.this.finish();
+            registerCall(endCause);
+            finish();
         }
 
         @Override
         public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
+
         }
     }
 }

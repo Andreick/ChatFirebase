@@ -78,7 +78,6 @@ public class CallsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         context = view.getContext();
-        sinchService = ((ChatFirebaseApplication) context.getApplicationContext()).getSinchService();
         recyclerView = view.findViewById(R.id.rv_calls);
         callsAdapter = new GroupAdapter<>();
 
@@ -175,8 +174,11 @@ public class CallsFragment extends Fragment {
                 }
             }
 
-            ivCall.setOnClickListener(view -> sinchService.callUser(callInfo.getContactId(),
-                    callInfo.getContactName(), callInfo.getContactProfileUrl()));
+            ivCall.setOnClickListener(view -> {
+                if (sinchService == null)
+                    sinchService = ((ChatFirebaseApplication) view.getContext().getApplicationContext()).getSinchService();
+                sinchService.callUser(callInfo.getContactId(), callInfo.getContactName(), callInfo.getContactProfileUrl());
+            });
         }
 
         @Override

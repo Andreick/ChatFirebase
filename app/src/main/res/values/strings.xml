@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">ChatFirebase</string>
+    <string name="app_name" translatable="false">Chat Firebase</string>
 
     <!-- User Edit Hints -->
     <string name="hint_login">Login</string>
@@ -13,19 +13,20 @@
     <string name="error_email">Enter your email</string>
     <string name="error_password">Enter your password</string>
     <string name="error_username">Enter your name</string>
-    <string name="error_photo">Enter your photo</string>
+    <string name="error_photo">Select your photo</string>
     <string name="error_confirm_password">Passwords do not match</string>
 
     <!-- Login Strings -->
-    <string name="title_login">Login account</string>
-    <string name="bt_login">Login</string>
-    <string name="lost_password">Password</string>
-    <string name="login_divider">\ |\ </string>
+    <string name="title_login">Login</string>
+    <string name="bt_login">Log In</string>
+    <string name="lost_password">New password</string>
+    <string name="login_divider" translatable="false">\ |\ </string>
+    <string name="new_account">New account</string>
     <string name="success_login">Successfully logged in</string>
 
     <!-- Register Strings -->
-    <string name="new_register">Register</string>
-    <string name="title_register">Register account</string>
+    <string name="title_register">New Account</string>
+    <string name="bt_register">Register</string>
     <string name="have_account">I already have an account!</string>
     <string name="bt_photo">Photo</string>
     <string name="loading_register">Creating a new account</string>
@@ -38,7 +39,7 @@
     <string name="tab_calls">Calls</string>
     <string name="bt_logout">Log out</string>
     <string name="user_offline">Offline</string>
-    <string name="user_absent">Absent</string>
+    <string name="user_away">Away</string>
     <string name="user_online">Online</string>
 
     <!-- Call Strings -->
@@ -47,10 +48,16 @@
     <string name="on_call_established">Call established</string>
     <string name="call_speaker_enabled">Speaker enabled</string>
     <string name="call_speaker_disabled">Speaker disabled</string>
-    <string name="call_hang_up">Call ended</string>
     <string name="call_denied">Call denied</string>
+    <string name="call_canceled">Call canceled</string>
+    <string name="call_hang_up">Call ended</string>
+    <string name="call_timeout">Timeout</string>
+    <string name="call_no_answer">No answer</string>
     <string name="call_notification_title">Incoming call</string>
     <string name="call_notification_text">tap to see</string>
+
+    <!-- Permissions Strings -->
+    <string name="permission_microphone_phone">Enable Microphone and Phone permissions</string>
 
     <!-- Failure Strings -->
     <string name="failure_chats">Failed to load chats</string>
@@ -62,43 +69,43 @@
     <string name="failure_sinch_service">Failed to connect to the calls service</string>
 
     <!-- Intent Extras -->
-    <string name="extra_user_id">uid</string>
-    <string name="extra_contact_id">cid</string>
-    <string name="extra_contact_name">cname</string>
-    <string name="extra_contact_profile_url">cprofileUrl</string>
+    <string name="extra_user_id" translatable="false">uid</string>
+    <string name="extra_contact_id" translatable="false">cid</string>
+    <string name="extra_contact_name" translatable="false">cname</string>
+    <string name="extra_contact_profile_url" translatable="false">cprofileUrl</string>
 
     <!-- Fields -->
-    <string name="name">name</string>
-    <string name="profile_url">profileUrl</string>
-    <string name="connection_status">connectionStatus</string>
-    <string name="timestamp">timestamp</string>
-    <string name="read">read</string>
-    <string name="last_message">lastMessage</string>
-    <string name="last_message_timestamp">lastMessage.timestamp</string>
-    <string name="last_message_read">lastMessage.read</string>
-    <string name="viewed">viewed</string>
-    <string name="unreadMessages">unreadMessages</string>
+    <string name="name" translatable="false">name</string>
+    <string name="profile_url" translatable="false">profileUrl</string>
+    <string name="connection_status" translatable="false">connectionStatus</string>
+    <string name="timestamp" translatable="false">timestamp</string>
+    <string name="read" translatable="false">read</string>
+    <string name="last_message" translatable="false">lastMessage</string>
+    <string name="last_message_timestamp" translatable="false">lastMessage.timestamp</string>
+    <string name="last_message_read" translatable="false">lastMessage.read</string>
+    <string name="viewed" translatable="false">viewed</string>
+    <string name="unreadMessages" translatable="false">unreadMessages</string>
 
     <!-- Firestore Collections -->
-    <string name="collection_talks">talks</string>
-    <string name="collection_talks_chats">chats</string>
-    <string name="collection_talks_calls">calls</string>
+    <string name="collection_talks" translatable="false">talks</string>
+    <string name="collection_talks_chats" translatable="false">chats</string>
+    <string name="collection_talks_calls" translatable="false">calls</string>
 
     <!-- Firebase Database References -->
-    <string name="database_users">users</string>
+    <string name="database_users" translatable="false">users</string>
 
     <!-- Firebase Storage References -->
-    <string name="storage_path_photos">images/photos/</string>
+    <string name="storage_path_photos" translatable="false">images/photos/</string>
 
     <!-- Channel Strings -->
-    <string name="channel_id">SinchChannel</string>
-    <string name="channel_name">Sinch Channel</string>
-    <string name="channel_description">Call Notifications</string>
+    <string name="channel_id" translatable="false">SinchChannel</string>
+    <string name="channel_name" translatable="false">Sinch Channel</string>
+    <string name="channel_description" translatable="false">Call Notifications</string>
 
     <!-- Sinch Credentials -->
-    <string name="sinch_hostname">clientapi.sinch.com</string>
-    <string name="sinch_key" tools:ignore="TypographyDashes">8c26ee5f-5ed7-4f00-9720-2da9bbfb127c</string>
-    <string name="sinch_secret">dxYgmyu/XE+jGNBoAsmJtA==</string>
+    <string name="sinch_hostname" translatable="false">clientapi.sinch.com</string>
+    <string name="sinch_key" tools:ignore="TypographyDashes" translatable="false">8c26ee5f-5ed7-4f00-9720-2da9bbfb127c</string>
+    <string name="sinch_secret" translatable="false">dxYgmyu/XE+jGNBoAsmJtA==</string>
 
-    <string name="max_badge_number">+99</string>
+    <string name="max_badge_number" translatable="false">+99</string>
 </resources>

@@ -190,8 +190,8 @@ public class ContactsFragment extends Fragment {
                 txtConnStatus.setText(context.getText(R.string.user_online));
                 connColor = R.color.green;
             }
-            else if (contact.getConnectionStatus() == UserConnectionStatus.ABSENT.ordinal()) {
-                txtConnStatus.setText(context.getText(R.string.user_absent));
+            else if (contact.getConnectionStatus() == UserConnectionStatus.AWAY.ordinal()) {
+                txtConnStatus.setText(context.getText(R.string.user_away));
                 connColor = R.color.orange;
             }
             else {

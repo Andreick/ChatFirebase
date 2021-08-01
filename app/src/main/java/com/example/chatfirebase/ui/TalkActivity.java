@@ -217,8 +217,8 @@ public class TalkActivity extends AppCompatActivity {
                     if (contactConnStatus == UserConnectionStatus.OFFLINE.ordinal()) {
                         txtConnStatus.setText(getText(R.string.user_offline));
                     }
-                    else if (contactConnStatus == UserConnectionStatus.ABSENT.ordinal()) {
-                        txtConnStatus.setText(getText(R.string.user_absent));
+                    else if (contactConnStatus == UserConnectionStatus.AWAY.ordinal()) {
+                        txtConnStatus.setText(getText(R.string.user_away));
                     }
                     else if (contactConnStatus == UserConnectionStatus.ONLINE.ordinal()) {
                         txtConnStatus.setText(getText(R.string.user_online));

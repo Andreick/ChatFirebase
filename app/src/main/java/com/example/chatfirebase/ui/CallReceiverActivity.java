@@ -87,13 +87,13 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
                     }
                     else {
                         Log.e(TAG, "Null contact");
-                        Toast.makeText(this, getString(R.string.failure_contact), Toast.LENGTH_SHORT).show();
+                        displayMessage(getString(R.string.failure_contact));
                         call.hangup();
                     }
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Get remote user failure");
-                    Toast.makeText(this, getString(R.string.failure_contact), Toast.LENGTH_SHORT).show();
+                    displayMessage(getString(R.string.failure_contact));
                     call.hangup();
                 });
 
@@ -103,19 +103,20 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
                 call.answer();
             }
             catch (MissingPermissionException e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                displayMessage(getString(R.string.permission_microphone_phone));
+                Log.e(TAG, e.getMessage());
             }
         });
         vbtSpeaker.setOnClickListener(view -> {
             int speakerIcon;
             if (speakerEnabled) {
                 sinchService.getAudioController().disableSpeaker();
-                Toast.makeText(this, getString(R.string.call_speaker_disabled), Toast.LENGTH_SHORT).show();
+                displayMessage(getString(R.string.call_speaker_disabled));
                 speakerIcon = R.drawable.disabled_speaker;
             }
             else {
                 sinchService.getAudioController().enableSpeaker();
-                Toast.makeText(this, getString(R.string.call_speaker_enabled), Toast.LENGTH_SHORT).show();
+                displayMessage(getString(R.string.call_speaker_enabled));
                 speakerIcon = R.drawable.enabled_speaker;
             }
             vbtSpeaker.setImageDrawable(ContextCompat.getDrawable(this, speakerIcon));
@@ -126,7 +127,7 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
     @Override
     public void onServiceDisconnected(ComponentName name) {
         Log.e(TAG, "Sinch Service disconnected");
-        Toast.makeText(this, getString(R.string.failure_sinch_service), Toast.LENGTH_SHORT).show();
+        displayMessage(getString(R.string.failure_sinch_service));
         finish();
     }
 
@@ -135,11 +136,15 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
         // Do not do anything
     }
 
+    private void displayMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
     private class SinchCallListener implements CallListener {
 
         @Override
         public void onCallProgressing(Call progressingCall) {
-            Toast.makeText(CallReceiverActivity.this, getString(R.string.on_call_progressing), Toast.LENGTH_SHORT).show();
+            displayMessage(getString(R.string.on_call_progressing));
         }
 
         @Override
@@ -151,7 +156,7 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
             vbtAccept.setEnabled(false);
             vbtAccept.setAlpha(0.5f);
             vbtSpeaker.setVisibility(View.VISIBLE);
-            Toast.makeText(CallReceiverActivity.this, getString(R.string.on_call_established), Toast.LENGTH_SHORT).show();
+            displayMessage(getString(R.string.on_call_established));
         }
 
         @Override
@@ -161,15 +166,21 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
 
             CallEndCause endCause = endedCall.getDetails().getEndCause();
             switch (endCause) {
+                case DENIED:
+                    displayMessage(getString(R.string.call_denied));
+                    break;
+                case CANCELED:
+                    displayMessage(getString(R.string.call_canceled));
+                    break;
                 case HUNG_UP:
-                    Toast.makeText(CallReceiverActivity.this, getString(R.string.call_hang_up), Toast.LENGTH_SHORT).show();
+                    displayMessage(getString(R.string.call_hang_up));
                     break;
                 case FAILURE:
                     SinchError e = endedCall.getDetails().getError();
-                    Toast.makeText(CallReceiverActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    displayMessage(e.getMessage());
                     break;
                 default:
-                    Toast.makeText(CallReceiverActivity.this, endCause.toString(), Toast.LENGTH_SHORT).show();
+                    displayMessage(endCause.toString());
             }
 
             finish();
