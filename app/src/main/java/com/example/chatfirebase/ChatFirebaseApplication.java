@@ -60,7 +60,7 @@ public class ChatFirebaseApplication extends Application implements LifecycleObs
                         .child(getString(R.string.connection_status));
 
                 currentUserReference.onDisconnect().setValue(UserConnectionStatus.OFFLINE.ordinal())
-                        .addOnFailureListener(e -> Log.d(TAG, "Could not establish onDisconnect event"));
+                        .addOnFailureListener(e -> Log.e(TAG, "Could not establish onDisconnect event"));
 
                 ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
 

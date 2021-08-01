@@ -215,7 +215,7 @@ public class ContactsFragment extends Fragment {
             int connStatusDiff = ci.contact.getConnectionStatus() - contact.getConnectionStatus();
             if (connStatusDiff != 0) return connStatusDiff;
 
-            int contactNameDiff = contact.getName().compareTo(ci.contact.getName());
+            int contactNameDiff = contact.getName().compareToIgnoreCase(ci.contact.getName());
             if (contactNameDiff != 0) return contactNameDiff;
 
             return contactId.compareTo(ci.contactId);
