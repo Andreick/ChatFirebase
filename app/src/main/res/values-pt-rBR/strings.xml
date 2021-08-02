@@ -50,4 +50,6 @@
     <string name="failure_sinch_service">Falha ao conectar ao serviço de chamadas</string>
     <string name="hint_login">Login</string>
     <string name="new_account">Nova conta</string>
+    <string name="failure_select_photo">Falha ao selecionar foto</string>
+    <string name="failure_create_account">Falha ao criar conta</string>
 </resources>

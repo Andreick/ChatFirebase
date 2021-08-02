@@ -60,6 +60,8 @@
     <string name="permission_microphone_phone">Enable Microphone and Phone permissions</string>
 
     <!-- Failure Strings -->
+    <string name="failure_select_photo">Failed to select photo</string>
+    <string name="failure_create_account">Failed to create account</string>
     <string name="failure_chats">Failed to load chats</string>
     <string name="failure_calls">Failed to load calls</string>
     <string name="failure_contact">Failed to load contact</string>

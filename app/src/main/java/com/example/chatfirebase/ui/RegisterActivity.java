@@ -61,9 +61,10 @@ public class RegisterActivity extends AppCompatActivity {
             new ActivityResultCallback<Uri>() {
                 @Override
                 public void onActivityResult(Uri uri) {
+                    if (uri == null) return;
                     vSelectData = uri;
-                    Bitmap bitmap;
                     try {
+                        Bitmap bitmap;
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
                             bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), vSelectData);
                         }
@@ -76,7 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                     catch (IOException e) {
                         Log.e(TAG, "Bitmap exception", e);
-                        Toast.makeText(RegisterActivity.this, "Failed to pick photo", Toast.LENGTH_SHORT).show();
+                        displayMessage(getString(R.string.failure_select_photo));
                     }
                 }
             });
@@ -137,7 +138,7 @@ public class RegisterActivity extends AppCompatActivity {
             hasInvalidField = true;
         }
         if (vImgPhoto.getDrawable() == null) {
-            Toast.makeText(this, getString(R.string.error_photo), Toast.LENGTH_SHORT).show();
+            displayMessage(getString(R.string.error_photo));
             hasInvalidField = true;
         }
 
@@ -155,7 +156,7 @@ public class RegisterActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     loadingBar.setVisibility(View.GONE);
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    displayMessage(e.getMessage());
                 });
     }
 
@@ -229,7 +230,7 @@ public class RegisterActivity extends AppCompatActivity {
                    }
                    loadingBar.setVisibility(View.GONE);
                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                   Toast.makeText(this, "Failed to create account", Toast.LENGTH_SHORT).show();
+                   displayMessage(getString(R.string.failure_create_account));
                 });
     }
 
@@ -243,7 +244,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void goToHomeActivity() {
         loadingBar.setVisibility(View.GONE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        Toast.makeText(this, getString(R.string.success_register), Toast.LENGTH_SHORT).show();
+        displayMessage(getString(R.string.success_register));
 
         Intent homeIntent = new Intent(this, HomeActivity.class);
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -256,5 +257,9 @@ public class RegisterActivity extends AppCompatActivity {
     private void goToLoginActivity() {
         Intent loginIntent = new Intent(this, LoginActivity.class);
         startActivity(loginIntent);
+    }
+
+    private void displayMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
