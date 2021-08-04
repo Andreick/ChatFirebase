@@ -148,7 +148,8 @@ public class CallsFragment extends Fragment {
             TextView tvContactName = viewHolder.itemView.findViewById(R.id.tv_call_username);
             TextView tvDate = viewHolder.itemView.findViewById(R.id.tv_call_timestamp);
 
-            Picasso.get().load(callInfo.getContactProfileUrl()).placeholder(R.drawable.profile_placeholder).into(civPhoto);
+            Picasso.get().load(callInfo.getContactProfileUrl()).fit().centerCrop()
+                    .placeholder(R.drawable.profile_placeholder).into(civPhoto);
             ivCall.setImageDrawable(ContextCompat.getDrawable(viewHolder.itemView.getContext(), R.drawable.ic_call_green_icon));
             tvContactName.setText(callInfo.getContactName());
             tvDate.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(callInfo.getTimestamp()));

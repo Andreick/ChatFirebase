@@ -81,6 +81,7 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
 
                     if (contact != null) {
                         Picasso.get().load(contact.getProfileUrl())
+                                .fit().centerCrop()
                                 .placeholder(R.drawable.profile_placeholder)
                                 .into(vImgEmitter);
                         vTxtEmitterName.setText(contact.getName());

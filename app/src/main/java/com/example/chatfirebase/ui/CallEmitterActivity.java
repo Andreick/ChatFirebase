@@ -64,7 +64,8 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
         contactName = getIntent().getStringExtra(getString(R.string.extra_contact_name));
         contactProfileUrl = getIntent().getStringExtra(getString(R.string.extra_contact_profile_url));
 
-        Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(vImgReceiver);
+        Picasso.get().load(contactProfileUrl).fit().centerCrop()
+                .placeholder(R.drawable.profile_placeholder).into(vImgReceiver);
         vTxtReceiverName.setText(contactName);
     }
 

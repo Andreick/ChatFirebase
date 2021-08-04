@@ -93,7 +93,8 @@ public class HomeActivity extends AppCompatActivity implements ChatsFragment.Cha
         }).attach();
 
         String profileUri = application.getCurrentUser().getProfileUrl();
-        Picasso.get().load(profileUri).placeholder(R.drawable.profile_placeholder).into(imgProfile);
+        Picasso.get().load(profileUri).fit().centerCrop()
+                .placeholder(R.drawable.profile_placeholder).into(imgProfile);
 
         buttonLogout.setOnClickListener(view -> logout());
     }

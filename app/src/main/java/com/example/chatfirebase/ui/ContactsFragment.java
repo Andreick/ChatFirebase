@@ -180,7 +180,8 @@ public class ContactsFragment extends Fragment {
             TextView txtUserNm = viewHolder.itemView.findViewById(R.id.tv_contact_username);
             TextView txtConnStatus = viewHolder.itemView.findViewById(R.id.tv_contact_conn_status);
 
-            Picasso.get().load(contact.getProfileUrl()).placeholder(R.drawable.profile_placeholder).into(imgPhoto);
+            Picasso.get().load(contact.getProfileUrl()).fit().centerCrop()
+                    .placeholder(R.drawable.profile_placeholder).into(imgPhoto);
             txtUserNm.setText(contact.getName());
 
             Context context = viewHolder.itemView.getContext();

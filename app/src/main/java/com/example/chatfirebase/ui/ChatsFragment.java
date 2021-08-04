@@ -203,7 +203,8 @@ public class ChatsFragment extends Fragment {
             TextView tvUserLastMessage = viewHolder.itemView.findViewById(R.id.tv_user_last_message);
             TextView tvChatBadge = viewHolder.itemView.findViewById(R.id.tv_chat_badge);
 
-            Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(civPhoto);
+            Picasso.get().load(contactProfileUrl).fit().centerCrop()
+                    .placeholder(R.drawable.profile_placeholder).into(civPhoto);
             tvContactName.setText(contactName);
             tvDate.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(lastMessage.getTimestamp()));
 

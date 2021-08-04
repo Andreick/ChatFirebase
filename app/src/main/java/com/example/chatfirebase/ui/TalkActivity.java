@@ -112,7 +112,8 @@ public class TalkActivity extends AppCompatActivity {
         rvMessages.setLayoutManager(new LinearLayoutManager(this));
         rvMessages.setAdapter(messagesAdapter);
 
-        Picasso.get().load(contactProfileUrl).placeholder(R.drawable.profile_placeholder).into(imgContact);
+        Picasso.get().load(contactProfileUrl).fit().centerCrop()
+                .placeholder(R.drawable.profile_placeholder).into(imgContact);
         txtNameContact.setText(contactName);
 
         vbtSend.setOnClickListener(view -> sendMessage());
