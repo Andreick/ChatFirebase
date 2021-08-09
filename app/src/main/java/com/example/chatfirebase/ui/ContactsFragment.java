@@ -1,7 +1,6 @@
 package com.example.chatfirebase.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.chatfirebase.R;
 import com.example.chatfirebase.data.User;
 import com.example.chatfirebase.data.UserConnectionStatus;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.chatfirebase.interfaces.CurrentUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,7 +42,7 @@ public class ContactsFragment extends Fragment {
     private final Map<String, ContactItem> contactItemMap = new HashMap<>();
     private final TreeSet<ContactItem> contactItemSet = new TreeSet<>();
 
-    private static String currentUid;
+    private CurrentUser currentUser;
     private DatabaseReference usersReference;
     private ChildEventListener contactsEventListener;
 
@@ -55,7 +54,8 @@ public class ContactsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        currentUid = FirebaseAuth.getInstance().getUid();
+        currentUser = (CurrentUser) getActivity();
+
         usersReference = FirebaseDatabase.getInstance().getReference(getString(R.string.database_users));
         setContactsEventListener();
     }
@@ -76,7 +76,11 @@ public class ContactsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(contactsAdapter);
 
-        contactsAdapter.setOnItemClickListener(new OnContactItemClickListener());
+        contactsAdapter.setOnItemClickListener((item, v) -> {
+            ContactItem contactItem = (ContactItem) item;
+            currentUser.goToTalkActivity(contactItem.contactId,
+                    contactItem.contact.getName(), contactItem.contact.getProfileUrl());
+        });
     }
 
     @Override
@@ -102,7 +106,7 @@ public class ContactsFragment extends Fragment {
                 Log.d(TAG, "onChildAdded: " + snapshot.getKey());
                 String uid = snapshot.getKey();
 
-                if (uid != null && !uid.equals(currentUid)) {
+                if (uid != null && !uid.equals(currentUser.getUid())) {
                     User contact = snapshot.getValue(User.class);
                     if (contact != null) {
                         ContactItem contactItem = new ContactItem(uid, contact);
@@ -123,7 +127,7 @@ public class ContactsFragment extends Fragment {
                 Log.d(TAG, "onChildChanged: " + snapshot.getKey());
                 String uid = snapshot.getKey();
 
-                if (uid != null && !uid.equals(currentUid)) {
+                if (uid != null && !uid.equals(currentUser.getUid())) {
                     User changedContact = snapshot.getValue(User.class);
                     ContactItem contactItem = contactItemMap.get(uid);
 
@@ -220,22 +224,6 @@ public class ContactsFragment extends Fragment {
             if (contactNameDiff != 0) return contactNameDiff;
 
             return contactId.compareTo(ci.contactId);
-        }
-    }
-
-    private static class OnContactItemClickListener implements com.xwray.groupie.OnItemClickListener {
-
-        @Override
-        public void onItemClick(@NonNull Item item, @NonNull View view) {
-            ContactItem contactItem = (ContactItem) item;
-            Context context = view.getContext();
-
-            Intent chatIntent = new Intent(context, TalkActivity.class);
-            chatIntent.putExtra(context.getString(R.string.extra_user_id), currentUid);
-            chatIntent.putExtra(context.getString(R.string.extra_contact_id), contactItem.contactId);
-            chatIntent.putExtra(context.getString(R.string.extra_contact_name), contactItem.contact.getName());
-            chatIntent.putExtra(context.getString(R.string.extra_contact_profile_url), contactItem.contact.getProfileUrl());
-            context.startActivity(chatIntent);
         }
     }
 }

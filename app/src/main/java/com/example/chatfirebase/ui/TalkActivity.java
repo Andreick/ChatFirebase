@@ -1,24 +1,29 @@
 package com.example.chatfirebase.ui;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chatfirebase.ChatFirebaseApplication;
 import com.example.chatfirebase.R;
 import com.example.chatfirebase.data.Message;
-import com.example.chatfirebase.data.User;
 import com.example.chatfirebase.data.UserConnectionStatus;
 import com.example.chatfirebase.services.SinchService;
+import com.example.chatfirebase.util.BaseCallActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -43,21 +48,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TalkActivity extends AppCompatActivity {
+public class TalkActivity extends AppCompatActivity implements ServiceConnection {
 
     private static final String TAG = "TalkActivity";
 
     private final Map<String, SenderMessageItem> senderMessageItemMap = new HashMap<>();
     private final List<MessageItem> messageItems = new ArrayList<>();
 
-    private String contactId;
-    private String currentUid;
-    private String contactName;
-    private String contactProfileUrl;
-    private CollectionReference talkContactReference;
-    private CollectionReference talkCurrentUserReference;
-    private DocumentReference chatContactReference;
-    private DocumentReference chatCurrentUserReference;
+    private String contactId, contactName, contactProfileUrl, currentUid;
+    private CollectionReference talkContactReference, talkCurrentUserReference;
+    private DocumentReference chatContactReference, chatCurrentUserReference;
     private com.google.firebase.firestore.Query messagesQuery;
     private com.google.firebase.database.Query contactStatusQuery;
     private EventListener<QuerySnapshot> messagesEventListener;
@@ -76,10 +76,10 @@ public class TalkActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_talk);
 
-        contactId = getIntent().getStringExtra(getString(R.string.extra_contact_id));
-        currentUid = getIntent().getStringExtra(getString(R.string.extra_user_id));
-        contactName = getIntent().getStringExtra(getString(R.string.extra_contact_name));
-        contactProfileUrl = getIntent().getStringExtra(getString(R.string.extra_contact_profile_url));
+        contactId = getIntent().getStringExtra(getString(R.string.contact_id));
+        contactName = getIntent().getStringExtra(getString(R.string.contact_name));
+        contactProfileUrl = getIntent().getStringExtra(getString(R.string.contact_profile_url));
+        currentUid = getIntent().getStringExtra(getString(R.string.user_id));
 
         CollectionReference talksReference = FirebaseFirestore.getInstance().collection(getString(R.string.collection_talks));
         DocumentReference contactReference = talksReference.document(contactId);
@@ -98,8 +98,6 @@ public class TalkActivity extends AppCompatActivity {
         setMessagesEventListener();
         setContactStatusEventListener();
 
-        sinchService = ((ChatFirebaseApplication) getApplication()).getSinchService();
-
         imgContact = findViewById(R.id.civ_chat_photo);
         txtNameContact = findViewById(R.id.tv_chat_name);
         txtConnStatus = findViewById(R.id.tv_chat_conn_status);
@@ -117,7 +115,10 @@ public class TalkActivity extends AppCompatActivity {
         txtNameContact.setText(contactName);
 
         vbtSend.setOnClickListener(view -> sendMessage());
-        vbtCall.setOnClickListener(view -> sinchService.callUser(contactId, contactName, contactProfileUrl));
+        vbtCall.setOnClickListener(view -> {
+            if (sinchService == null) bindService(new Intent(this, SinchService.class), this, 0);
+            else sinchService.callUser(contactId, contactName, contactProfileUrl);
+        });
     }
 
     @Override
@@ -261,12 +262,11 @@ public class TalkActivity extends AppCompatActivity {
                 String name = getString(R.string.name);
                 String profileUrl = getString(R.string.profile_url);
 
-                User currentUser = ((ChatFirebaseApplication) getApplication()).getCurrentUser();
-                chatInfo.put(name, currentUser.getName());
-                chatInfo.put(profileUrl, currentUser.getProfileUrl());
+                chatInfo.put(name, getIntent().getStringExtra(getString(R.string.user_name)));
+                chatInfo.put(profileUrl, getIntent().getStringExtra(getString(R.string.user_profile_url)));
                 batch.set(chatContactReference, chatInfo);
 
-                //chatInfo.put(getString(R.string.unreadMessages), 0);
+                chatInfo.put(getString(R.string.unreadMessages), 0);
                 chatInfo.put(name, contactName);
                 chatInfo.put(profileUrl, contactProfileUrl);
                 batch.set(chatCurrentUserReference, chatInfo);
@@ -284,6 +284,20 @@ public class TalkActivity extends AppCompatActivity {
 
             editMessage.setText(null);
         }
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        Log.d(TAG, "onServiceConnected");
+        SinchService.SinchServiceBinder binder = (SinchService.SinchServiceBinder) service;
+        sinchService = binder.getService();
+        sinchService.callUser(contactId, contactName, contactProfileUrl);
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        Log.e(TAG, "Sinch Service disconnected");
+        sinchService = null;
     }
 
     private abstract static class MessageItem extends Item<GroupieViewHolder> {

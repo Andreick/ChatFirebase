@@ -62,19 +62,24 @@
     <!-- Failure Strings -->
     <string name="failure_select_photo">Failed to select photo</string>
     <string name="failure_create_account">Failed to create account</string>
+    <string name="failure_user">Failed to load user</string>
+    <string name="failure_user_profile">Failed to load user profile</string>
     <string name="failure_chats">Failed to load chats</string>
     <string name="failure_calls">Failed to load calls</string>
     <string name="failure_contact">Failed to load contact</string>
     <string name="failure_messages">Failed to load messages</string>
     <string name="failure_message">Failed to send message</string>
     <string name="failure_call">Failed to register call</string>
-    <string name="failure_sinch_service">Failed to connect to the calls service</string>
+    <string name="failure_sinch_service">Call service failure</string>
+    <string name="failure_call_service">Failed to connect to call service</string>
 
     <!-- Intent Extras -->
-    <string name="extra_user_id" translatable="false">uid</string>
-    <string name="extra_contact_id" translatable="false">cid</string>
-    <string name="extra_contact_name" translatable="false">cname</string>
-    <string name="extra_contact_profile_url" translatable="false">cprofileUrl</string>
+    <string name="user_id" translatable="false">uId</string>
+    <string name="user_name" translatable="false">uName</string>
+    <string name="user_profile_url" translatable="false">uProfileUrl</string>
+    <string name="contact_id" translatable="false">cId</string>
+    <string name="contact_name" translatable="false">cName</string>
+    <string name="contact_profile_url" translatable="false">cProfileUrl</string>
 
     <!-- Fields -->
     <string name="name" translatable="false">name</string>

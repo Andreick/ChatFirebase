@@ -251,7 +251,7 @@ public class RegisterActivity extends AppCompatActivity {
         startActivity(homeIntent);
 
         ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
-        application.setup();
+        application.setup(currentUser.getUid());
     }
 
     private void goToLoginActivity() {

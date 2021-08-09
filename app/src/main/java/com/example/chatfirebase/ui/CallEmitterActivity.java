@@ -17,10 +17,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.example.chatfirebase.ChatFirebaseApplication;
 import com.example.chatfirebase.R;
 import com.example.chatfirebase.data.CallInfo;
-import com.example.chatfirebase.data.User;
 import com.example.chatfirebase.services.SinchService;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -40,8 +38,7 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
 
     private SinchService sinchService;
     private Call call;
-    private String contactName;
-    private String contactProfileUrl;
+    private String contactName, contactProfileUrl;
     private boolean speakerEnabled;
 
     private ImageView vbtReject, vbtSpeaker;
@@ -61,8 +58,8 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
         Intent serviceIntent = new Intent(this, SinchService.class);
         bindService(serviceIntent, this, 0);
 
-        contactName = getIntent().getStringExtra(getString(R.string.extra_contact_name));
-        contactProfileUrl = getIntent().getStringExtra(getString(R.string.extra_contact_profile_url));
+        contactName = getIntent().getStringExtra(getString(R.string.contact_name));
+        contactProfileUrl = getIntent().getStringExtra(getString(R.string.contact_profile_url));
 
         Picasso.get().load(contactProfileUrl).fit().centerCrop()
                 .placeholder(R.drawable.profile_placeholder).into(vImgReceiver);
@@ -98,7 +95,7 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
     @Override
     public void onServiceDisconnected(ComponentName name) {
         Log.e(TAG, "Sinch Service disconnected");
-        displayMessage(getString(R.string.failure_sinch_service));
+        displayMessage(getString(R.string.failure_call_service));
         finish();
     }
 
@@ -108,9 +105,10 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
     }
 
     private void registerCall(CallEndCause endCause) {
-        String contactId = getIntent().getStringExtra(getString(R.string.extra_contact_id));
-        String currentUid = getIntent().getStringExtra(getString(R.string.extra_user_id));
-        User currentUser = ((ChatFirebaseApplication) getApplication()).getCurrentUser();
+        String contactId = getIntent().getStringExtra(getString(R.string.contact_id));
+        String currentUid = getIntent().getStringExtra(getString(R.string.user_id));
+        String currentUserName = getIntent().getStringExtra(getString(R.string.user_name));
+        String currentProfileUrl = getIntent().getStringExtra(getString(R.string.user_profile_url));
 
         CollectionReference talksReference = FirebaseFirestore.getInstance().collection(getString(R.string.collection_talks));
         WriteBatch batch = FirebaseFirestore.getInstance().batch();
@@ -120,7 +118,7 @@ public class CallEmitterActivity extends AppCompatActivity implements ServiceCon
         callInfo.setContact(contactId, contactName, contactProfileUrl);
         batch.set(talksReference.document(currentUid).collection(getString(R.string.collection_talks_calls)).document(), callInfo);
 
-        callInfo.setContact(currentUid, currentUser.getName(), currentUser.getProfileUrl());
+        callInfo.setContact(currentUid, currentUserName, currentProfileUrl);
         callInfo.setViewed(endCause == CallEndCause.DENIED || endCause == CallEndCause.HUNG_UP);
         batch.set(talksReference.document(contactId).collection(getString(R.string.collection_talks_calls)).document(), callInfo);
 

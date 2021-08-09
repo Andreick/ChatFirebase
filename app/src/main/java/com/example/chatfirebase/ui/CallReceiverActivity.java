@@ -128,7 +128,7 @@ public class CallReceiverActivity extends AppCompatActivity implements ServiceCo
     @Override
     public void onServiceDisconnected(ComponentName name) {
         Log.e(TAG, "Sinch Service disconnected");
-        displayMessage(getString(R.string.failure_sinch_service));
+        displayMessage(getString(R.string.failure_call_service));
         finish();
     }
 

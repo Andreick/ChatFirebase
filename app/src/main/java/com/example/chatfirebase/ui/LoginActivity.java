@@ -102,6 +102,6 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(homeIntent);
 
         ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
-        application.setup();
+        application.setup(FirebaseAuth.getInstance().getUid());
     }
 }

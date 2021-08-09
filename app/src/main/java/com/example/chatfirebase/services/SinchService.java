@@ -4,6 +4,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -16,6 +17,7 @@ import androidx.core.content.ContextCompat;
 import com.example.chatfirebase.R;
 import com.example.chatfirebase.ui.CallEmitterActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.sinch.android.rtc.AudioController;
 import com.sinch.android.rtc.ClientRegistration;
 import com.sinch.android.rtc.MissingPermissionException;
@@ -35,28 +37,25 @@ public class SinchService extends Service {
     private static final String TAG = "SinchService";
 
     private final IBinder binder = new SinchServiceBinder();
+    private String currentUid, currentUserName, currentProfileUrl;
     private SinchClient sinchClient;
-    private String currentUid;
     private Intent notificationIntent;
     private Call call;
 
     @Override
     public void onCreate() {
         Log.d(TAG, "onCreate");
-        startClient();
-    }
 
-    @Override
-    public void onDestroy() {
-        Log.d(TAG, "onDestroy");
-        stopClient();
-    }
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-    private void startClient() {
-        if (sinchClient == null) {
-            currentUid = FirebaseAuth.getInstance().getUid();
+        if (currentUser != null) {
+            currentUserName = currentUser.getDisplayName();
+            Uri photoUri = currentUser.getPhotoUrl();
 
-            if (!TextUtils.isEmpty(currentUid)) {
+            if (!TextUtils.isEmpty(currentUserName) && photoUri != null) {
+                currentUid = currentUser.getUid();
+                currentProfileUrl = photoUri.toString();
+
                 sinchClient = Sinch.getSinchClientBuilder()
                         .context(this)
                         .userId(currentUid)
@@ -87,11 +86,10 @@ public class SinchService extends Service {
         }
     }
 
-    private void stopClient() {
-        if (sinchIsStarted()) {
-            sinchClient.stopListeningOnActiveConnection();
-            sinchClient.terminateGracefully();
-        }
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand");
+        return START_STICKY;
     }
 
     @Override
@@ -110,29 +108,42 @@ public class SinchService extends Service {
         return (sinchClient != null && sinchClient.isStarted());
     }
 
-    public void callUser(String contactId, String contactName, String contactProfileUrl) {
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Log.d(TAG, "onTaskRemoved");
+        super.onTaskRemoved(rootIntent);
+        stopSelf();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy");
         if (sinchIsStarted()) {
-            if (call == null) {
-                try {
-                    call = sinchClient.getCallClient().callUser(contactId);
-
-                    Intent emitterIntent = new Intent(SinchService.this, CallEmitterActivity.class);
-                    emitterIntent.putExtra(getString(R.string.extra_user_id), currentUid);
-                    emitterIntent.putExtra(getString(R.string.extra_contact_id), contactId);
-                    emitterIntent.putExtra(getString(R.string.extra_contact_name), contactName);
-                    emitterIntent.putExtra(getString(R.string.extra_contact_profile_url), contactProfileUrl);
-
-                    emitterIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(emitterIntent);
-                }
-                catch (MissingPermissionException e) {
-                    Toast.makeText(this, getString(R.string.permission_microphone_phone), Toast.LENGTH_LONG).show();
-                    Log.e(TAG, e.getMessage());
-                }
-            }
+            sinchClient.stopListeningOnActiveConnection();
+            sinchClient.terminateGracefully();
         }
-        else {
-            Toast.makeText(this, "O servidor de chamadas não foi iniciado", Toast.LENGTH_LONG).show();
+    }
+
+    public void callUser(String contactId, String contactName, String contactProfileUrl) {
+        if (call == null && sinchIsStarted()) {
+            try {
+                call = sinchClient.getCallClient().callUser(contactId);
+
+                Intent emitterIntent = new Intent(SinchService.this, CallEmitterActivity.class);
+                emitterIntent.putExtra(getString(R.string.contact_id), contactId);
+                emitterIntent.putExtra(getString(R.string.contact_name), contactName);
+                emitterIntent.putExtra(getString(R.string.contact_profile_url), contactProfileUrl);
+                emitterIntent.putExtra(getString(R.string.user_id), currentUid);
+                emitterIntent.putExtra(getString(R.string.user_name), currentUserName);
+                emitterIntent.putExtra(getString(R.string.user_profile_url), currentProfileUrl);
+
+                emitterIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(emitterIntent);
+            }
+            catch (MissingPermissionException e) {
+                Toast.makeText(this, getString(R.string.permission_microphone_phone), Toast.LENGTH_LONG).show();
+                Log.e(TAG, e.getMessage());
+            }
         }
     }
 
@@ -152,7 +163,6 @@ public class SinchService extends Service {
 
         @Override
         public void onIncomingCall(CallClient callClient, Call incomingCall) {
-            Log.d(TAG, "Incoming call");
             if (call == null) {
                 call = incomingCall;
                 call.addCallListener(new NotificationCallListener());
@@ -194,10 +204,9 @@ public class SinchService extends Service {
         @Override
         public void onClientFailed(SinchClient client, SinchError error) {
             Log.e(TAG, "Sinch Client failed " + error.getMessage());
+            Toast.makeText(SinchService.this, getString(R.string.failure_sinch_service), Toast.LENGTH_SHORT).show();
             sinchClient.terminate();
-            sinchClient = null;
-            call = null;
-            Toast.makeText(SinchService.this, "Falha no servidor de chamadas", Toast.LENGTH_SHORT).show();
+            stopSelf();
         }
 
         @Override

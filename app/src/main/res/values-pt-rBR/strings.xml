@@ -41,15 +41,18 @@
     <string name="call_notification_text">toque para ver</string>
     <string name="call_notification_title">Chamada recebida</string>
     <string name="permission_microphone_phone">Ative as permissões de Microfone e Telefone</string>
-    <string name="failure_chats">Falha ao carregar as conversas</string>
-    <string name="failure_calls">Falha ao carregar as chamadas</string>
+    <string name="failure_chats">Falha ao carregar conversas</string>
+    <string name="failure_calls">Falha ao carregar chamadas</string>
     <string name="failure_contact">Falha ao carregar contato</string>
     <string name="failure_messages">Falha ao carregar mensagens</string>
     <string name="failure_message">Falha ao enviar mensagem</string>
     <string name="failure_call">Falha ao registrar chamada</string>
-    <string name="failure_sinch_service">Falha ao conectar ao serviço de chamadas</string>
+    <string name="failure_call_service">Falha ao conectar ao serviço de chamadas</string>
     <string name="hint_login">Login</string>
     <string name="new_account">Nova conta</string>
     <string name="failure_select_photo">Falha ao selecionar foto</string>
     <string name="failure_create_account">Falha ao criar conta</string>
+    <string name="failure_sinch_service">Falha no serviço de chamadas</string>
+    <string name="failure_user">Falha ao carregar usuário</string>
+    <string name="failure_user_profile">Falha ao carregar perfil do usuário</string>
 </resources>

@@ -1,12 +1,16 @@
 package com.example.chatfirebase.ui;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -17,23 +21,26 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.chatfirebase.ChatFirebaseApplication;
 import com.example.chatfirebase.R;
+import com.example.chatfirebase.interfaces.CallsFragmentListener;
+import com.example.chatfirebase.interfaces.ChatsFragmentListener;
+import com.example.chatfirebase.services.SinchService;
+import com.example.chatfirebase.util.BaseCallActivity;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.squareup.picasso.Picasso;
 
-public class HomeActivity extends AppCompatActivity implements ChatsFragment.ChatsListener,
-        CallsFragment.CallsListener {
+public class HomeActivity extends AppCompatActivity implements ChatsFragmentListener, CallsFragmentListener {
 
     private static final String TAG = "HomeActivity";
     private static final int NUM_PAGES = 3;
 
-    private String currentUid;
-    private ChatFirebaseApplication application;
+    private String currentUid, userName, profileUrl;
 
     private ImageView imgProfile;
     private Button buttonLogout;
@@ -47,15 +54,25 @@ public class HomeActivity extends AppCompatActivity implements ChatsFragment.Cha
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        currentUid = FirebaseAuth.getInstance().getUid();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (currentUid == null) {
-            Toast.makeText(this, "Failed to load user", Toast.LENGTH_SHORT).show();
-            goToLoginActivity();
+        if (currentUser == null) {
+            userFailure(getString(R.string.failure_user));
             return;
         }
 
-        application = (ChatFirebaseApplication) getApplication();
+        userName = currentUser.getDisplayName();
+        Uri photoUri = currentUser.getPhotoUrl();
+
+        if (TextUtils.isEmpty(userName) || photoUri == null) {
+            userFailure(getString(R.string.failure_user_profile));
+            return;
+        }
+
+        currentUid = currentUser.getUid();
+        profileUrl = photoUri.toString();
+
+        startService(new Intent(this, SinchService.class));
 
         imgProfile = findViewById(R.id.civ_home_photo);
         buttonLogout = findViewById(R.id.btn_logout);
@@ -92,8 +109,7 @@ public class HomeActivity extends AppCompatActivity implements ChatsFragment.Cha
             }
         }).attach();
 
-        String profileUri = application.getCurrentUser().getProfileUrl();
-        Picasso.get().load(profileUri).fit().centerCrop()
+        Picasso.get().load(profileUrl).fit().centerCrop()
                 .placeholder(R.drawable.profile_placeholder).into(imgProfile);
 
         buttonLogout.setOnClickListener(view -> logout());
@@ -105,6 +121,11 @@ public class HomeActivity extends AppCompatActivity implements ChatsFragment.Cha
         else viewPager.setCurrentItem(0);
     }
 
+    private void userFailure(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        goToLoginActivity();
+    }
+
     private void goToLoginActivity() {
         Intent loginIntent = new Intent(this, LoginActivity.class);
         loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -113,8 +134,23 @@ public class HomeActivity extends AppCompatActivity implements ChatsFragment.Cha
 
     private void logout() {
         viewPager.setAdapter(null);
-        application.close();
+        ((ChatFirebaseApplication) getApplication()).close();
         goToLoginActivity();
+    }
+
+    public String getUid() {
+        return currentUid;
+    }
+
+    public void goToTalkActivity(String contactId, String contactName, String contactProfileUrl) {
+        Intent talkIntent = new Intent(this, TalkActivity.class);
+        talkIntent.putExtra(getString(R.string.user_id), currentUid);
+        talkIntent.putExtra(getString(R.string.user_name), userName);
+        talkIntent.putExtra(getString(R.string.user_profile_url), profileUrl);
+        talkIntent.putExtra(getString(R.string.contact_id), contactId);
+        talkIntent.putExtra(getString(R.string.contact_name), contactName);
+        talkIntent.putExtra(getString(R.string.contact_profile_url), contactProfileUrl);
+        startActivity(talkIntent);
     }
 
     @Override
@@ -177,10 +213,12 @@ public class HomeActivity extends AppCompatActivity implements ChatsFragment.Cha
 
         @Override
         public void onTabUnselected(TabLayout.Tab tab) {
+
         }
 
         @Override
         public void onTabReselected(TabLayout.Tab tab) {
+
         }
     }
 

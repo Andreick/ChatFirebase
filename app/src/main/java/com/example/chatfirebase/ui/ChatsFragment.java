@@ -1,7 +1,6 @@
 package com.example.chatfirebase.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatfirebase.R;
 import com.example.chatfirebase.data.Message;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.chatfirebase.interfaces.ChatsFragmentListener;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,7 +29,6 @@ import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
-import com.xwray.groupie.OnItemClickListener;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -46,7 +44,7 @@ public class ChatsFragment extends Fragment {
     private final Map<String, ChatItem> chatItemMap = new HashMap<>();
     private final List<ChatItem> chatItems = new ArrayList<>();
 
-    private static String currentUid;
+    private ChatsFragmentListener fragmentListener;
     private Query chatsQuery;
     private EventListener<QuerySnapshot> chatsEventListener;
     private ListenerRegistration chatsRegistration;
@@ -60,10 +58,10 @@ public class ChatsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        currentUid = FirebaseAuth.getInstance().getUid();
+        fragmentListener = (ChatsFragmentListener) getActivity();
 
         chatsQuery = FirebaseFirestore.getInstance().collection(getString(R.string.collection_talks))
-                .document(currentUid)
+                .document(fragmentListener.getUid())
                 .collection(getString(R.string.collection_talks_chats))
                 .orderBy(getString(R.string.last_message_timestamp), Query.Direction.DESCENDING);
 
@@ -86,7 +84,10 @@ public class ChatsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(chatsAdapter);
 
-        chatsAdapter.setOnItemClickListener(new OnChatItemClickListener());
+        chatsAdapter.setOnItemClickListener((item, v) -> {
+            ChatItem chatItem = (ChatItem) item;
+            fragmentListener.goToTalkActivity(chatItem.contactId, chatItem.contactName, chatItem.contactProfileUrl);
+        });
     }
 
     @Override
@@ -155,7 +156,7 @@ public class ChatsFragment extends Fragment {
                     Collections.sort(chatItems);
                     chatsAdapter.update(chatItems, false);
                     chatsAdapter.notifyDataSetChanged();
-                    ((ChatsListener) context).updateChatsTab(totalUnreadMessages);
+                    fragmentListener.updateChatsTab(totalUnreadMessages);
                 }
                 else {
                     Log.e(TAG, "Null chats snapshot");
@@ -242,25 +243,5 @@ public class ChatsFragment extends Fragment {
 
             return contactId.compareTo(ci.contactId);
         }
-    }
-
-    private static class OnChatItemClickListener implements OnItemClickListener {
-
-        @Override
-        public void onItemClick(@NonNull Item item, @NonNull View view) {
-            ChatItem chatItem = (ChatItem) item;
-            Context context = view.getContext();
-
-            Intent chatIntent = new Intent(context, TalkActivity.class);
-            chatIntent.putExtra(context.getString(R.string.extra_user_id), currentUid);
-            chatIntent.putExtra(context.getString(R.string.extra_contact_id), chatItem.contactId);
-            chatIntent.putExtra(context.getString(R.string.extra_contact_name), chatItem.contactName);
-            chatIntent.putExtra(context.getString(R.string.extra_contact_profile_url), chatItem.contactProfileUrl);
-            context.startActivity(chatIntent);
-        }
-    }
-
-    public interface ChatsListener {
-        void updateChatsTab(int numberUnreadMessages);
     }
 }

@@ -10,6 +10,8 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
+    String currentUid;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -17,14 +19,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void authenticateUser() {
-        String currentUid = FirebaseAuth.getInstance().getUid();
+        currentUid = FirebaseAuth.getInstance().getUid();
 
-        if (currentUid == null) {
-            goToLoginActivity();
-        }
-        else {
-            goToHomeActivity();
-        }
+        if (currentUid == null) goToLoginActivity();
+        else goToHomeActivity();
     }
 
     private void goToLoginActivity() {
@@ -39,6 +37,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(homeIntent);
 
         ChatFirebaseApplication application = (ChatFirebaseApplication) getApplication();
-        application.setup();
+        application.setup(currentUid);
     }
 }
