@@ -1,20 +1,14 @@
 package com.example.chatfirebase.ui;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,7 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TalkActivity extends AppCompatActivity implements ServiceConnection {
+public class TalkActivity extends BaseCallActivity {
 
     private static final String TAG = "TalkActivity";
 
@@ -62,7 +56,6 @@ public class TalkActivity extends AppCompatActivity implements ServiceConnection
     private com.google.firebase.database.Query contactStatusQuery;
     private EventListener<QuerySnapshot> messagesEventListener;
     private ValueEventListener contactStatusEventListener;
-    private SinchService sinchService;
 
     private ImageView imgContact;
     private TextView txtNameContact, txtConnStatus;
@@ -116,8 +109,11 @@ public class TalkActivity extends AppCompatActivity implements ServiceConnection
 
         vbtSend.setOnClickListener(view -> sendMessage());
         vbtCall.setOnClickListener(view -> {
-            if (sinchService == null) bindService(new Intent(this, SinchService.class), this, 0);
-            else sinchService.callUser(contactId, contactName, contactProfileUrl);
+            Intent sinchServiceIntent = new Intent(this, SinchService.class);
+            sinchServiceIntent.putExtra(getString(R.string.contact_id), contactId);
+            sinchServiceIntent.putExtra(getString(R.string.contact_name), contactName);
+            sinchServiceIntent.putExtra(getString(R.string.contact_profile_url), contactProfileUrl);
+            attemptToStartSinchService(sinchServiceIntent);
         });
     }
 
@@ -284,20 +280,6 @@ public class TalkActivity extends AppCompatActivity implements ServiceConnection
 
             editMessage.setText(null);
         }
-    }
-
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        Log.d(TAG, "onServiceConnected");
-        SinchService.SinchServiceBinder binder = (SinchService.SinchServiceBinder) service;
-        sinchService = binder.getService();
-        sinchService.callUser(contactId, contactName, contactProfileUrl);
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        Log.e(TAG, "Sinch Service disconnected");
-        sinchService = null;
     }
 
     private abstract static class MessageItem extends Item<GroupieViewHolder> {

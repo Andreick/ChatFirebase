@@ -172,11 +172,8 @@ public class CallsFragment extends Fragment {
                 }
             }
 
-            ivCall.setOnClickListener(view -> {
-                /*if (sinchService == null)
-                    sinchService = ((ChatFirebaseApplication) view.getContext().getApplicationContext()).getOrCreateSinchService();
-                sinchService.callUser(callInfo.getContactId(), callInfo.getContactName(), callInfo.getContactProfileUrl());*/
-            });
+            ivCall.setOnClickListener(view -> fragmentListener
+                    .callContact(callInfo.getContactId(), callInfo.getContactName(), callInfo.getContactProfileUrl()));
         }
 
         @Override

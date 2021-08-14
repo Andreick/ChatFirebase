@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Andreick/Documents/UNIP/5Sem/APS/Projetos/ChatFirebase-APS-2021/app/src/main/res/layout/activity_call_receiver.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Andreick/Documents/UNIP/5Sem/APS/Projetos/ChatFirebase-APS-2021/app/src/main/res/layout/activity_login.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Andreick/Documents/UNIP/5Sem/APS/Projetos/ChatFirebase-APS-2021/app/src/main/res/layout/activity_register.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Andreick/Documents/UNIP/5Sem/APS/Projetos/ChatFirebase-APS-2021/app/src/main/res/layout/activity_talk.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Andreick/Documents/UNIP/5Sem/APS/Projetos/ChatFirebase-APS-2021/app/src/main/res/layout/alert_dialog.xml" value="0.75" />
+        <entry key="..\:/Users/Andreick/Documents/UNIP/5Sem/APS/Projetos/ChatFirebase-APS-2021/app/src/main/res/layout/card_call.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Andreick/Documents/UNIP/5Sem/APS/Projetos/ChatFirebase-APS-2021/app/src/main/res/layout/card_chat.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Andreick/Documents/UNIP/5Sem/APS/Projetos/ChatFirebase-APS-2021/app/src/main/res/layout/card_contact.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Andreick/Documents/UNIP/5Sem/APS/Projetos/ChatFirebase-APS-2021/app/src/main/res/layout/fragment_calls.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Andreick/Documents/UNIP/5Sem/APS/Projetos/ChatFirebase-APS-2021/app/src/main/res/layout/fragment_chats.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Andreick/Documents/UNIP/5Sem/APS/Projetos/ChatFirebase-APS-2021/app/src/main/res/layout/message_receiver.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Andreick/Documents/UNIP/5Sem/APS/Projetos/ChatFirebase-APS-2021/app/src/main/res/layout/message_sender.xml" value="0.36666666666666664" />
+      </map>
+    </option>
+  </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="org.jetbrains.annotations.Nullable" />
     <option name="myDefaultNotNull" value="androidx.annotation.NonNull" />

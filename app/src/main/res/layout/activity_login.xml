@@ -15,7 +15,6 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/btn_login"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_login_password"
         tools:visibility="visible" />
@@ -30,7 +29,6 @@
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="@+id/iv_login_logo"
         app:layout_constraintEnd_toEndOf="@+id/iv_login_logo"
-        app:layout_constraintHorizontal_bias="0.45"
         app:layout_constraintStart_toStartOf="@+id/iv_login_logo" />
 
     <EditText
@@ -82,7 +80,6 @@
         app:backgroundTint="@color/yellow"
         app:layout_constraintBottom_toTopOf="@+id/tv_login_register"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView

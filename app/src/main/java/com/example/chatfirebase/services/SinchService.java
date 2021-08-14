@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,6 +42,7 @@ public class SinchService extends Service {
     private SinchClient sinchClient;
     private Intent notificationIntent;
     private Call call;
+    private Bundle contactBundle;
 
     @Override
     public void onCreate() {
@@ -89,7 +91,13 @@ public class SinchService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand");
-        return START_STICKY;
+
+        if (intent.getExtras() != null) {
+            if (sinchIsStarted()) callContact(intent.getExtras());
+            else contactBundle = intent.getExtras();
+        }
+
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -124,8 +132,11 @@ public class SinchService extends Service {
         }
     }
 
-    public void callUser(String contactId, String contactName, String contactProfileUrl) {
-        if (call == null && sinchIsStarted()) {
+    private void callContact(Bundle bundle) {
+        if (call == null) {
+            String contactId = bundle.getString(getString(R.string.contact_id));
+            String contactName = bundle.getString(getString(R.string.contact_name));
+            String contactProfileUrl = bundle.getString(getString(R.string.contact_profile_url));
             try {
                 call = sinchClient.getCallClient().callUser(contactId);
 
@@ -213,6 +224,10 @@ public class SinchService extends Service {
         public void onClientStarted(SinchClient client) {
             Log.d(TAG, "Sinch Client started");
             sinchClient.startListeningOnActiveConnection();
+            if (contactBundle != null) {
+                callContact(contactBundle);
+                contactBundle = null;
+            }
         }
 
         @Override

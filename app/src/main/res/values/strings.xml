@@ -57,7 +57,9 @@
     <string name="call_notification_text">tap to see</string>
 
     <!-- Permissions Strings -->
-    <string name="permission_microphone_phone">Enable Microphone and Phone permissions</string>
+    <string name="permission_microphone_phone">Phone and microphone permissions are required to make and receive calls</string>
+    <string name="dialog_continue">Continue</string>
+    <string name="dialog_ignore">Ignore</string>
 
     <!-- Failure Strings -->
     <string name="failure_select_photo">Failed to select photo</string>

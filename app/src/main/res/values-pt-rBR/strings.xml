@@ -40,7 +40,7 @@
     <string name="call_no_answer">Sem resposta</string>
     <string name="call_notification_text">toque para ver</string>
     <string name="call_notification_title">Chamada recebida</string>
-    <string name="permission_microphone_phone">Ative as permissões de Microfone e Telefone</string>
+    <string name="permission_microphone_phone">São necessárias permissões de telefone e microfone para fazer e receber chamadas</string>
     <string name="failure_chats">Falha ao carregar conversas</string>
     <string name="failure_calls">Falha ao carregar chamadas</string>
     <string name="failure_contact">Falha ao carregar contato</string>
@@ -55,4 +55,6 @@
     <string name="failure_sinch_service">Falha no serviço de chamadas</string>
     <string name="failure_user">Falha ao carregar usuário</string>
     <string name="failure_user_profile">Falha ao carregar perfil do usuário</string>
+    <string name="dialog_continue">Continuar</string>
+    <string name="dialog_ignore">Ignorar</string>
 </resources>

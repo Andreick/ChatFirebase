@@ -9,10 +9,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -35,7 +32,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.squareup.picasso.Picasso;
 
-public class HomeActivity extends AppCompatActivity implements ChatsFragmentListener, CallsFragmentListener {
+public class HomeActivity extends BaseCallActivity implements ChatsFragmentListener, CallsFragmentListener {
 
     private static final String TAG = "HomeActivity";
     private static final int NUM_PAGES = 3;
@@ -72,7 +69,7 @@ public class HomeActivity extends AppCompatActivity implements ChatsFragmentList
         currentUid = currentUser.getUid();
         profileUrl = photoUri.toString();
 
-        startService(new Intent(this, SinchService.class));
+        attemptToStartSinchService(new Intent(this, SinchService.class));
 
         imgProfile = findViewById(R.id.civ_home_photo);
         buttonLogout = findViewById(R.id.btn_logout);
@@ -138,10 +135,12 @@ public class HomeActivity extends AppCompatActivity implements ChatsFragmentList
         goToLoginActivity();
     }
 
+    @Override
     public String getUid() {
         return currentUid;
     }
 
+    @Override
     public void goToTalkActivity(String contactId, String contactName, String contactProfileUrl) {
         Intent talkIntent = new Intent(this, TalkActivity.class);
         talkIntent.putExtra(getString(R.string.user_id), currentUid);
@@ -151,6 +150,15 @@ public class HomeActivity extends AppCompatActivity implements ChatsFragmentList
         talkIntent.putExtra(getString(R.string.contact_name), contactName);
         talkIntent.putExtra(getString(R.string.contact_profile_url), contactProfileUrl);
         startActivity(talkIntent);
+    }
+
+    @Override
+    public void callContact(String contactId, String contactName, String contactProfileUrl) {
+        Intent sinchServiceIntent = new Intent(this, SinchService.class);
+        sinchServiceIntent.putExtra(getString(R.string.contact_id), contactId);
+        sinchServiceIntent.putExtra(getString(R.string.contact_name), contactName);
+        sinchServiceIntent.putExtra(getString(R.string.contact_profile_url), contactProfileUrl);
+        attemptToStartSinchService(sinchServiceIntent);
     }
 
     @Override
